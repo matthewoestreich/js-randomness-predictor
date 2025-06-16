@@ -1,13 +1,13 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "preserve",
+    "target": "es2020",
+    "module": "es2020",
+    "moduleResolution": "bundler",
     "outDir": "./dist/bin",
     "rootDir": "./src",
     "allowJs": false,
     "declaration": true,
-    "moduleResolution": "bundler",
     "isolatedModules": true
   },
   "include": ["./src/**/*"],
