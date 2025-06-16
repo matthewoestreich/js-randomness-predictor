@@ -1,4 +1,4 @@
-import JSRandomnessPredictor from "../JSRandomnessPredictor.js";
+import JSRandomnessPredictor from "../index.js";
 import { PredictorArgs, PredictorResult, OptionalResults, SequenceNotFoundError, DEFAULT_NUM_PREDICTIONS } from "./types.js";
 
 export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult> {
