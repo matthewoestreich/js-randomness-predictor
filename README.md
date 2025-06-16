@@ -77,13 +77,28 @@ const isAccurate = nextPrediction === Math.random();
 
 ## Command Line Interface
 
-You can run the predictor from the command line.
-
-Each number in the sequence should be separated by a space.
+You can run the predictor from the command line. Each number in the sequence should be separated by a space.
 
 ```bash
 # To get full list of options
 js-randomness-predictor --help
+```
+
+### Global Usage
+
+If you want to be able to use the command line from anywhere, you'll need to install this package globally:
+
+```bash
+npm i -g js-randomness-predictor
+```
+
+### Non-Global Usage
+
+You'll need to manually specify the path to the script in a project that has this package installed.
+
+```bash
+# Pretend we are in a project that has this package installed.
+node_modules/.bin/js-randomness-predictor [options]
 ```
 
 ### CLI Examples
@@ -108,21 +123,4 @@ You can also use shorthand:
 
 ```bash
 js-randomness-predictor -e <environment> [-s <sequence...>] [-p <num_predictions>]
-```
-
-### Global Usage
-
-If you want to be able to use the command line from anywhere, you'll need to install this package globally:
-
-```bash
-npm i -g js-randomness-predictor
-```
-
-### Non-Global Usage
-
-You'll need to manually specify the path to the script in a project that has this package installed.
-
-```bash
-# Pretend we are in a project that has this package installed.
-./node_modules/.bin/js-randomness-predictor [options]
 ```
