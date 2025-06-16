@@ -1,4 +1,4 @@
-import { V8RandomnessPredictor, FirefoxRandomnessPredictor, ChromeRandomnessPredictor } from "./predictors";
+import { V8RandomnessPredictor, FirefoxRandomnessPredictor, ChromeRandomnessPredictor } from "./predictors/index.js";
 
 export default class JSRandomnessPredictor {
   private constructor() {}

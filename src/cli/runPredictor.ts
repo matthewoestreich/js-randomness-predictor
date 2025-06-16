@@ -1,5 +1,5 @@
-import JSRandomnessPredictor from "../JSRandomnessPredictor";
-import { PredictorArgs, PredictorResult, OptionalResults, SequenceNotFoundError, DEFAULT_NUM_PREDICTIONS } from "./types";
+import JSRandomnessPredictor from "../JSRandomnessPredictor.js";
+import { PredictorArgs, PredictorResult, OptionalResults, SequenceNotFoundError, DEFAULT_NUM_PREDICTIONS } from "./types.js";
 
 export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult> {
   if (!argv.sequence && argv.environment !== "v8") {

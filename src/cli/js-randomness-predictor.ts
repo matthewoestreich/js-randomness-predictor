@@ -2,8 +2,8 @@
 
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
-import { runPredictor } from "./runPredictor";
-import { PredictorArgs, PREDICTOR_ENVIRONMENTS } from "./types";
+import { runPredictor } from "./runPredictor.js";
+import { PredictorArgs, PREDICTOR_ENVIRONMENTS } from "./types.js";
 
 const USAGE_STRING = `Usage: $0 --environment <environment> [--sequence <numbers...>] [--predictions <count>]
 

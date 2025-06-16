@@ -1,9 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "es2020",
-    "module": "es2020",
-    "moduleResolution": "node",
+    "target": "esnext",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "outDir": "./dist/esm",
     "rootDir": "./src",
     "allowJs": false,
@@ -11,5 +11,5 @@
     "isolatedModules": true
   },
   "include": ["./src/**/*"],
-  "exclude": ["node_modules/", "**/*.test.*", "src/cli/**/*"]
+  "exclude": ["node_modules/", "**/*.test.*"]
 }

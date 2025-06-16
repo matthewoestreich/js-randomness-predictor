@@ -1,3 +1,3 @@
-export { default as ChromeRandomnessPredictor } from "./Chrome";
-export { default as V8RandomnessPredictor } from "./V8";
-export { default as FirefoxRandomnessPredictor } from "./Firefox";
+export { default as ChromeRandomnessPredictor } from "./Chrome.js";
+export { default as V8RandomnessPredictor } from "./V8.js";
+export { default as FirefoxRandomnessPredictor } from "./Firefox.js";

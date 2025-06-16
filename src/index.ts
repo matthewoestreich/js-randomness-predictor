@@ -1,3 +1,3 @@
-import JSRandomnessPredictor from "./JSRandomnessPredictor";
+import JSRandomnessPredictor from "./JSRandomnessPredictor.js";
 
 export default JSRandomnessPredictor;

@@ -1,5 +1,5 @@
-import { runPredictor } from "./runPredictor";
-import { SequenceNotFoundError } from "./types";
+import { runPredictor } from "./runPredictor.js";
+import { SequenceNotFoundError } from "./types.js";
 
 describe("CLI : V8 : Dynamically Generated Sequence", () => {
   const environment = "v8";

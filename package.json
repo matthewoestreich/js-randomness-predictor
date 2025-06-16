@@ -5,13 +5,13 @@
   "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "types": "dist/esm/JSRandomnessPredictor.d.ts",
+  "types": "dist/esm/index.d.ts",
   "exports": {
     "import": "./dist/esm/index.js",
     "require": "./dist/cjs/index.js"
   },
   "bin": {
-    "js-randomness-predictor": "./dist/bin/cli/js-randomness-predictor.js"
+    "js-randomness-predictor": "./dist/esm/cli/js-randomness-predictor.js"
   },
   "files": [
     "dist",
@@ -19,10 +19,9 @@
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:bin",
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:bin": "tsc -p tsconfig.bin.json",
     "test": "jest --config jest.config.cjs --verbose",
     "format": "prettier . --write"
   },
