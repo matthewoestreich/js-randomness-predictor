@@ -1,0 +1,62 @@
+{
+  "name": "js-randomness-predictor",
+  "version": "1.0.0",
+  "description": "Predict Math.random output in Node, Chrome, and Firefox",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "bin": {
+    "js-randomness-predictor": "./dist/bin/cli/js-randomness-predictor.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:bin",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:bin": "tsc -p tsconfig.bin.json",
+    "test": "jest --verbose",
+    "format": "prettier . --write"
+  },
+  "keywords": [
+    "predict-javascript-math-random",
+    "predict",
+    "javascript",
+    "math.random",
+    "Math.random",
+    "math.random predictor",
+    "javascript random predictor",
+    "z3",
+    "z3-solver",
+    "rng predict"
+  ],
+  "author": "Matt Oestreich",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthewoestreich/js-randomness-predictor.git"
+  },
+  "homepage": "https://github.com/matthewoestreich/js-randomness-predictor#readme",
+  "bugs": {
+    "url": "https://github.com/matthewoestreich/js-randomness-predictor/issues"
+  },
+  "dependencies": {
+    "@types/node": "^24.0.3",
+    "@types/yargs": "^17.0.33",
+    "typescript": "^5.8.3",
+    "yargs": "^18.0.0",
+    "z3-solver": "^4.15.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.4.0",
+    "tsx": "^4.20.3"
+  }
+}
