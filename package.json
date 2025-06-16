@@ -23,7 +23,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:bin": "tsc -p tsconfig.bin.json",
-    "test": "jest --verbose",
+    "test": "jest --config jest.config.cjs --verbose",
     "format": "prettier . --write"
   },
   "keywords": [

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "es2020",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "outDir": "./dist/bin",
     "rootDir": "./src",
     "allowJs": false,
