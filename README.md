@@ -2,7 +2,6 @@
 
 [![npm version](https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000)](https://www.npmjs.com/package/js-randomness-predictor)
 
-
 Predict Math.random output in Node, Chrome, and Firefox
 
 # Installation
