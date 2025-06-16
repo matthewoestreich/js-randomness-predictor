@@ -2,12 +2,12 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
+    "module": "preserve",
     "outDir": "./dist/esm",
     "rootDir": "./src",
     "allowJs": false,
     "declaration": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "isolatedModules": true
   },
   "include": ["./src/**/*"],

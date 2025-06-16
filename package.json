@@ -2,6 +2,7 @@
   "name": "js-randomness-predictor",
   "version": "1.0.3",
   "description": "Predict Math.random output in Node, Chrome, and Firefox",
+  "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/JSRandomnessPredictor.d.ts",
