@@ -38,7 +38,7 @@ const predictCommand: CommandModule = {
         default: 10,
       })
       .check((argv) => {
-        if (argv.use !== "v8" && (!argv.sequence || argv.sequence.length === 0)) {
+        if (argv.environment !== "v8" && (!argv.sequence || argv.sequence.length === 0)) {
           throw new Error("The --sequence (-s) option is required when using firefox or chrome.");
         }
         return true;
