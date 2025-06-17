@@ -21,7 +21,7 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
   };
 
   // Since we are running this CLI in v8 we can automatically get the next random numbers.
-  if (argv.environment === "v8") {
+  if (argv.environment === "v8" && !argv.sequence) {
     optionalResults.actual = [];
     for (let i = 0; i < numPredictions; i++) {
       optionalResults.actual.push(Math.random());
