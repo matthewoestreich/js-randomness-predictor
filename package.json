@@ -22,7 +22,7 @@
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
-    "test": "jest --config jest.config.cjs --verbose",
+    "test": "jest --verbose",
     "format": "prettier . --write"
   },
   "keywords": [
