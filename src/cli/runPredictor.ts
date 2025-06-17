@@ -7,7 +7,7 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
   }
 
   const numPredictions = argv.predictions === undefined ? DEFAULT_NUM_PREDICTIONS : argv.predictions;
-  const sequence = argv.sequence === undefined ? Array.from({ length: numPredictions }, Math.random) : argv.sequence;
+  const sequence = argv.sequence === undefined ? Array.from({ length: 4 }, Math.random) : argv.sequence;
   const predictor = JSRandomnessPredictor[argv.environment](sequence);
 
   const predictions: number[] = [];
