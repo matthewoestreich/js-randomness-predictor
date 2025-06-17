@@ -28,4 +28,19 @@ async function Main() {
     actualMathRandom: EXP_GEN_IN_V_22[0],
     isCorrect: v8_v22_NextPred === EXP_GEN_IN_V_22[0],
   });
+
+  const v8 = JSRandomnessPredictor.v8();
+  const NUM_PREDS = 10;
+  const predictions: number[] = [];
+  for (let i = 0; i < NUM_PREDS; i++) {
+    predictions.push(await v8.predictNext());
+  }
+  const actuals = Array.from({ length: NUM_PREDS }, Math.random);
+  console.log({
+    version: `Dynamic:UsesCurrentVersion:v${process.versions.node}`,
+    v8Seq: v8.sequence,
+    predictions,
+    actuals,
+    isCorrect: predictions.every((v, i) => v === actuals[i]),
+  });
 }

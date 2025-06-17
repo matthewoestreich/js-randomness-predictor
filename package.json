@@ -22,7 +22,8 @@
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
-    "test": "jest --verbose",
+    "test": "vitest --typecheck.tsconfig tsconfig.esm.json",
+    "test:ui": "vitest --typecheck.tsconfig tsconfig.esm.json --ui",
     "format": "prettier . --write"
   },
   "keywords": [
@@ -55,11 +56,10 @@
     "z3-solver": "^4.15.1"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "jest": "^30.0.0",
+    "@vitest/ui": "^3.2.4",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.4.0",
-    "tsx": "^4.20.3"
+    "tsx": "^4.20.3",
+    "vitest": "^3.2.4"
   }
 }

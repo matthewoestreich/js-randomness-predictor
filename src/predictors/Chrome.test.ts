@@ -10,7 +10,7 @@ const EXPECTED = [
 ];
 
 describe("Chrome", () => {
-  it(`should predict the next ${EXPECTED.length} numbers`, async () => {
+  test(`should predict the next ${EXPECTED.length} numbers`, async () => {
     const p = new ChromeRandomnessPredictor(SEQUENCE);
     const predictions: number[] = [];
     for (const n of EXPECTED) {

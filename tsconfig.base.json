@@ -4,6 +4,6 @@
     "skipLibCheck": true,
     "strict": true,
     "baseUrl": "./",
-    "types": ["node", "jest"]
+    "types": ["node", "vitest/globals"]
   }
 }
