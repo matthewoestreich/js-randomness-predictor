@@ -5,14 +5,6 @@ import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
 import { PredictorArgs, PREDICTOR_ENVIRONMENTS } from "./types.js";
 
-const USAGE_STRING = `Usage: $0 --environment <environment> [--sequence <numbers...>] [--predictions <count>]
-
-Options:
-  --environment, -e Predictor environment to use (firefox, chrome, v8) (required)
-  --sequence, -s    Observed sequence of numbers (required for firefox/chrome)
-  --predictions, -p Number of predictions to generate (default is 10)
-`;
-
 const predictCommand: CommandModule = {
   command: "*",
   describe: "Predict future Math.random() values",
@@ -20,14 +12,14 @@ const predictCommand: CommandModule = {
     return yargs
       .option("environment", {
         alias: "e",
-        describe: "Predictor environment to use (firefox, chrome, v8) (required)",
+        describe: "Predictor environment",
         choices: PREDICTOR_ENVIRONMENTS,
         demandOption: true,
         type: "string",
       })
       .option("sequence", {
         alias: "s",
-        describe: "Observed sequence of numbers (required for firefox/chrome)",
+        describe: "Observed sequence of numbers, separated by space (required for firefox/chrome)",
         type: "array",
         coerce: (arr: number[]) => {
           return arr.map((v) => {
@@ -66,7 +58,7 @@ const predictCommand: CommandModule = {
 // prettier-ignore
 yargs(hideBin(process.argv))
   .scriptName("js-randomness-predictor")
-  .usage(USAGE_STRING)
+  .usage("Usage:\n$0 --environment <env> [--sequence <numbers...>] [--predictions <count>]")
   .command(predictCommand)
   .help()
   .argv;
