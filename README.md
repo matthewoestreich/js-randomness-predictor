@@ -17,18 +17,17 @@ pnpm add js-randomness-predictor
 
 # Usage
 
+**IMPORTANT**:
+
+- You must use the appropriate predictor for the environment used to generate the initial sequence. **Meaning, if you generated the sequence in Chrome, you must use the Chrome predictor, etc..**
+- We recommend at least 4 numbers in the initial sequence.
+
 ```js
 // ESM
 import JSRandomnessPredictor from "js-randomness-predictor";
 // CJS
 const JSRandomnessPredictor = require("js-randomness-predictor");
 ```
-
-## Important
-
-You must use the appropriate predictor for the environment used to generate the initial sequence. **Meaning, if you generated the sequence in Chrome, you must use the Chrome predictor, etc..**
-
-We recommend at least 4 numbers in the initial sequence.
 
 ## Chrome Predictor
 
