@@ -40,18 +40,46 @@ const nextPrediction = await chromePredictor.predictNext();
 
 ## Firefox Predictor
 
-#### FIREFOX ISSUE WHEN GENERATING NUMBERS IN CONSOLE 
+```js
+const firefoxPredictor = JSRandomnessPredictor.firefox([...]);
+const nextPrediction = await firefoxPredictor.predictNext();
+// You'll need to manually verify accuracy.
+```
+
+#### FIREFOX ISSUE WHEN GENERATING NUMBERS IN CONSOLE
 
 You must disable "Instant Evaluation", otherwise your predictions may show incorrectly. Especially if you use more than one call to generate the initial sequence + expected values.
 
 <img width="1920" alt="Firefox_DisableConsoleInstantEvaluation" src="https://github.com/user-attachments/assets/12d93b56-6a7f-4f79-9cf3-957c98fb28ba" />
 
-<br/>
+**If you do not want to disable "Instant Evaluation"**, you'll need to generate initial sequence + expected values in one command.
+
+So instead of using two (or more) calls to `Math.random`:
 
 ```js
-const firefoxPredictor = JSRandomnessPredictor.firefox([...]);
-const nextPrediction = await firefoxPredictor.predictNext();
-// You'll need to manually verify accuracy.
+/** Pretend this is the console */
+// Output used as initial sequence.
+Array.from({ length: 4 }, Math.random);
+// Output used for validating predictions.
+Array.from({ length: 10 }, Math.random);
+```
+
+You'll need to do:
+
+```js
+/** Pretend this is the console */
+// Only use one call! Manually separate numbers!
+Array.from({ length: 6 }, Math.random);
+[
+  // --------------------|
+  0.5654163987207667, // |
+  0.7409356182179403, // | --> Use "these" numbers as initial sequence
+  0.46136469064448193, //|
+  0.18124646315195891, //|
+  // --------------------|
+  0.25678544986069995, // --> Use the rest of the numbers for validation
+  0.5543550504255771,
+];
 ```
 
 ## Node/V8 Predictor
@@ -66,7 +94,7 @@ Keep in mind, you can manually provide a sequence as well.
 const manualSequence = Array.from({ length: 4 }, Math.random);
 // You could also generate your sequence via Node REPL and provide it that way.
 const manualSequence = [
-  /* Copy/Paste Numbers generated via REPL*/
+  /* copy/paste numbers generated via REPL */
 ];
 const v8Predictor = JSRandomnessPredictor.v8(manualSequence);
 const nextPrediction = await v8Predictor.predictNext();
@@ -114,23 +142,22 @@ node_modules/.bin/js-randomness-predictor [options]
 ### CLI Examples
 
 ```bash
-# If environment is NOT v8, you must provide a sequence.
-# Output 10 predictions by default
-js-randomness-predictor --environment chrome --sequence 0.111 0.222 0.333 0.444
-# Output 5 predictions
-js-randomness-predictor --environment chrome --sequence 0.111 0.222 0.333 0.444 --predictions 5
-# Output 10 predictions by default
-js-randomness-predictor --environment firefox --sequence 0.111 0.222 0.333 0.444
-# Output 5 predictions
-js-randomness-predictor --environment firefox --sequence 0.111 0.222 0.333 0.444 --predictions 5
-# If using v8, and no --sequence is provided, one will be automatically generated
-js-randomness-predictor --environment v8
-js-randomness-predictor --environment v8 --sequence 0.111 0.222 0.333 0.444
-js-randomness-predictor --environment v8 --sequence 0.111 0.222 0.333 0.444 --predictions 15
+# You can use shorthand for flags.
+js-randomness-predictor -e <environment> [-s <sequence...>] [-p <num_predictions>]
 ```
 
-You can also use shorthand:
-
 ```bash
-js-randomness-predictor -e <environment> [-s <sequence...>] [-p <num_predictions>]
+# If environment is NOT v8, you must provide a sequence.
+# Output 10 predictions by default
+js-randomness-predictor --environment chrome --sequence 1 2 3 4
+# Output 5 predictions
+js-randomness-predictor --environment chrome --sequence 1 2 3 4 --predictions 5
+# Output 10 predictions by default
+js-randomness-predictor --environment firefox --sequence 1 2 3 4
+# Output 5 predictions
+js-randomness-predictor --environment firefox --sequence 1 2 3 4 --predictions 5
+# If using v8, and no --sequence is provided, one will be automatically generated
+js-randomness-predictor --environment v8
+js-randomness-predictor --environment v8 --sequence 1 2 3 4
+js-randomness-predictor --environment v8 --sequence 1 2 3 4 --predictions 15
 ```
