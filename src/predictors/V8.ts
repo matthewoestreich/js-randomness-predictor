@@ -51,7 +51,6 @@ export default class V8RandomnessPredictor {
       // Generate sequence ourselves
       sequence = Array.from({ length: 4 }, Math.random);
     }
-
     this.#internalSequence = [...sequence];
     this.sequence = [...this.#internalSequence];
     this.#internalSequence.reverse();
@@ -86,7 +85,7 @@ export default class V8RandomnessPredictor {
     }
   }
 
-  async #predict() {
+  async #predict(): Promise<number> {
     if (!this.#isInitialized) {
       if (!(await this.#initialize())) {
         return Promise.reject("[V8 Predictor] Initialization failed!");
@@ -111,15 +110,12 @@ export default class V8RandomnessPredictor {
     }
 
     const model = this.#solver.model();
-
     const states = {};
     for (const state of model.decls()) {
-      // @ts-ignore
       states[state.name()] = model.get(state);
     }
-
-    // @ts-ignore
     const state0 = states["se_state0"].value(); // BigInt
+
     return this.#toDouble(state0);
   }
 

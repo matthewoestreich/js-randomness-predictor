@@ -1,6 +1,6 @@
 import * as z3 from "z3-solver";
 
-class FirefoxRandomnessPredictor {
+export default class FirefoxRandomnessPredictor {
   #isInitialized = false;
   #isUnsat = false;
   #mask = 0xffffffffffffffffn;
@@ -110,5 +110,3 @@ class FirefoxRandomnessPredictor {
     return Number(n & 0x1fffffffffffffn) / Number(1n << 53n);
   }
 }
-
-export default FirefoxRandomnessPredictor;

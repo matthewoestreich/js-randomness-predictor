@@ -40,6 +40,8 @@ const nextPrediction = await chromePredictor.predictNext();
 
 ## Firefox Predictor
 
+**FIREFOX ISSUE WHEN GENERATING NUMBERS IN CONSOLE**: You must disable "Instant Evaluation", otherwise your predictions may show incorrectly. Especially if you use more than one call to generate the initial sequence + expected values.
+
 ```js
 const firefoxPredictor = JSRandomnessPredictor.firefox([...]);
 const nextPrediction = await firefoxPredictor.predictNext();

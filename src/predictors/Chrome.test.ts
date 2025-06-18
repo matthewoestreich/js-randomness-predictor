@@ -1,4 +1,5 @@
 import ChromeRandomnessPredictor from "./Chrome";
+import { describe, it, expect } from "vitest";
 
 const SEQUENCE = [0.32096095967729477, 0.3940071672626849, 0.3363374923027722, 0.7518761096243554, 0.44201420586496387];
 
@@ -10,7 +11,7 @@ const EXPECTED = [
 ];
 
 describe("Chrome", () => {
-  test(`should predict the next ${EXPECTED.length} numbers`, async () => {
+  it(`should predict the next ${EXPECTED.length} numbers`, async () => {
     const p = new ChromeRandomnessPredictor(SEQUENCE);
     const predictions: number[] = [];
     for (const n of EXPECTED) {
