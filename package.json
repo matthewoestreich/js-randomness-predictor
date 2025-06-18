@@ -25,6 +25,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "test": "vitest --typecheck.tsconfig tsconfig.esm.json",
     "test:coverage": "vitest run --coverage --typecheck.tsconfig tsconfig.esm.json",
+    "test:open:coverage": "open coverage/lcov-report/index.html",
     "test:ui": "vitest --typecheck.tsconfig tsconfig.esm.json --ui",
     "format": "prettier . --write"
   },
