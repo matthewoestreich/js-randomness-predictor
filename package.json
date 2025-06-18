@@ -24,6 +24,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "test": "vitest --typecheck.tsconfig tsconfig.esm.json",
+    "test:coverage": "vitest run --coverage --typecheck.tsconfig tsconfig.esm.json",
     "test:ui": "vitest --typecheck.tsconfig tsconfig.esm.json --ui",
     "format": "prettier . --write"
   },
@@ -57,6 +58,7 @@
     "z3-solver": "^4.15.1"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",

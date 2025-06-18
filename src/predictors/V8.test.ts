@@ -1,22 +1,20 @@
 import V8RandomnessPredictor from "./V8";
 import { describe, it, expect } from "vitest";
 
-// TESTS WHATEVER CURRENT NODE VERSION YOU ARE ON
-// todo: figure out why this is not working in vitest
-/*
-describe(`V8 : v${process.versions.node} : Dynamically Generated Sequence`, () => {
-  it("predicts the next 5 numbers correctly", async () => {
-    const predictor = new V8RandomnessPredictor();
-    const predicted = Array.from({ length: 5 }, async () => await predictor.predictNext());
-    const resolvedPredictions = await Promise.all(predicted);
-
-    const actuals = Array.from({ length: 5 }, Math.random);
-    expect(resolvedPredictions).toEqual(actuals);
-  });
-});
-*/
-
 describe("v8", () => {
+  // TESTS WHATEVER CURRENT NODE VERSION YOU ARE ON
+  describe(`v${process.versions.node} (current runtime version) : Dynamically Generated Sequence`, () => {
+    it("predicts the next 5 numbers correctly", async () => {
+      const v8 = new V8RandomnessPredictor();
+      const expected = Array.from({ length: 5 }, Math.random);
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        predictions.push(await v8.predictNext());
+      }
+      expect(predictions).toEqual(expected);
+    });
+  });
+
   // TESTS NODE VERSION 22
   describe("v22.0.0 : User Provided Sequence", () => {
     // THESE NUMBERS WERE GENERATED IN NODE v22.x.x

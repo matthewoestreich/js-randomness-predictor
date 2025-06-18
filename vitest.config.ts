@@ -5,9 +5,11 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["**/*.test.ts", "**/*.spec.ts"],
-    isolate: true,
-    //coverage: {
-    //  reporter: ["text", "json", "html"],
-    //},
+    setupFiles: "./vitest.setup.ts",
+    coverage: {
+      reporter: ["text", "html", "lcov"],
+      reportsDirectory: "./coverage",
+      exclude: ["*", "!src/predictors/**"],
+    },
   },
 });
