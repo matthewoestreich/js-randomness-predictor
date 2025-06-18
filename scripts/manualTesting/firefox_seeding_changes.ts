@@ -1,4 +1,4 @@
-import FirefoxRandomnessPredictor from "../src/predictors/Firefox";
+import FirefoxRandomnessPredictor from "../../src/predictors/Firefox";
 import FirefoxRandomnessPredictor_New from "./FirefoxSymbolicStateOnly";
 
 /** WORKING : THESE NUMBERS WERE GENERATED IN FIREFOX VERSION '137.0.2' BUILD ID '20250414091429' */
