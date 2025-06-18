@@ -35,6 +35,7 @@ export default class V8RandomnessPredictor {
   #isInitialized = false;
   #seState0: z3.BitVec | undefined;
   #seState1: z3.BitVec | undefined;
+  #s0Ref: z3.BitVec | undefined;
   #solver: z3.Solver | undefined;
   #context: z3.Context | undefined;
   #internalSequence: number[] = [];
@@ -98,6 +99,7 @@ export default class V8RandomnessPredictor {
     this.#solver = new this.#context.Solver();
     this.#seState0 = this.#context.BitVec.const("se_state0", 64);
     this.#seState1 = this.#context.BitVec.const("se_state1", 64);
+    this.#s0Ref = this.#seState0;
 
     for (let i = 0; i < this.#internalSequence.length; i++) {
       this.#xorShift128Plus(this.#seState0, this.#seState1);
@@ -110,12 +112,7 @@ export default class V8RandomnessPredictor {
     }
 
     const model = this.#solver.model();
-    const states = {};
-    for (const state of model.decls()) {
-      states[state.name()] = model.get(state);
-    }
-    const state0 = states["se_state0"].value(); // BigInt
-
+    const state0 = (model.get(this.#s0Ref) as z3.BitVecNum).value();
     return this.#toDouble(state0);
   }
 
