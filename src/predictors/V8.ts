@@ -105,6 +105,7 @@ export default class V8RandomnessPredictor {
     }
   }
 
+  // Performs XORShift128+ on symbolic state (z3).
   #xorShift128PlusSymbolic(): void {
     if (!this.#seState0 || !this.#seState1) {
       throw new Error(`[V8][xorShift128PlusSymbolic] Either seState0 or seState1 is undefined!`);
@@ -119,7 +120,7 @@ export default class V8RandomnessPredictor {
     this.#seState1 = s1;
   }
 
-  // Performs XORShift128+ backwards, due to how V8 provides random numbers.
+  // Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
   #xorShift128PlusConcrete(): bigint {
     const result = this.#concreteState0!;
     let ps1 = this.#concreteState0!;
