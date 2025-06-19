@@ -33,38 +33,35 @@ import { NodeJSVersion } from "../types.js";
 export default class V8RandomnessPredictor {
   #nodeVersion: NodeJSVersion = this.#getNodeVersion();
   #isInitialized = false;
+  #concreteState0 = 0n;
+  #concreteState1 = 0n;
+  #mask = 0xffffffffffffffffn;
+  #internalSequence: number[] = [];
   #seState0: z3.BitVec | undefined;
   #seState1: z3.BitVec | undefined;
   #s0Ref: z3.BitVec | undefined;
+  #s1Ref: z3.BitVec | undefined;
   #solver: z3.Solver | undefined;
   #context: z3.Context | undefined;
-  #internalSequence: number[] = [];
 
-  public sequence: number[] = [];
+  public sequence: number[];
+
+  constructor(sequence?: number[]) {
+    if (sequence === undefined) {
+      sequence = Array.from({ length: 4 }, Math.random);
+    }
+    this.sequence = sequence;
+    this.#internalSequence = [...sequence.reverse()];
+  }
+
+  async predictNext(): Promise<number> {
+    await this.#initialize();
+    return this.#toDouble(this.#xorShift128PlusConcrete());
+  }
 
   // For testing - DO NOT USE IF YOU DON'T WANT TO BREAK THINGS.
   setNodeVersion(version: NodeJSVersion): void {
     this.#nodeVersion = version;
-  }
-
-  constructor(sequence?: number[]) {
-    if (sequence === undefined) {
-      // Generate sequence ourselves
-      sequence = Array.from({ length: 4 }, Math.random);
-    }
-    this.#internalSequence = [...sequence];
-    this.sequence = [...this.#internalSequence];
-    this.#internalSequence.reverse();
-  }
-
-  public async predictNext(): Promise<number> {
-    const next = await this.#predict();
-    this.#internalSequence.unshift(next);
-    // Only keep 4 numbers since that seems to be what we need to successfully predict.
-    if (this.#internalSequence.length > 4) {
-      this.#internalSequence.splice(4);
-    }
-    return next;
   }
 
   #getNodeVersion(): NodeJSVersion {
@@ -72,48 +69,67 @@ export default class V8RandomnessPredictor {
     return { major, minor, patch };
   }
 
-  async #initialize() {
+  // `#initialize()` essentially solves symbolic state so we can move forward using
+  // concrete state (which is way faster than having to recompute symbolic state
+  // for every prediction).
+  async #initialize(): Promise<boolean> {
     if (this.#isInitialized) {
       return true;
     }
     try {
       const { Context } = await z3.init();
       this.#context = Context("main");
+      this.#solver = new this.#context.Solver();
+      this.#seState0 = this.#context.BitVec.const("se_state0", 64);
+      this.#seState1 = this.#context.BitVec.const("se_state1", 64);
+      this.#s0Ref = this.#seState0;
+      this.#s1Ref = this.#seState1;
+
+      for (let i = 0; i < this.#internalSequence.length; i++) {
+        this.#xorShift128PlusSymbolic();
+        this.#recoverMantissaAndAddToSolver(this.#internalSequence[i]);
+      }
+
+      const check = await this.#solver.check();
+      if (check !== "sat") {
+        return Promise.reject(new Error(`[V8] Unsatisfiable: unable to reconstruct internal state. ${check}`));
+      }
+
+      const model = this.#solver.model();
+      this.#concreteState0 = (model.get(this.#s0Ref!) as z3.BitVecNum).value();
+      this.#concreteState1 = (model.get(this.#s1Ref!) as z3.BitVecNum).value();
       this.#isInitialized = true;
       return true;
     } catch (e) {
-      return false;
+      return Promise.reject(e);
     }
   }
 
-  async #predict(): Promise<number> {
-    if (!this.#isInitialized) {
-      if (!(await this.#initialize())) {
-        return Promise.reject("[V8 Predictor] Initialization failed!");
-      }
+  #xorShift128PlusSymbolic(): void {
+    if (!this.#seState0 || !this.#seState1) {
+      throw new Error(`[V8][xorShift128PlusSymbolic] Either seState0 or seState1 is undefined!`);
     }
-    if (this.#context === undefined) {
-      return Promise.reject("[V8 Predictor] Context not initialized!");
-    }
+    let s1 = this.#seState0;
+    let s0 = this.#seState1;
+    this.#seState0 = s0;
+    s1 = s1.xor(s1.shl(23));
+    s1 = s1.xor(s1.lshr(17));
+    s1 = s1.xor(s0);
+    s1 = s1.xor(s0.lshr(26));
+    this.#seState1 = s1;
+  }
 
-    this.#solver = new this.#context.Solver();
-    this.#seState0 = this.#context.BitVec.const("se_state0", 64);
-    this.#seState1 = this.#context.BitVec.const("se_state1", 64);
-    this.#s0Ref = this.#seState0;
-
-    for (let i = 0; i < this.#internalSequence.length; i++) {
-      this.#xorShift128Plus(this.#seState0, this.#seState1);
-      this.#recoverMantissaAndAddToSolver(this.#internalSequence[i]);
-    }
-
-    const check = await this.#solver.check();
-    if (check !== "sat") {
-      throw new Error(`Unsatisfiable: unable to reconstruct internal state. ${check}`);
-    }
-
-    const model = this.#solver.model();
-    const state0 = (model.get(this.#s0Ref) as z3.BitVecNum).value();
-    return this.#toDouble(state0);
+  // Performs XORShift128+ backwards, due to how V8 provides random numbers.
+  #xorShift128PlusConcrete(): bigint {
+    const result = this.#concreteState0!;
+    let ps1 = this.#concreteState0!;
+    let ps0 = this.#concreteState1! ^ (ps1 >> 26n);
+    ps0 ^= ps1;
+    ps0 = (ps0 ^ (ps0 >> 17n) ^ (ps0 >> 34n) ^ (ps0 >> 51n)) & this.#mask;
+    ps0 = (ps0 ^ (ps0 << 23n) ^ (ps0 << 46n)) & this.#mask;
+    this.#concreteState0 = ps0;
+    this.#concreteState1 = ps1;
+    return result;
   }
 
   #recoverMantissaAndAddToSolver(n: number): void {
@@ -127,42 +143,24 @@ export default class V8RandomnessPredictor {
     }
 
     // Old `ToDouble` logic (in use from ~2022 - Feb 2025)
-    const uint64 = this.#doubleToUInt64(n + 1);
-    const mantissa = uint64 & ((BigInt(1) << BigInt(52)) - BigInt(1));
-    this.#solver!.add(this.#seState0!.lshr(12).eq(this.#context!.BitVec.val(mantissa, 64)));
-  }
-
-  #xorShift128Plus(state0: z3.BitVec, state1: z3.BitVec) {
-    let s1 = state0;
-    let s0 = state1;
-    this.#seState0 = s0;
-    s1 = s1.xor(s1.shl(23));
-    s1 = s1.xor(s1.lshr(17));
-    s1 = s1.xor(s0);
-    s1 = s1.xor(s0.lshr(26));
-    this.#seState1 = s1;
-  }
-
-  #doubleToUInt64(value: number): bigint {
     const buffer = Buffer.alloc(8);
-    buffer.writeDoubleLE(value, 0);
-    return (BigInt(buffer.readUInt32LE(4)) << BigInt(32)) | BigInt(buffer.readUInt32LE(0));
+    buffer.writeDoubleLE(n + 1, 0);
+    const uint64 = (BigInt(buffer.readUInt32LE(4)) << 32n) | BigInt(buffer.readUInt32LE(0));
+    const mantissa = uint64 & ((1n << 52n) - 1n);
+    this.#solver!.add(this.#seState0!.lshr(12).eq(this.#context!.BitVec.val(mantissa, 64)));
   }
 
   #toDouble(n: bigint): number {
     const majorVersion = this.#nodeVersion.major;
 
     if (majorVersion >= 24) {
-      // New ToDouble logic (Feb 2025+)
-      const value = n >> 11n; // drop 11 bits
-      const result = Number(value) / Math.pow(2, 53);
-      return result;
+      /* New ToDouble logic (Feb 2025+) */
+      return Number(n >> 11n) / Math.pow(2, 53);
     }
 
-    // Old logic (pre-Feb 2025)
-    const random = (n >> 12n) | 0x3ff0000000000000n;
+    /* Old logic (pre-Feb 2025) */
     const buffer = Buffer.allocUnsafe(8);
-    buffer.writeBigUInt64LE(random, 0);
+    buffer.writeBigUInt64LE((n >> 12n) | 0x3ff0000000000000n, 0);
     return buffer.readDoubleLE(0) - 1;
   }
 }
