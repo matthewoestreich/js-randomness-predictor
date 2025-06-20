@@ -20,9 +20,14 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
+    "build:native": "cmake-js compile --cxx=clang++ --prefer-make --parallel 6",
     "postbuild": "node scripts/postbuild.cjs",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
+    "cpp:preset:dev": "cmake --preset dev",
+    "cpp:preset:release": "cmake --preset release",
+    "cpp:build:dev": "cmake --build --preset dev",
+    "cpp:build:release": "cmake --build --preset release",
     "test": "vitest --typecheck.tsconfig tsconfig.esm.json",
     "test:coverage": "vitest run --coverage --typecheck.tsconfig tsconfig.esm.json",
     "test:open:coverage": "open coverage/lcov-report/index.html",
@@ -61,6 +66,8 @@
   "devDependencies": {
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
+    "cmake-js": "^7.3.1",
+    "node-addon-api": "^8.4.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
     "tsx": "^4.20.3",

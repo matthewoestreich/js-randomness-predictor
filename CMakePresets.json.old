@@ -1,0 +1,54 @@
+{
+  "version": 4,
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 0,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "dev",
+      "inherits": "default",
+      "description": "Development build with Debug info",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "default",
+      "description": "Optimized build for production",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "all",
+      "configurePreset": "dev"
+    }
+  ]
+}
