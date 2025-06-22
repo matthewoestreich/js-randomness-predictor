@@ -27,7 +27,10 @@
     "test:coverage": "vitest run --coverage --typecheck.tsconfig tsconfig.esm.json",
     "test:open:coverage": "open coverage/lcov-report/index.html",
     "test:ui": "vitest --typecheck.tsconfig tsconfig.esm.json --ui",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "publish:main:major": "npm version major && git push origin main --tags",
+    "publish:main:minor": "npm version minor && git push origin main --tags",
+    "publish:main:patch": "npm version patch && git push origin main --tags"
   },
   "keywords": [
     "predict-javascript-math-random",
