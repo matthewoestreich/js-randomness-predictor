@@ -4,6 +4,8 @@
 
 Predict Math.random output in Node, Chrome, and Firefox
 
+**NOTE** If you'd like to use native Node.js addons for predictors (meaning, all predictors are written in C++) check out [this repo](https://github.com/matthewoestreich/js-randomness-predictor-cpp)!
+
 # Installation
 
 Use your favorite package manager.
