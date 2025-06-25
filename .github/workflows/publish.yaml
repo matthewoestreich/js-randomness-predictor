@@ -34,6 +34,14 @@ jobs:
           always-auth: true
       - name: Install dependencies
         run: npm install --ignore-scripts
+      - name: Automated Version Bump
+        uses: phips28/gh-action-bump-version@v11.0.7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          major-wording: "#major"
+          minor-wording: "#minor"
+          patch-wording: "#patch"
       - name: Publish to npm
         run: npm publish
         env:
