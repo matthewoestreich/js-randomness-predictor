@@ -18,11 +18,11 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
       - name: Install dependencies
         run: npm install --ignore-scripts
-      - name: Log event
-        shell: bash
-        run: |
-          echo '${{ toJson(github.event) }}' > event.json
-          cat event.json
+      #- name: Log event
+      #  shell: bash
+      #  run: |
+      #    echo '${{ toJson(github.event) }}' > event.json
+      #    cat event.json
       - name: Build
         shell: bash
         run: npm run build
