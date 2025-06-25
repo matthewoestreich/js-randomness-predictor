@@ -21,7 +21,8 @@ jobs:
       - name: Log event
         shell: bash
         run: |
-          echo "${{ toJson(github.event) }}"
+          echo '${{ toJson(github.event) }}' > event.json
+          cat event.json
       - name: Build
         shell: bash
         run: npm run build
