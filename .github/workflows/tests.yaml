@@ -1,0 +1,25 @@
+name: tests.yaml
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - main
+jobs:
+  test-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.2.0
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        run: npm run build
+      - name: Run tests
+        run: npm run test
+        env:
+          FORCE_COLOR: "1"
