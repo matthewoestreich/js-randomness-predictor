@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.2.0
+          registry-url: "https://registry.npmjs.org/"
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Log event
@@ -27,3 +28,17 @@ jobs:
         run: npm run test
         env:
           FORCE_COLOR: "1"
+      - name: Automated Version Bump
+        if: startsWith(github.event.head_commit.message, '[publish] ')
+        uses: phips28/gh-action-bump-version@v11.0.7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          major-wording: "#major"
+          minor-wording: "#minor"
+          patch-wording: "#patch"
+      - name: Publish to npm
+        if: startsWith(github.event.head_commit.message, '[publish] ')
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
