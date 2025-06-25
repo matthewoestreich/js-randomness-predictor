@@ -3,7 +3,7 @@ import {
   V8RandomnessPredictor, 
   FirefoxRandomnessPredictor, 
   ChromeRandomnessPredictor, 
-  NodeRandomnessPredictor 
+  NodeRandomnessPredictor,
 } from "./predictors/index.js";
 
 const JSRandomnessPredictor = {
