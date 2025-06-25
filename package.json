@@ -1,6 +1,6 @@
 {
   "name": "js-randomness-predictor",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Predict Math.random output in Node, Chrome, and Firefox",
   "type": "module",
   "main": "dist/cjs/index.js",
