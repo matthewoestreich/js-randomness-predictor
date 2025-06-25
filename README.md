@@ -85,6 +85,8 @@ Array.from({ length: 6 }, Math.random);
 
 ## Node/V8 Predictor
 
+**Note:** you can use `JSRandomnessPredictor.v8()` interchangeably with `JSRandomnessPredictor.node()` - they both target the Node.js environment.
+
 Since we are running in V8, we can produce the initial sequence dynamically by not providing any parameters to the `v8()` method. This will automatically generate a sequence behind the scenes.
 
 Keep in mind, you can manually provide a sequence as well.
@@ -98,6 +100,8 @@ const manualSequence = [
   /* copy/paste numbers generated via REPL */
 ];
 const v8Predictor = JSRandomnessPredictor.v8(manualSequence);
+// FYI you can also use |.node(...)|
+const v8Predictor = JSRandomnessPredictor.node(manualSequence);
 const nextPrediction = await v8Predictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
@@ -105,13 +109,11 @@ const isAccurate = nextPrediction === Math.random();
 
 ### Node/V8 : Automatically Generate Sequence
 
-You can use `JSRandomnessPredictor.v8()` interchangeably with `JSRandomnessPredictor.node()` - they both target the Node.js environment.
-
 ```js
 // Automatically create sequence behind the scenes because
 // parameter not provided to 'v8' method.
 const v8Predictor = JSRandomnessPredictor.v8();
-// FYI you can also do this:
+// FYI you can also use |.node()|
 const v8Predictor = JSRandomnessPredictor.node();
 const nextPrediction = await v8Predictor.predictNext();
 // We can programmatically verify since we are running in Node.
