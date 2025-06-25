@@ -30,6 +30,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   publish:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +38,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.2.0
+          registry-url: "https://registry.npmjs.org/"
+          always-auth: true
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Publish to npm
