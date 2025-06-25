@@ -24,7 +24,9 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
           always-auth: true
       - name: Log event
-        run: echo "${{ toJson(github.event) }}"
+        shell: bash
+        run: |
+          echo "${{ toJson(github.event) }}"
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Build files
