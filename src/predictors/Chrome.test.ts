@@ -1,5 +1,6 @@
 import ChromeRandomnessPredictor from "./Chrome";
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert";
 
 const SEQUENCE = [0.32096095967729477, 0.3940071672626849, 0.3363374923027722, 0.7518761096243554, 0.44201420586496387];
 
@@ -17,6 +18,6 @@ describe("Chrome", () => {
     for (const n of EXPECTED) {
       predictions.push(await p.predictNext());
     }
-    expect(EXPECTED).toEqual(predictions);
-  }, 10000);
+    assert.deepStrictEqual(EXPECTED, predictions);
+  });
 });

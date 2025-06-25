@@ -105,10 +105,14 @@ const isAccurate = nextPrediction === Math.random();
 
 ### Node/V8 : Automatically Generate Sequence
 
+You can use `JSRandomnessPredictor.v8()` interchangeably with `JSRandomnessPredictor.node()` - they both target the Node.js environment.
+
 ```js
 // Automatically create sequence behind the scenes because
 // parameter not provided to 'v8' method.
 const v8Predictor = JSRandomnessPredictor.v8();
+// FYI you can also do this:
+const v8Predictor = JSRandomnessPredictor.node();
 const nextPrediction = await v8Predictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();

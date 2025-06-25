@@ -1,5 +1,6 @@
 import FirefoxRandomnessPredictor from "./Firefox";
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert";
 
 const SEQUENCE = [0.1321263101773572, 0.03366887439746058, 0.032596957696410134, 0.9986575482138969];
 
@@ -15,6 +16,6 @@ describe("Firefox", () => {
     for (let i = 0; i < EXPECTED.length; i++) {
       predictions.push(await p.predictNext());
     }
-    expect(EXPECTED).toEqual(predictions);
+    assert.deepStrictEqual(EXPECTED, predictions);
   });
 });
