@@ -17,6 +17,8 @@ jobs:
           node-version: 24.2.0
       - name: Install dependencies
         run: npm install --ignore-scripts
+      - name: Log event
+        run: echo "${{ toJson(github.event) }}"
       - name: Build
         run: npm run build
       - name: Run tests
