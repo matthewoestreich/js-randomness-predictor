@@ -17,18 +17,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.2.0
-      - name: Automated Version Bump
-        uses: phips28/gh-action-bump-version@v11.0.7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          major-wording: "#major"
-          minor-wording: "#minor"
-          patch-wording: "#patch"
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Build files
+        run: npm run build
   publish:
     needs: build
     runs-on: ubuntu-latest
