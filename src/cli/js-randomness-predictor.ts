@@ -3,7 +3,7 @@
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, PREDICTOR_ENVIRONMENTS } from "./types.js";
+import { PredictorArgs, PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS, SequenceNotFoundError } from "./types.js";
 
 const predictCommand: CommandModule = {
   command: "*",
@@ -13,9 +13,14 @@ const predictCommand: CommandModule = {
       .option("environment", {
         alias: "e",
         describe: "Predictor environment",
-        choices: PREDICTOR_ENVIRONMENTS,
+        // Add node so people can use "v8" and "node" interchangeably.
+        // We don't want to mess with our underlying types, though, which
+        // is why it wasn't added directly to PREDICTOR_ENVIRONMENTS.
+        choices: [...PREDICTOR_ENVIRONMENTS, "node"],
         demandOption: true,
         type: "string",
+        // So people can use "v8" and "node" interchangeably.
+        coerce: (s: string) => (s === "node" ? "v8" : s),
       })
       .option("sequence", {
         alias: "s",
@@ -37,9 +42,21 @@ const predictCommand: CommandModule = {
         type: "number",
         default: 10,
       })
+      .option("env-version", {
+        alias: "v",
+        describe: "Node.js major version",
+        type: "number",
+        choices: ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS,
+      })
       .check((argv) => {
-        if (argv.environment !== "v8" && (!argv.sequence || argv.sequence.length === 0)) {
-          throw new Error("The --sequence (-s) option is required when using firefox or chrome.");
+        // If the environment is not V8 and there was no sequence provided, throw an error.
+        if (argv.sequence === undefined && argv.environment !== "v8") {
+          throw new SequenceNotFoundError("'--sequence' is only optional when '--environment' is 'v8'.");
+        }
+        // If the environment is V8 and a specific version was provided and the sequence is not defined, throw an error.
+        // Sequence is required when doing `-e v8 -v 24`.
+        if (argv.environment === "v8" && argv.envVersion !== undefined && argv.sequence === undefined) {
+          throw new SequenceNotFoundError("'--sequence' is required when '--environment' is 'v8' and '--env-version' is defined!");
         }
         return true;
       });
@@ -58,7 +75,7 @@ const predictCommand: CommandModule = {
 // prettier-ignore
 yargs(hideBin(process.argv))
   .scriptName("js-randomness-predictor")
-  .usage("Usage:\n$0 --environment <env> [--sequence <numbers...>] [--predictions <count>]")
+  .usage("Usage:\n$0 --environment <env> [--env-version <environment_version>] [--sequence <numbers...>] [--predictions <count>]")
   .command(predictCommand)
   .help()
   .argv;

@@ -144,8 +144,47 @@ node_modules/.bin/js-randomness-predictor [options]
 
 ```bash
 # You can use shorthand for flags.
-js-randomness-predictor -e <environment> [-s <sequence...>] [-p <num_predictions>]
+js-randomness-predictor -e <environment> [-v <environment-version>] [-s <sequence...>] [-p <num_predictions>]
 ```
+
+#### Node/V8
+
+If using `v8`/`node`, and no `--sequence` is provided, one will be automatically generated
+
+You can specify `v8` or `node` as the `--environment` when targeting Node.js.
+
+```bash
+js-randomness-predictor --environment v8
+js-randomness-predictor --environment v8 --sequence 1 2 3 4
+js-randomness-predictor --environment v8 --sequence 1 2 3 4 --predictions 15
+# Same as
+js-randomness-predictor --environment node
+js-randomness-predictor --environment node --sequence 1 2 3 4
+js-randomness-predictor --environment node --sequence 1 2 3 4 --predictions 15
+```
+
+Lets say your current Node.js version is `v24.2.0`, but you wanted to run the predictor against numbers that were generated in Node.js `v22.0.0`.
+
+You can do this by specifying the `--env-version` (or `-v`) flag.
+
+This works both ways - you can provide a version that is greater or less than your current version!
+
+```bash
+js-randomness-predictor --environment node --env-version 22 --sequence 1 2 3 4
+# Shorthand
+js-randomness-predictor -e node -v 22 -s 1 2 3 4
+```
+
+If the `--env-version` flag is provided, and it is different than your current Node.js version, then the `--sequence` flag is required!
+
+```bash
+# For example, lets say I am on Node.js v24.2.0
+js-randomness-predictor -e node -v 22 # ERROR!
+```
+
+#### Chrome
+
+If the '--env-version' flag is provided and the '--environment' flag is 'firefox' or 'chrome', the '--env-version' flag is ignored!
 
 ```bash
 # If environment is NOT v8, you must provide a sequence.
@@ -153,12 +192,15 @@ js-randomness-predictor -e <environment> [-s <sequence...>] [-p <num_predictions
 js-randomness-predictor --environment chrome --sequence 1 2 3 4
 # Output 5 predictions
 js-randomness-predictor --environment chrome --sequence 1 2 3 4 --predictions 5
+```
+
+#### Firefox
+
+If the '--env-version' flag is provided and the '--environment' flag is 'firefox' or 'chrome', the '--env-version' flag is ignored!
+
+```bash
 # Output 10 predictions by default
 js-randomness-predictor --environment firefox --sequence 1 2 3 4
 # Output 5 predictions
 js-randomness-predictor --environment firefox --sequence 1 2 3 4 --predictions 5
-# If using v8, and no --sequence is provided, one will be automatically generated
-js-randomness-predictor --environment v8
-js-randomness-predictor --environment v8 --sequence 1 2 3 4
-js-randomness-predictor --environment v8 --sequence 1 2 3 4 --predictions 15
 ```
