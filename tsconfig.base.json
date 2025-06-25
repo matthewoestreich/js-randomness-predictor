@@ -5,6 +5,6 @@
     "strict": true,
     "baseUrl": "./",
     "allowSyntheticDefaultImports": true,
-    "types": ["node", "vitest/globals"]
+    "types": ["node"]
   }
 }
