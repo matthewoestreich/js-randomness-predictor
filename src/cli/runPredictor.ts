@@ -29,10 +29,7 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
   // not provided OR equals the current version, we can generate the sequence since
   // we are running in the correct Node version.
   if (argv.environment === "v8" && !argv.sequence && (argv.envVersion === undefined || argv.envVersion === getCurrentNodeJsMajorVersion())) {
-    actual = [];
-    for (let i = 0; i < numPredictions; i++) {
-      actual.push(Math.random());
-    }
+    actual = Array.from({ length: numPredictions }, Math.random);
     isCorrect = actual.every((v, i) => v === predictions[i]);
   }
 
