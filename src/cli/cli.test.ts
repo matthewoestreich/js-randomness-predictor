@@ -37,7 +37,7 @@ describe("CLI", () => {
     assert.strictEqual(fs.existsSync(BIN_PATH), true);
   });
 
-  describe("V8", () => {
+  describe("V8/Node", () => {
     const CURR_NODE_MAJOR_VER = Number(process.versions.node.split(".")[0]);
     const environment = "v8";
 
@@ -51,6 +51,24 @@ describe("CLI", () => {
       const result = runCommand({ environment });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.strictEqual(jsonResult.isCorrect, true);
+    });
+
+    it("should error when sequence is >= 64", () => {
+      const seq = Array.from({ length: 64 }, Math.random);
+      const result = runCommand({ environment, sequence: seq });
+      assert.notStrictEqual(result.stderr.toString(), "");
+    });
+
+    it("should truncate number of predictions when sequence.length + numPredictions > 64 and predict accurately", () => {
+      const seqLength = 4;
+      const numPreds = 60;
+      const expectedNumPreds = 64 - seqLength;
+      const seq = Array.from({ length: seqLength }, Math.random);
+      const expected = Array.from({ length: expectedNumPreds }, Math.random);
+      const result = runCommand({ environment, sequence: seq, predictions: numPreds });
+      const jsonResult = JSON.parse(result.stdout.toString());
+      assert.equal(jsonResult.predictions.length, expectedNumPreds);
+      assert.deepStrictEqual(jsonResult.predictions, expected);
     });
 
     it("enforces proper node version when sequence not provided", () => {

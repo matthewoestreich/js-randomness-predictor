@@ -31,9 +31,16 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
     // Node/V8 create a "pool" of random numbers that they pop from. This "pool" only contains
     // 64 numbers. Once the pool is exhausted, they generate a new pool using a new seed. This
     // means anything over 64 (numPredictions + sequence.length) cannot be predicted accurately.
-    const isExhaustedCache = numPredictions + sequence.length > MAX_NODE_V8_PREDICTIONS;
+    const maxPredictionsAllowed = numPredictions + sequence.length;
+    const isExhaustedCache = maxPredictionsAllowed > MAX_NODE_V8_PREDICTIONS;
     if (isNodeOrV8 && isExhaustedCache) {
-      console.warn();
+      // check if sequence is >= 64
+      if (sequence.length >= 64) {
+        throw new Error(`Sequence too large! Must be less than 64! Got ${sequence.length}`);
+      }
+      console.warn(
+        `Exceeded max predictions! For a sequence length of '${sequence.length}', max predictions allowed is '${MAX_NODE_V8_PREDICTIONS - sequence.length}'. Truncating predictions.\nSee more here : https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion`,
+      );
       numPredictions = MAX_NODE_V8_PREDICTIONS - sequence.length;
     }
 
