@@ -4,7 +4,7 @@
 
 Due to how Node/V8 generates random numbers, the "length of sequence" + "number of predictions" cannot exceed 64. Meaning, if you provide 4 numbers within the sequence, the max numbers you can successfully predict is 60. (sequence length [4] + number of predictions = 64).
 
-If "length of sequence" + "number of predictions" exceeds 64, you will be warned about this, and "number of predictions" will be truncated to allow for accurate predictions.
+When using the CLI, if "length of sequence" + "number of predictions" exceeds 64, we will show a warning as well as truncate "number of predictions" to be within the allowed bounds.
 
 If "length of sequence" is >= 64, we will throw an error.
 

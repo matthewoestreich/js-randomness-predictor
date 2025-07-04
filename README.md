@@ -23,6 +23,7 @@ pnpm add js-randomness-predictor
 
 - You must use the appropriate predictor for the environment used to generate the initial sequence. **Meaning, if you generated the sequence in Chrome, you must use the Chrome predictor, etc..**
 - We recommend at least 4 numbers in the initial sequence.
+- [See all known issues with all predictors here](.github/KNOWN_ISSUES.md)
 
 ```js
 // ESM
@@ -32,6 +33,8 @@ const JSRandomnessPredictor = require("js-randomness-predictor");
 ```
 
 ## Node/V8 Predictor
+
+**[See known Node/V8 issues here](.github/KNOWN_ISSUES.md#nodev8)**
 
 **Note:** you can use `JSRandomnessPredictor.v8()` interchangeably with `JSRandomnessPredictor.node()` - they both target the Node.js environment.
 
@@ -77,6 +80,8 @@ const nextPrediction = await chromePredictor.predictNext();
 ```
 
 ## Firefox Predictor
+
+**[See known Firefox issues here](.github/KNOWN_ISSUES.md#firefox)**
 
 ```js
 const firefoxPredictor = JSRandomnessPredictor.firefox([...]);
