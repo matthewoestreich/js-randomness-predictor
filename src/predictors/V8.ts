@@ -1,5 +1,6 @@
 import * as z3 from "z3-solver";
-import { NodeJSVersion } from "../types.js";
+import { NodeJsVersion } from "../types.js";
+import { UnsatError } from "../errors.js";
 
 /**
  *
@@ -31,7 +32,7 @@ import { NodeJSVersion } from "../types.js";
  */
 
 export default class V8RandomnessPredictor {
-  #nodeVersion: NodeJSVersion = this.#getNodeVersion();
+  #nodeVersion: NodeJsVersion = this.#getNodeVersion();
   #isInitialized = false;
   #concreteState0 = 0n;
   #concreteState1 = 0n;
@@ -60,11 +61,11 @@ export default class V8RandomnessPredictor {
   }
 
   // For testing - DO NOT USE IF YOU DON'T WANT TO BREAK THINGS.
-  setNodeVersion(version: NodeJSVersion): void {
+  setNodeVersion(version: NodeJsVersion): void {
     this.#nodeVersion = version;
   }
 
-  #getNodeVersion(): NodeJSVersion {
+  #getNodeVersion(): NodeJsVersion {
     const [major, minor, patch] = process.versions.node.split(".").map(Number);
     return { major, minor, patch };
   }
@@ -92,7 +93,7 @@ export default class V8RandomnessPredictor {
 
       const check = await this.#solver.check();
       if (check !== "sat") {
-        return Promise.reject(new Error(`[V8] Unsatisfiable: unable to reconstruct internal state. ${check}`));
+        return Promise.reject(new UnsatError());
       }
 
       const model = this.#solver.model();

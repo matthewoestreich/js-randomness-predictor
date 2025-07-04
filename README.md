@@ -31,58 +31,6 @@ import JSRandomnessPredictor from "js-randomness-predictor";
 const JSRandomnessPredictor = require("js-randomness-predictor");
 ```
 
-## Chrome Predictor
-
-```js
-const chromePredictor = JSRandomnessPredictor.chrome([...]);
-const nextPrediction = await chromePredictor.predictNext();
-// You'll need to manually verify accuracy.
-```
-
-## Firefox Predictor
-
-```js
-const firefoxPredictor = JSRandomnessPredictor.firefox([...]);
-const nextPrediction = await firefoxPredictor.predictNext();
-// You'll need to manually verify accuracy.
-```
-
-#### FIREFOX ISSUE WHEN GENERATING NUMBERS IN CONSOLE
-
-You must disable "Instant Evaluation", otherwise your predictions may show incorrectly. Especially if you use more than one call to generate the initial sequence + expected values.
-
-<img width="1920" alt="Firefox_DisableConsoleInstantEvaluation" src="/.github/Firefox_DisableConsoleInstantEvaluation.png" />
-
-**If you do not want to disable "Instant Evaluation"**, you'll need to generate initial sequence + expected values in one command.
-
-So instead of using two (or more) calls to `Math.random`:
-
-```js
-/** Pretend this is the console */
-// Output used as initial sequence.
-Array.from({ length: 4 }, Math.random);
-// Output used for validating predictions.
-Array.from({ length: 10 }, Math.random);
-```
-
-You'll need to do:
-
-```js
-/** Pretend this is the console */
-// Only use one call! Manually separate numbers!
-Array.from({ length: 6 }, Math.random);
-[
-  // --------------------|
-  0.5654163987207667, // |
-  0.7409356182179403, // | --> Use "these" numbers as initial sequence
-  0.46136469064448193, //|
-  0.18124646315195891, //|
-  // --------------------|
-  0.25678544986069995, // --> Use the rest of the numbers for validation
-  0.5543550504255771,
-];
-```
-
 ## Node/V8 Predictor
 
 **Note:** you can use `JSRandomnessPredictor.v8()` interchangeably with `JSRandomnessPredictor.node()` - they both target the Node.js environment.
@@ -118,6 +66,22 @@ const v8Predictor = JSRandomnessPredictor.node();
 const nextPrediction = await v8Predictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
+```
+
+## Chrome Predictor
+
+```js
+const chromePredictor = JSRandomnessPredictor.chrome([...]);
+const nextPrediction = await chromePredictor.predictNext();
+// You'll need to manually verify accuracy.
+```
+
+## Firefox Predictor
+
+```js
+const firefoxPredictor = JSRandomnessPredictor.firefox([...]);
+const nextPrediction = await firefoxPredictor.predictNext();
+// You'll need to manually verify accuracy.
 ```
 
 ## Safari Predictor

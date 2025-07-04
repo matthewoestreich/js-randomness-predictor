@@ -1,4 +1,5 @@
 import * as z3 from "z3-solver";
+import { UnsatError } from "../errors.js";
 
 export default class ChromeRandomnessPredictor {
   #isInitialized = false;
@@ -43,7 +44,7 @@ export default class ChromeRandomnessPredictor {
 
       const result = await this.#solver.check();
       if (result !== "sat") {
-        return Promise.reject("Unsat");
+        return Promise.reject(new UnsatError());
       }
 
       const model = this.#solver.model();

@@ -10,9 +10,10 @@ export interface PredictorArgs {
   sequence?: number[];
   envVersion?: NodeJsMajorVersion;
   predictions?: number;
+  _currentNodeJsMajorVersion: NodeJsMajorVersion;
 }
 
-export type NodeJSVersion = {
+export type NodeJsVersion = {
   major: number;
   minor: number;
   patch: number;

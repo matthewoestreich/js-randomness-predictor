@@ -1,8 +1,8 @@
 import * as z3 from "z3-solver";
+import { UnsatError } from "../errors.js";
 
 export default class FirefoxRandomnessPredictor {
   #isInitialized = false;
-  #isUnsat = false;
   #mask = 0xffffffffffffffffn;
   #seState0: z3.BitVec | undefined;
   #seState1: z3.BitVec | undefined;
@@ -41,8 +41,7 @@ export default class FirefoxRandomnessPredictor {
 
       const check = await this.#solver.check();
       if (check !== "sat") {
-        this.#isUnsat = true;
-        return Promise.reject("Unsat");
+        return Promise.reject(new UnsatError());
       }
 
       const model = this.#solver.model();
@@ -70,9 +69,6 @@ export default class FirefoxRandomnessPredictor {
    */
   public async predictNext(): Promise<number> {
     await this.#initialize();
-    if (this.#isUnsat) {
-      throw new Error("[Firefox Predictor] Current state is unsatisfiable!");
-    }
     return this.#toDouble(this.#xorShift128PlusConcrete());
   }
 

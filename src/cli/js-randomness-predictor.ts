@@ -3,8 +3,12 @@
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS, SequenceNotFoundError } from "../types.js";
-import { getCurrentNodeJsMajorVersion } from "./getCurrentNodeJsMajorVersion.js";
+import { PredictorArgs, PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS, SequenceNotFoundError, NodeJsMajorVersion } from "../types.js";
+import { UnsatError } from "../errors.js";
+
+export function getCurrentNodeJsMajorVersion(): NodeJsMajorVersion {
+  return Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
+}
 
 const predictCommand: CommandModule = {
   command: "*",
@@ -45,8 +49,9 @@ const predictCommand: CommandModule = {
         choices: ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS,
       })
       .check((argv) => {
+        argv._currentNodeJsMajorVersion = getCurrentNodeJsMajorVersion();
         const isNodeOrV8 = argv.environment === "node" || argv.environment === "v8";
-        const isNodeVersionMatch = argv.envVersion === getCurrentNodeJsMajorVersion();
+        const isNodeVersionMatch = argv.envVersion === argv._currentNodeJsMajorVersion;
 
         // If the --environment is not v8 or node the --sequence is required!
         if (!argv.sequence && !isNodeOrV8) {
@@ -75,11 +80,10 @@ const predictCommand: CommandModule = {
       const result = await runPredictor(argv as PredictorArgs & Arguments);
       console.log(JSON.stringify(result, null, 2));
     } catch (err: any) {
-      if (err === "Unsat") {
-        console.error("ERROR! Cannot determine state! Unabble to make accurate predictions.");
-        process.exit(1);
-      }
-      console.error("ERROR! ", err);
+      const jsonError = {
+        error: "Something went wrong! " + err?.message,
+      };
+      console.error(JSON.stringify(jsonError, null, 2));
       process.exit(1);
     }
   },
