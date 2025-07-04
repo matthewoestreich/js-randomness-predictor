@@ -14,20 +14,6 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
     const predictor: Predictor = JSRandomnessPredictor[argv.environment](sequence);
 
     let numPredictions = argv.predictions ? argv.predictions : DEFAULT_NUM_PREDICTIONS;
-
-    // * If the conditions below are met:
-    //    We need to set the --env-version that was provided on the predictor itself.
-    // * Conditions that must be met:
-    //    - The --env-version is defined
-    //    - The --environment is v8 OR node
-    //    - The --env-version is NOT equal to the users current running node version
-    if (argv.envVersion && isNodeOrV8 && !isNodeVersionMatch) {
-      const v = { major: Number(argv.envVersion), minor: 0, patch: 0 };
-      argv.environment === "v8"
-        ? (predictor as ReturnType<typeof JSRandomnessPredictor.v8>).setNodeVersion(v)
-        : (predictor as ReturnType<typeof JSRandomnessPredictor.node>).setNodeVersion(v);
-    }
-
     // Node/V8 create a "pool" of random numbers that they pop from. This "pool" only contains
     // 64 numbers. Once the pool is exhausted, they generate a new pool using a new seed. This
     // means anything over 64 (numPredictions + sequence.length) cannot be predicted accurately.
@@ -42,6 +28,19 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
         `Exceeded max predictions! For a sequence length of '${sequence.length}', max predictions allowed is '${MAX_NODE_V8_PREDICTIONS - sequence.length}'. Truncating predictions.\nSee more here : https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion`,
       );
       numPredictions = MAX_NODE_V8_PREDICTIONS - sequence.length;
+    }
+
+    // * If the conditions below are met:
+    //    We need to set the --env-version that was provided on the predictor itself.
+    // * Conditions that must be met:
+    //    - The --env-version is defined
+    //    - The --environment is v8 OR node
+    //    - The --env-version is NOT equal to the users current running node version
+    if (argv.envVersion && isNodeOrV8 && !isNodeVersionMatch) {
+      const v = { major: Number(argv.envVersion), minor: 0, patch: 0 };
+      argv.environment === "v8"
+        ? (predictor as ReturnType<typeof JSRandomnessPredictor.v8>).setNodeVersion(v)
+        : (predictor as ReturnType<typeof JSRandomnessPredictor.node>).setNodeVersion(v);
     }
 
     const predictions: number[] = [];
