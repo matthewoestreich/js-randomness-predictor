@@ -1,17 +1,23 @@
 const nodeFs = require("node:fs");
 const nodePath = require("node:path");
 
-const outDir = nodePath.resolve(__dirname, "../dist/cjs");
-const outFile = nodePath.resolve(__dirname, "../dist/cjs/package.json");
+createPackageJsonInCjsDist(nodePath.resolve(__dirname, "../dist/cjs"));
 
-nodeFs.mkdirSync(outDir, { recursive: true });
+function createPackageJsonInCjsDist(distPath = "") {
+  if (distPath === "") {
+    throw new Error("distPath required!");
+  }
 
-const pkgJson = JSON.stringify(
-  {
-    type: "commonjs",
-  },
-  null,
-  2,
-);
+  const outFile = nodePath.resolve(__dirname, distPath, "package.json");
+  nodeFs.mkdirSync(distPath, { recursive: true });
 
-nodeFs.writeFileSync(outFile, pkgJson);
+  const pkgJson = JSON.stringify(
+    {
+      type: "commonjs",
+    },
+    null,
+    2,
+  );
+
+  nodeFs.writeFileSync(outFile, pkgJson);
+}

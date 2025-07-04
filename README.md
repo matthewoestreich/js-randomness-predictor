@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000)](https://www.npmjs.com/package/js-randomness-predictor)
 
-Predict Math.random output in Node, Chrome, and Firefox
+Predict Math.random output in Node, Chrome, Firefox, and Safari
 
 **NOTE** If you'd like to use native Node.js addons for predictors (meaning, all predictors are written in C++) check out [this repo](https://github.com/matthewoestreich/js-randomness-predictor-cpp)!
 
@@ -120,6 +120,14 @@ const nextPrediction = await v8Predictor.predictNext();
 const isAccurate = nextPrediction === Math.random();
 ```
 
+## Safari Predictor
+
+```js
+const safariPredictor = JSRandomnessPredictor.safari([...]);
+const nextPrediction = await safariPredictor.predictNext();
+// You'll need to manually verify accuracy.
+```
+
 ## Command Line Interface
 
 You can run the predictor from the command line. Each number in the sequence should be separated by a space.
@@ -190,7 +198,7 @@ js-randomness-predictor -e node -v 22 # ERROR!
 
 #### Chrome
 
-If the '--env-version' flag is provided and the '--environment' flag is 'firefox' or 'chrome', the '--env-version' flag is ignored!
+If the '--env-version' flag is provided and the '--environment' flag is not 'node' or 'v8', the '--env-version' flag is ignored!
 
 ```bash
 # If environment is NOT v8, you must provide a sequence.
@@ -202,11 +210,22 @@ js-randomness-predictor --environment chrome --sequence 1 2 3 4 --predictions 5
 
 #### Firefox
 
-If the '--env-version' flag is provided and the '--environment' flag is 'firefox' or 'chrome', the '--env-version' flag is ignored!
+If the '--env-version' flag is provided and the '--environment' flag is not 'node' or 'v8', the '--env-version' flag is ignored!
 
 ```bash
 # Output 10 predictions by default
 js-randomness-predictor --environment firefox --sequence 1 2 3 4
 # Output 5 predictions
 js-randomness-predictor --environment firefox --sequence 1 2 3 4 --predictions 5
+```
+
+#### Safari
+
+If the '--env-version' flag is provided and the '--environment' flag is not 'node' or 'v8', the '--env-version' flag is ignored!
+
+```bash
+# Output 10 predictions by default
+js-randomness-predictor --environment safari --sequence 1 2 3 4
+# Output 5 predictions
+js-randomness-predictor --environment safari --sequence 1 2 3 4 --predictions 5
 ```
