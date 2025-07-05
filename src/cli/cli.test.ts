@@ -3,12 +3,12 @@ import assert from "node:assert";
 import { spawnSync, SpawnSyncReturns } from "node:child_process";
 import path from "node:path";
 import fs from "node:fs";
+import { PREDICTOR_ENVIRONMENTS } from "../constants.ts";
 
 const BIN_PATH = path.resolve(import.meta.dirname, "../../dist/esm/cli/js-randomness-predictor.js");
-const SUPPORTED_ENVS = ["node", "v8", "firefox", "chrome", "safari"] as const;
 
 type Flags = {
-  environment?: NonNullable<(typeof SUPPORTED_ENVS)[number]>;
+  environment?: NonNullable<(typeof PREDICTOR_ENVIRONMENTS)[number]>;
   envVersion?: number;
   sequence?: number[];
   predictions?: number;
@@ -49,8 +49,8 @@ describe("CLI", () => {
     assert.strictEqual(fs.existsSync(BIN_PATH), true);
   });
 
-  it(`[${SUPPORTED_ENVS.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
-    SUPPORTED_ENVS.forEach((e) => {
+  it(`[${PREDICTOR_ENVIRONMENTS.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
+    PREDICTOR_ENVIRONMENTS.forEach((e) => {
       assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment: e, predictions: -1, sequence: [1, 2, 3] })));
     });
   });
