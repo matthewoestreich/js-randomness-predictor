@@ -14,9 +14,10 @@ type Flags = {
   predictions?: number;
 };
 
+// Programmatically call js-randomness-predictor CLI
 function jsRandomnessPredictor(flags: Flags) {
   const { environment, envVersion, sequence, predictions } = flags;
-  const args: (string | number)[] = [];
+  const args: string[] = [];
   if (environment) {
     args.push("-e", environment);
   }
@@ -24,12 +25,12 @@ function jsRandomnessPredictor(flags: Flags) {
     args.push("-v", envVersion.toString());
   }
   if (sequence?.length) {
-    args.push("-s", ...sequence);
+    args.push("-s", ...sequence.map(String));
   }
   if (predictions) {
     args.push("-p", predictions.toString());
   }
-  return spawnSync("node", [BIN_PATH, ...args.map(String)], { encoding: "utf8" });
+  return spawnSync("node", [BIN_PATH, ...args], { encoding: "utf8" });
 }
 
 // Wrapper around child process (or anything that returns SpawnSyncReturns<T>).
