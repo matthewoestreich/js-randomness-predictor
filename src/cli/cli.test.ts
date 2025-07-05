@@ -14,7 +14,10 @@ type Flags = {
   predictions?: number;
 };
 
-// Programmatically call js-randomness-predictor CLI
+/**
+ * Programmatically call js-randomness-predictor CLI
+ * @param {Flags} flags
+ */
 function jsRandomnessPredictor(flags: Flags) {
   const { environment, envVersion, sequence, predictions } = flags;
   const args: string[] = [];
@@ -33,15 +36,16 @@ function jsRandomnessPredictor(flags: Flags) {
   return spawnSync("node", [BIN_PATH, ...args], { encoding: "utf8" });
 }
 
-// Wrapper around child process (or anything that returns SpawnSyncReturns<T>).
-// Instead of just writing errors to stderr and silently continuing, we throw those errors.
-function stderrThrows<T>(fn: () => SpawnSyncReturns<T>) {
-  const r = fn();
-  if (r.stderr !== "") {
-    throw new Error((r.stderr as String).toString());
+/**
+ * Instead of just writing errors to stderr and silently continuing, we throw those errors.
+ * @param {SpawnSyncReturns<T>} ssr
+ */
+function stderrThrows<T>(ssr: SpawnSyncReturns<T>) {
+  if (ssr.stderr !== "") {
+    throw new Error((ssr.stderr as String).toString());
   }
-  if (r.error !== undefined) {
-    throw r.error;
+  if (ssr.error !== undefined) {
+    throw ssr.error;
   }
 }
 
@@ -51,9 +55,10 @@ describe("CLI", () => {
   });
 
   it(`[${PREDICTOR_ENVIRONMENTS.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
-    PREDICTOR_ENVIRONMENTS.forEach((e) =>
-      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment: e, predictions: -1, sequence: [1, 2, 3] }))),
-    );
+    PREDICTOR_ENVIRONMENTS.forEach((e) => {
+      const result = jsRandomnessPredictor({ environment: e, predictions: -1, sequence: [1, 2, 3] });
+      assert.throws(() => stderrThrows(result));
+    });
   });
 
   describe("V8/Node", () => {
@@ -74,7 +79,8 @@ describe("CLI", () => {
 
     it("should error when sequence is >= 64", () => {
       const seq = Array.from({ length: 64 }, Math.random);
-      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment, sequence: seq })));
+      const result = jsRandomnessPredictor({ environment, sequence: seq });
+      assert.throws(() => stderrThrows(result));
     });
 
     it("should truncate number of predictions when sequence.length + numPredictions > 64 and predict accurately", () => {
@@ -93,11 +99,13 @@ describe("CLI", () => {
       // We need to ensure we have a node version that is different than our current version.
       // So we get our current version, then subtract 1.
       const diffNodeMajor = CURR_NODE_MAJOR_VER - 1;
-      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment, envVersion: diffNodeMajor })));
+      const result = jsRandomnessPredictor({ environment, envVersion: diffNodeMajor });
+      assert.throws(() => stderrThrows(result));
     });
 
     it("should not require a sequence if specified --env-version matches our current version", () => {
-      assert.doesNotThrow(() => stderrThrows(() => jsRandomnessPredictor({ environment, envVersion: CURR_NODE_MAJOR_VER })));
+      const result = jsRandomnessPredictor({ environment, envVersion: CURR_NODE_MAJOR_VER });
+      assert.doesNotThrow(() => stderrThrows(result));
     });
   });
 
@@ -116,7 +124,8 @@ describe("CLI", () => {
     });
 
     it("enforces sequence", () => {
-      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment })));
+      const result = jsRandomnessPredictor({ environment });
+      assert.throws(() => stderrThrows(result));
     });
   });
 
@@ -124,7 +133,8 @@ describe("CLI", () => {
     const environment = "chrome";
 
     it("enforces sequence", () => {
-      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment })));
+      const result = jsRandomnessPredictor({ environment });
+      assert.throws(() => stderrThrows(result));
     });
   });
 
@@ -132,7 +142,8 @@ describe("CLI", () => {
     const environment = "safari";
 
     it("enforces sequence", () => {
-      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment })));
+      const result = jsRandomnessPredictor({ environment });
+      assert.throws(() => stderrThrows(result));
     });
   });
 });
