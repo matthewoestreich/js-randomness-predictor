@@ -50,9 +50,9 @@ describe("CLI", () => {
   });
 
   it(`[${PREDICTOR_ENVIRONMENTS.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
-    PREDICTOR_ENVIRONMENTS.forEach((e) => {
-      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment: e, predictions: -1, sequence: [1, 2, 3] })));
-    });
+    PREDICTOR_ENVIRONMENTS.forEach((e) =>
+      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment: e, predictions: -1, sequence: [1, 2, 3] }))),
+    );
   });
 
   describe("V8/Node", () => {
