@@ -73,8 +73,7 @@ describe("CLI", () => {
 
     it("should error when sequence is >= 64", () => {
       const seq = Array.from({ length: 64 }, Math.random);
-      const result = jsRandomnessPredictor({ environment, sequence: seq });
-      assert.notStrictEqual(result.stderr.toString(), "");
+      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment, sequence: seq })));
     });
 
     it("should truncate number of predictions when sequence.length + numPredictions > 64 and predict accurately", () => {
@@ -93,15 +92,11 @@ describe("CLI", () => {
       // We need to ensure we have a node version that is different than our current version.
       // So we get our current version, then subtract 1.
       const diffNodeMajor = CURR_NODE_MAJOR_VER - 1;
-      const result = jsRandomnessPredictor({ environment, envVersion: diffNodeMajor });
-      // Make sure something exists on stderr. We don't want stderr.toString() to equal "".
-      assert.notStrictEqual(result.stderr.toString(), "");
+      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment, envVersion: diffNodeMajor })));
     });
 
     it("should not require a sequence if specified --env-version matches our current version", () => {
-      const result = jsRandomnessPredictor({ environment, envVersion: CURR_NODE_MAJOR_VER });
-      // Expect stderr to be equal to "" (aka no error exists)
-      assert.strictEqual(result.stderr.toString(), "");
+      assert.doesNotThrow(() => stderrThrows(() => jsRandomnessPredictor({ environment, envVersion: CURR_NODE_MAJOR_VER })));
     });
   });
 
@@ -120,9 +115,7 @@ describe("CLI", () => {
     });
 
     it("enforces sequence", () => {
-      const result = jsRandomnessPredictor({ environment });
-      // Expect something (string) on stderr. We don't want stderr.toString() to equal "".
-      assert.notStrictEqual(result.stderr.toString(), "");
+      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment })));
     });
   });
 
@@ -130,9 +123,7 @@ describe("CLI", () => {
     const environment = "chrome";
 
     it("enforces sequence", () => {
-      const result = jsRandomnessPredictor({ environment });
-      // Expect something (string) on stderr
-      assert.strictEqual(result.stderr.toString() !== "", true);
+      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment })));
     });
   });
 
@@ -140,9 +131,7 @@ describe("CLI", () => {
     const environment = "safari";
 
     it("enforces sequence", () => {
-      const result = jsRandomnessPredictor({ environment });
-      // Expect something (string) on stderr
-      assert.strictEqual(result.stderr.toString() !== "", true);
+      assert.throws(() => stderrThrows(() => jsRandomnessPredictor({ environment })));
     });
   });
 });
