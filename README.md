@@ -56,17 +56,17 @@ Since we're running in Node/V8, you can dynamically generate the initial sequenc
 
 <!-- prettier-ignore -->
 ```js
-const manualSequence = Array.from({ length: 4 }, Math.random);
+const providedSequence = Array.from({ length: 4 }, Math.random);
 // Or...
-const manualSequence = [/* copy & paste from REPL */];
+const providedSequence = [/* copy & paste from REPL */];
 
-const v8Predictor = JSRandomnessPredictor.v8(manualSequence);
+const v8Predictor = JSRandomnessPredictor.v8(providedSequence);
 const nextPrediction = await v8Predictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
 
 // Node equivalent
-const nodePredictor = JSRandomnessPredictor.node(manualSequence);
+const nodePredictor = JSRandomnessPredictor.node(providedSequence);
 const nextPrediction = await nodePredictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
@@ -86,6 +86,31 @@ const nodePredictor = JSRandomnessPredictor.node();
 const nextPrediction = await nodePredictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
+```
+
+**Node & V8 : Targeting a Different Node.js Version**
+
+You can target Node.js versions that are either **older or newer** than your current version.
+
+For example:
+
+- If you're currently running Node.js `v24.x.x` but want to predict values generated in `v22.x.x`
+- Or if you're on Node.js `v18.x.x` and want to predict values from a newer version like `v20.x.x`
+
+You can do this via the `setNodeVersion(version)` method.  
+Essentially, setting the Node.js version tells the predictor: **"The sequence I provided was generated using Node.js version X."**
+
+⚠️ The provided sequence (and expected sequence) must be generated in the matching Node.js version used in `setNodeVersion(...)`!
+
+<!-- prettier-ignore -->
+```js
+// Current Node.js: v24.x.x
+const v8 = JSRandomnessPredictor.v8(sequenceFromNodeV22);
+v8.setNodeVersion({ major: 22, minor: 0, patch: 0 });
+
+const expectedPredictionsFromNodeV22 = [/* Copied from Node.js v22 */];
+const nextPrediction = await v8.predictNext();
+const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 ```
 
 # Chrome Predictor
