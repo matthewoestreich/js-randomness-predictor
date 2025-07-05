@@ -61,3 +61,11 @@ Array.from({ length: 6 }, Math.random);
   0.5543550504255771,
 ];
 ```
+
+# Safari
+
+NONE
+
+# Chrome
+
+NONE

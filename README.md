@@ -1,10 +1,22 @@
-# js-randomness-predictor
+<h1 align="center">js-randomness-predictor</h1>
 
-[![npm version](https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000)](https://www.npmjs.com/package/js-randomness-predictor)
+<p align="center">
+  <a href="https://www.npmjs.com/package/js-randomness-predictor">
+    <img src="https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000" alt="npm version" />
+  </a>
+</p>
 
-Predict Math.random output in Node, Chrome, Firefox, and Safari
+<p align="center">
+  Predict Math.random output in Node/V8, Chrome, Firefox, and Safari
+</p>
 
-**NOTE** If you'd like to use native Node.js addons for predictors (meaning, all predictors are written in C++) check out [this repo](https://github.com/matthewoestreich/js-randomness-predictor-cpp)!
+---
+
+# Important Info
+
+- Use the predictor that matches the environment where the sequence was originally generated. **Meaning, if it came from Chrome, use the Chrome predictor, etc...**.
+- We recommend at least 4 numbers in the initial sequence.
+- [See all known issues here](.github/KNOWN_ISSUES.md)
 
 # Installation
 
@@ -19,59 +31,66 @@ pnpm add js-randomness-predictor
 
 # Usage
 
-**IMPORTANT**:
-
-- You must use the appropriate predictor for the environment used to generate the initial sequence. **Meaning, if you generated the sequence in Chrome, you must use the Chrome predictor, etc..**
-- We recommend at least 4 numbers in the initial sequence.
-- [See all known issues with all predictors here](.github/KNOWN_ISSUES.md)
+**ESM**
 
 ```js
-// ESM
 import JSRandomnessPredictor from "js-randomness-predictor";
-// CJS
+```
+
+**CJS**
+
+```js
 const JSRandomnessPredictor = require("js-randomness-predictor");
 ```
 
-## Node/V8 Predictor
+# Node & V8 Predictors
 
 **[See known Node/V8 issues here](.github/KNOWN_ISSUES.md#nodev8)**
 
-**Note:** you can use `JSRandomnessPredictor.v8()` interchangeably with `JSRandomnessPredictor.node()` - they both target the Node.js environment.
+Both `JSRandomnessPredictor.v8()` and `JSRandomnessPredictor.node()` target Node.js. You can use them interchangeably.
 
-Since we are running in V8, we can produce the initial sequence dynamically by not providing any parameters to the `v8()` method. This will automatically generate a sequence behind the scenes.
+Since we're running in Node/V8, you can dynamically generate the initial sequence by calling the `v8()` or `node()` method without any parameters. This will automatically produce a sequence behind the scenes. **Alternatively, you can manually provide a sequence if you prefer.**
+<br/>
 
-Keep in mind, you can manually provide a sequence as well.
+**Node & V8 : Provide Your Own Sequence**
 
-### Node/V8 : Provide Your Own Sequence
-
+<!-- prettier-ignore -->
 ```js
 const manualSequence = Array.from({ length: 4 }, Math.random);
-// You could also generate your sequence via Node REPL and provide it that way.
-const manualSequence = [
-  /* copy/paste numbers generated via REPL */
-];
+// Or...
+const manualSequence = [/* copy & paste from REPL */];
+
 const v8Predictor = JSRandomnessPredictor.v8(manualSequence);
-// FYI you can also use |.node(...)|
-const v8Predictor = JSRandomnessPredictor.node(manualSequence);
 const nextPrediction = await v8Predictor.predictNext();
+// We can programmatically verify since we are running in Node.
+const isAccurate = nextPrediction === Math.random();
+
+// Node equivalent
+const nodePredictor = JSRandomnessPredictor.node(manualSequence);
+const nextPrediction = await nodePredictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
 ```
 
-### Node/V8 : Automatically Generate Sequence
+**Node & V8 : Automatically Generate Sequence**
 
 ```js
-// Automatically create sequence behind the scenes because
-// parameter not provided to 'v8' method.
+// Automatically creates sequence behind the scenes
 const v8Predictor = JSRandomnessPredictor.v8();
-// FYI you can also use |.node()|
-const v8Predictor = JSRandomnessPredictor.node();
 const nextPrediction = await v8Predictor.predictNext();
+// We can programmatically verify since we are running in Node.
+const isAccurate = nextPrediction === Math.random();
+
+// Node equivalent
+const nodePredictor = JSRandomnessPredictor.node();
+const nextPrediction = await nodePredictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
 ```
 
-## Chrome Predictor
+# Chrome Predictor
+
+**[See known Chrome issues here](.github/KNOWN_ISSUES.md#chrome)**
 
 ```js
 const chromePredictor = JSRandomnessPredictor.chrome([...]);
@@ -79,7 +98,7 @@ const nextPrediction = await chromePredictor.predictNext();
 // You'll need to manually verify accuracy.
 ```
 
-## Firefox Predictor
+# Firefox Predictor
 
 **[See known Firefox issues here](.github/KNOWN_ISSUES.md#firefox)**
 
@@ -89,7 +108,9 @@ const nextPrediction = await firefoxPredictor.predictNext();
 // You'll need to manually verify accuracy.
 ```
 
-## Safari Predictor
+# Safari Predictor
+
+**[See known Safari issues here](.github/KNOWN_ISSUES.md#safari)**
 
 ```js
 const safariPredictor = JSRandomnessPredictor.safari([...]);
@@ -97,77 +118,82 @@ const nextPrediction = await safariPredictor.predictNext();
 // You'll need to manually verify accuracy.
 ```
 
-## Command Line Interface
+# Command Line Interface
 
-You can run the predictor from the command line. Each number in the sequence should be separated by a space.
+**Important info**
+
+- Each number in the sequence should be separated by a space
+- Each flag has a shorthand equivalent
 
 ```bash
 # To get full list of options
 js-randomness-predictor --help
+
+# You can use shorthand for flags.
+js-randomness-predictor -e <environment> [-v <environment-version>] [-s <sequence...>] [-p <num_predictions>]
 ```
 
-### Global Usage
+**Global Usage**
 
-If you want to be able to use the command line from anywhere, you'll need to install this package globally:
+To make the CLI accessible system-wide, install this package globally using the appropriate global flag for your package manager.
 
 ```bash
 npm i -g js-randomness-predictor
 ```
 
-### Non-Global Usage
+**Non-Global Usage**
 
-You'll need to manually specify the path to the script in a project that has this package installed.
+You'll need to manually specify the path within a project that has this package installed.
 
 ```bash
 # Pretend we are in a project that has this package installed.
 node_modules/.bin/js-randomness-predictor [options]
 ```
 
-### CLI Examples
+## CLI Examples
+
+**Node & V8**
+
+If you're targeting Node.js, you can use either `v8` or `node` as the `--environment`. They are interchangeable.
+
+When no `--sequence` is provided, a sequence will be generated automatically based on the current runtime.
 
 ```bash
-# You can use shorthand for flags.
-js-randomness-predictor -e <environment> [-v <environment-version>] [-s <sequence...>] [-p <num_predictions>]
-```
-
-#### Node/V8
-
-If using `v8`/`node`, and no `--sequence` is provided, one will be automatically generated
-
-You can specify `v8` or `node` as the `--environment` when targeting Node.js.
-
-```bash
+# Auto-generate sequence
 js-randomness-predictor --environment v8
+
+# Provide your own sequence and prediction count
 js-randomness-predictor --environment v8 --sequence 1 2 3 4
 js-randomness-predictor --environment v8 --sequence 1 2 3 4 --predictions 15
-# Same as
+
+# Equivalent using "node"
 js-randomness-predictor --environment node
 js-randomness-predictor --environment node --sequence 1 2 3 4
 js-randomness-predictor --environment node --sequence 1 2 3 4 --predictions 15
 ```
 
-Lets say your current Node.js version is `v24.2.0`, but you wanted to run the predictor against numbers that were generated in Node.js `v22.0.0`.
+**Targeting a Different Node.js Version**
 
-You can do this by specifying the `--env-version` (or `-v`) flag.
-
-This works both ways - you can provide a version that is greater or less than your current version!
+Suppose you're currently running Node.js `v24.2.0` but want to predict values generated in an older version, like `v22.0.0`. You can do this using the `--env-version` (or `-v`) flag:
 
 ```bash
+# Specify environment version explicitly
 js-randomness-predictor --environment node --env-version 22 --sequence 1 2 3 4
-# Shorthand
+
+# Shorthand version
 js-randomness-predictor -e node -v 22 -s 1 2 3 4
 ```
 
-If the `--env-version` flag is provided, and it is different than your current Node.js version, then the `--sequence` flag is required!
+⚠️ If you use `--env-version` with a version different from your current Node.js version, the `--sequence` flag is **required**:
 
 ```bash
-# For example, lets say I am on Node.js v24.2.0
+# Current Node.js: v24.2.0
 js-randomness-predictor -e node -v 22 # ERROR!
 ```
 
-#### Chrome
+**Chrome**
 
-If the '--env-version' flag is provided and the '--environment' flag is not 'node' or 'v8', the '--env-version' flag is ignored!
+If the `--env-version` flag is provided and the `--environment` flag is not `node` or `v8`, the `--env-version` flag is ignored!
 
 ```bash
 # If environment is NOT v8, you must provide a sequence.
@@ -175,26 +201,32 @@ If the '--env-version' flag is provided and the '--environment' flag is not 'nod
 js-randomness-predictor --environment chrome --sequence 1 2 3 4
 # Output 5 predictions
 js-randomness-predictor --environment chrome --sequence 1 2 3 4 --predictions 5
+# --env-version (-v) ignored
+js-randomness-predictor -e chrome -v 23 -s 1 2 3 4
 ```
 
-#### Firefox
+**Firefox**
 
-If the '--env-version' flag is provided and the '--environment' flag is not 'node' or 'v8', the '--env-version' flag is ignored!
+If the `--env-version` flag is provided and the `--environment` flag is not `node` or `v8`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
 js-randomness-predictor --environment firefox --sequence 1 2 3 4
 # Output 5 predictions
 js-randomness-predictor --environment firefox --sequence 1 2 3 4 --predictions 5
+# --env-version (-v) ignored
+js-randomness-predictor -e firefox -v 23 -s 1 2 3 4
 ```
 
-#### Safari
+**Safari**
 
-If the '--env-version' flag is provided and the '--environment' flag is not 'node' or 'v8', the '--env-version' flag is ignored!
+If the `--env-version` flag is provided and the `--environment` flag is not `node` or `v8`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
 js-randomness-predictor --environment safari --sequence 1 2 3 4
 # Output 5 predictions
 js-randomness-predictor --environment safari --sequence 1 2 3 4 --predictions 5
+# --env-version (-v) ignored
+js-randomness-predictor -e safari -v 23 -s 1 2 3 4
 ```
