@@ -174,7 +174,17 @@ js-randomness-predictor --environment node --sequence 1 2 3 4 --predictions 15
 
 **Targeting a Different Node.js Version**
 
-Suppose you're currently running Node.js `v24.2.0` but want to predict values generated in an older version, like `v22.0.0`. You can do this using the `--env-version` (or `-v`) flag:
+You can target Node.js versions that are either **older or newer** than your current version.
+
+For example:
+
+- If you're currently running Node.js `v24.x.x` but want to predict values generated in `v22.x.x`
+- Or if you're on Node.js `v18.x.x` and want to predict values from a newer version like `v20.x.x`
+
+You can do this using the `--env-version` (or `-v`) flag.  
+Essentially, this flag tells the predictor: **"The sequence I provided was generated using Node.js version X."**
+
+⚠️ Only the **major version number is needed** for `--env-version` value.
 
 ```bash
 # Specify environment version explicitly
@@ -196,7 +206,6 @@ js-randomness-predictor -e node -v 22 # ERROR!
 If the `--env-version` flag is provided and the `--environment` flag is not `node` or `v8`, the `--env-version` flag is ignored!
 
 ```bash
-# If environment is NOT v8, you must provide a sequence.
 # Output 10 predictions by default
 js-randomness-predictor --environment chrome --sequence 1 2 3 4
 # Output 5 predictions
