@@ -78,7 +78,7 @@ describe("CLI", () => {
 
     it("should truncate number of predictions when sequence.length + numPredictions > 64 and predict accurately", () => {
       const seqLength = 4;
-      const numPreds = 60;
+      const numPreds = 70;
       const expectedNumPreds = 64 - seqLength;
       const seq = Array.from({ length: seqLength }, Math.random);
       const expected = Array.from({ length: expectedNumPreds }, Math.random);
