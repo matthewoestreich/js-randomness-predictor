@@ -72,7 +72,7 @@ export default class FirefoxRandomnessPredictor {
     return this.#toDouble(this.#xorShift128PlusConcrete());
   }
 
-  #xorShift128PlusSymbolic() {
+  #xorShift128PlusSymbolic(): void {
     if (this.#seState0 === undefined || this.#seState1 === undefined) {
       throw new Error("States are not defined!");
     }

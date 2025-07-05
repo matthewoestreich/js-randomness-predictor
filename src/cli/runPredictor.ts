@@ -18,8 +18,8 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
 
     let numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUM_PREDICTIONS;
 
-    // For node/v8 only!
     // * If:
+    //    - '--environment' is "node" or "v8"
     //    - numPredictions + sequence.length > 64
     // * Then:
     //    We cannot predict accurately.
@@ -62,6 +62,7 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       }
     }
 
+    // Make predictions
     for (let i = 0; i < numPredictions; i++) {
       const p = await predictor.predictNext();
       RESULT.predictions.push(p);

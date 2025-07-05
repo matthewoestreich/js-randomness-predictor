@@ -98,15 +98,16 @@ const predictCommand: CommandModule = {
         console.log();
         result._warnings.forEach((warning) => Logger.warn(warning, "\n"));
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log();
-      Logger.error(`Something went wrong!`, err?.message, "\n");
+      Logger.error(`Something went wrong!`, (err as Error)?.message, "\n");
       process.exit(1);
     }
   },
 };
 
 // prettier-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 yargs(hideBin(process.argv))
   .scriptName("js-randomness-predictor")
   .usage("Usage:\n$0 --environment <env> [--env-version <environment_version>] [--sequence <numbers...>] [--predictions <count>]")

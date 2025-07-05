@@ -25,6 +25,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "test": "tsx --test",
     "format": "prettier . --write",
+    "lint": "eslint .",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
     "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
     "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
@@ -59,6 +60,11 @@
     "z3-solver": "^4.15.1"
   },
   "devDependencies": {
+    "@types/eslint": "^9.6.1",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "eslint": "^9.30.1",
+    "jiti": "^2.4.2",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
     "tsx": "^4.20.3"

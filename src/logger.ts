@@ -7,16 +7,16 @@ function yellowText(s: string): string {
 }
 
 export default class Logger {
-  static info(...messages: string[]) {
+  static info(...messages: string[]): void {
     console.info(`[INFO] ${messages.join(" ")}`);
   }
-  static log(...messages: string[]) {
+  static log(...messages: string[]): void {
     console.log(`[LOG] ${messages.join(" ")}`);
   }
-  static warn(...messages: string[]) {
+  static warn(...messages: string[]): void {
     console.warn(yellowText(`[WARN] ${messages.join(" ")}`));
   }
-  static error(...messages: string[]) {
+  static error(...messages: string[]): void {
     console.error(redText(`[ERROR] ${messages.join(" ")}`));
   }
 }

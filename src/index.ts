@@ -10,11 +10,11 @@ import {
 export type { NodeJsVersion } from "./types.js";
 
 const JSRandomnessPredictor = {
-  node: (sequence?: number[]) => new NodeRandomnessPredictor(sequence),
-  v8: (sequence?: number[]) => new V8RandomnessPredictor(sequence),
-  firefox: (sequence: number[]) => new FirefoxRandomnessPredictor(sequence),
-  chrome: (sequence: number[]) => new ChromeRandomnessPredictor(sequence),
-  safari: (sequence: number[]) => new SafariRandomnessPredictor(sequence),
+  node: (sequence?: number[]): NodeRandomnessPredictor => new NodeRandomnessPredictor(sequence),
+  v8: (sequence?: number[]): V8RandomnessPredictor => new V8RandomnessPredictor(sequence),
+  firefox: (sequence: number[]): FirefoxRandomnessPredictor => new FirefoxRandomnessPredictor(sequence),
+  chrome: (sequence: number[]): ChromeRandomnessPredictor => new ChromeRandomnessPredictor(sequence),
+  safari: (sequence: number[]): SafariRandomnessPredictor => new SafariRandomnessPredictor(sequence),
 };
 
 export default JSRandomnessPredictor;
