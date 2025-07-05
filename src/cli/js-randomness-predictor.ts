@@ -3,12 +3,9 @@
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS, SequenceNotFoundError, NodeJsMajorVersion } from "../types.js";
-import { UnsatError } from "../errors.js";
-
-export function getCurrentNodeJsMajorVersion(): NodeJsMajorVersion {
-  return Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
-}
+import { PredictorArgs, SequenceNotFoundError, NodeJsMajorVersion, PredictorResult } from "../types.js";
+import { PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS } from "../constants.js";
+import Logger from "../logger.js";
 
 const predictCommand: CommandModule = {
   command: "*",
@@ -41,6 +38,12 @@ const predictCommand: CommandModule = {
         describe: "Number of predictions",
         type: "number",
         default: 10,
+        coerce: (numPredictions: number) => {
+          if (numPredictions <= 0) {
+            throw new Error(`--predictions must be greater than 0! Got ${numPredictions}`);
+          }
+          return numPredictions;
+        },
       })
       .option("env-version", {
         alias: "v",
@@ -49,7 +52,7 @@ const predictCommand: CommandModule = {
         choices: ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS,
       })
       .check((argv) => {
-        argv._currentNodeJsMajorVersion = getCurrentNodeJsMajorVersion();
+        argv._currentNodeJsMajorVersion = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
         const isNodeOrV8 = argv.environment === "node" || argv.environment === "v8";
         const isNodeVersionMatch = argv.envVersion === argv._currentNodeJsMajorVersion;
 
@@ -58,14 +61,13 @@ const predictCommand: CommandModule = {
           throw new SequenceNotFoundError(`'--sequence' is required when '--environment' is '${argv.environment}'`);
         }
 
-        // * If the conditions below are met:
-        //    Throw an error.
-        //    Sequence is required when doing `-e (v8|node) -v N` where `-v N` is != current nodejs major version.
-        // * Conditions that need to be met:
+        // * If:
         //    - The --environment is v8 or node
         //    - The --env-version was provided
         //    - The --sequence was NOT provided
         //    - The --env-version does NOT match the users current running node version
+        // * Then:
+        //    Throw an error. Sequence is required when doing `-e (v8|node) -v X` where `X` is != current nodejs major version.
         if (isNodeOrV8 && argv.envVersion && !argv.sequence && !isNodeVersionMatch) {
           throw new SequenceNotFoundError(
             `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version!`,
@@ -78,12 +80,27 @@ const predictCommand: CommandModule = {
   handler: async (argv: Arguments) => {
     try {
       const result = await runPredictor(argv as PredictorArgs & Arguments);
-      console.log(JSON.stringify(result, null, 2));
-    } catch (err: any) {
-      const jsonError = {
-        error: "Something went wrong! " + err?.message,
+
+      const finalResult: PredictorResult = {
+        sequence: result.sequence,
+        predictions: result.predictions,
+        actual: result.actual,
       };
-      console.error(JSON.stringify(jsonError, null, 2));
+      if (result?.isCorrect !== undefined) {
+        finalResult.isCorrect = result.isCorrect;
+      }
+
+      // Show user the final result(s)
+      console.log(JSON.stringify(finalResult, null, 2));
+
+      // If any warnings, show them after results.
+      if (result._warnings && result._warnings.length) {
+        console.log();
+        result._warnings.forEach((warning) => Logger.warn(warning, "\n"));
+      }
+    } catch (err: any) {
+      console.log();
+      Logger.error(`Something went wrong!`, err?.message, "\n");
       process.exit(1);
     }
   },

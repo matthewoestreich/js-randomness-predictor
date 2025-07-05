@@ -3,6 +3,12 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 
 describe("v8", () => {
+  it("should throw an error if sequence.length >= 64", () => {
+    assert.throws(() => {
+      new V8RandomnessPredictor(Array.from({ length: 64 }, () => 0.0));
+    });
+  });
+
   // TESTS WHATEVER CURRENT NODE VERSION YOU ARE ON
   describe(`v${process.versions.node} (current runtime version) : Dynamically Generated Sequence`, () => {
     it("predicts the next 5 numbers correctly", async () => {

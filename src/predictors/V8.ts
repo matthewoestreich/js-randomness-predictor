@@ -32,6 +32,9 @@ import { UnsatError } from "../errors.js";
  */
 
 export default class V8RandomnessPredictor {
+  // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
+  #MAX_SEQUENCE_LENGTH = 64;
+  #DEFAULT_SEQUENCE_LENGTH = 4;
   #nodeVersion: NodeJsVersion = this.#getNodeVersion();
   #isInitialized = false;
   #concreteState0 = 0n;
@@ -48,8 +51,11 @@ export default class V8RandomnessPredictor {
   public sequence: number[];
 
   constructor(sequence?: number[]) {
-    if (sequence === undefined) {
-      sequence = Array.from({ length: 4 }, Math.random);
+    if (sequence && sequence.length >= this.#MAX_SEQUENCE_LENGTH) {
+      throw new Error(`sequence.length must be less than '${this.#MAX_SEQUENCE_LENGTH}', got '${sequence.length}'`);
+    }
+    if (!sequence) {
+      sequence = Array.from({ length: this.#DEFAULT_SEQUENCE_LENGTH }, Math.random);
     }
     this.sequence = sequence;
     this.#internalSequence = [...sequence.reverse()];

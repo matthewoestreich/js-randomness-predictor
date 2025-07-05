@@ -2,11 +2,24 @@
 
 ## Random Number Pool Exhaustion
 
-Due to how Node/V8 generates random numbers, the "length of sequence" + "number of predictions" cannot exceed 64. Meaning, if you provide 4 numbers within the sequence, the max numbers you can successfully predict is 60. (sequence length [4] + number of predictions = 64).
+TLDR; If `number of predictions` + `sequence length` > `64`, we cannot make accurate predictions. We call this "pool exhaustion".
 
-When using the CLI, if "length of sequence" + "number of predictions" exceeds 64, we will show a warning as well as truncate "number of predictions" to be within the allowed bounds.
+**Why does this happen?**
 
-If "length of sequence" is >= 64, we will throw an error.
+- Node/V8 generate 64 "random" numbers at a time, which they cache in a "pool"
+- A seed is used to generate these "random" numbers
+- Solving for that seed is what allows us to predict future `Math.random` output
+- When you call `Math.random()` they grab a number from this "pool" and return it to you
+- When that "pool" is exhausted, they generate a new "pool", **with a new/different seed**
+- This means we cannot make accurate predictions for the new pool using the old pools seed
+
+**How we handle it**
+
+- When using the CLI, if `number of predictions` + `sequence length` > `64`, we will show a warning as well as truncate "number of predictions" to be within the allowed bounds.
+- For example, if you provided `[1, 2, 3, 4]` as the sequence, which has a length of 4, the max amount of predictions we can successfully make is 60 (because 64 - 4 = 60)
+- If the "length of the sequence" **on it's own** is >= 64, we will throw an error because we have no room for predictions, the entire pool was exhausted on the sequence
+
+---
 
 # Firefox
 
@@ -14,11 +27,14 @@ If "length of sequence" is >= 64, we will throw an error.
 
 You must disable "Instant Evaluation", otherwise your predictions may show incorrectly. Especially if you use more than one call to generate the initial sequence + expected values.
 
+**How to disable**
+
 <img width="1920" alt="Firefox_DisableConsoleInstantEvaluation" src="/.github/Firefox_DisableConsoleInstantEvaluation.png" />
 
-**If you do not want to disable "Instant Evaluation"**, you'll need to generate initial sequence + expected values in one command.
+**If you do not want to disable "Instant Evaluation"**
 
-So instead of using two (or more) calls to `Math.random`:
+- You'll need to generate initial sequence + expected values in one command.
+- So instead of using two (or more) calls to `Math.random`:
 
 ```js
 /** Pretend this is the console */
@@ -28,7 +44,7 @@ Array.from({ length: 4 }, Math.random);
 Array.from({ length: 10 }, Math.random);
 ```
 
-You'll need to do:
+- You'll need to do:
 
 ```js
 /** Pretend this is the console */
