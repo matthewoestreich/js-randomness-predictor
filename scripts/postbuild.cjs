@@ -13,13 +13,8 @@ function createPackageJsonInCjsDist(distPath = "") {
   const outFile = nodePath.resolve(__dirname, distPath, "package.json");
   nodeFs.mkdirSync(distPath, { recursive: true });
 
-  const pkgJson = JSON.stringify(
-    {
-      type: "commonjs",
-    },
-    null,
-    2,
-  );
+  // prettier-ignore
+  const pkgJson = JSON.stringify({ type: "commonjs" }, null, 2,);
 
   nodeFs.writeFileSync(outFile, pkgJson);
 }
