@@ -7,6 +7,8 @@ import {
   SafariRandomnessPredictor,
 } from "./predictors/index.js";
 
+export type { NodeJsVersion } from "./types.js";
+
 const JSRandomnessPredictor = {
   node: (sequence?: number[]) => new NodeRandomnessPredictor(sequence),
   v8: (sequence?: number[]) => new V8RandomnessPredictor(sequence),
