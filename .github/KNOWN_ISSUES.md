@@ -7,14 +7,14 @@ TLDR; If `number of predictions` + `sequence length` > `64`, we cannot make accu
 **Why does this happen?**
 
 - Node/V8 generate 64 "random" numbers at a time, which they cache in a "pool"
-  - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=19-27) that shows how they build the cache
+  - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=17-27) that shows how they build the cache
   - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.h;l=24;drc=75a8035abe03764596f30424030465636e82aa70;bpv=0) showing cache size
 - A seed is used to generate these "random" numbers
 - Solving for that seed is what allows us to predict future `Math.random` output
 - When you call `Math.random()` they grab a number from this "pool" and return it to you
   - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/math.tq;l=515-530) that shows how they pull from cache and return a random number to you, [specifically here](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/math.tq;l=529)
 - When that "pool" is exhausted, they generate a new "pool", **with a new/different seed**
-  - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=35-56) that shows how they refill the cache
+  - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=35-71) that shows how they refill the cache, [specifically here](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=61-65)
 - This means we cannot make accurate predictions for the new pool using the old pools seed
 
 **How we handle it**
