@@ -25,6 +25,7 @@ jobs:
           npm run build
           npm run test:current:nodejs:version
   test-js-and-maybe-publish:
+    needs: test-various-node-versions
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
