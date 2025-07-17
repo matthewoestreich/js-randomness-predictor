@@ -1,4 +1,5 @@
 const JsRandomnessPredictor = require("../dist/cjs/index.js");
+const randomNumbers = require("./random-numbers.json");
 
 /**
  * This script is used in a GitHub action that is meant to
@@ -20,15 +21,21 @@ if (arg_version) {
 }
 
 (async () => {
-  const sequence = Array.from({ length: 4 }, Math.random);
+  let sequence = Array.from({ length: 4 }, Math.random);
+  let expected = Array.from({ length: 10 }, Math.random);
+  let predictor = JsRandomnessPredictor.node(sequence);
+
   console.log({ v8_version: process.versions.v8 });
   console.log({ sequence });
-  const predictor = JsRandomnessPredictor.node(sequence);
-  const expected = Array.from({ length: 10 }, Math.random);
 
-  if (VERSION !== null) {
+  if (VERSION !== null && VERSION <= 16) {
+    const randsForThisVersion = randomNumbers.find((r) => r.nodeVersion === VERSION);
+    const noCustomSeed = randsForThisVersion.randomNumbers.find((r) => r.isCustomSeed === false);
+    sequence = noCustomSeed.sequence;
+    expected = noCustomSeed.expected;
+    predictor = JsRandomnessPredictor.node(sequence);
     predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
-    console.log(`Testing Node.js v${VERSION}`);
+    console.log(`[VERSION <= 16] Testing Node.js v${VERSION}`);
   } else {
     console.log(`Testing Node.js v${process.versions.node.split(".")[0]}`);
   }
