@@ -21,6 +21,7 @@ if (arg_version) {
 
 (async () => {
   const sequence = Array.from({ length: 4 }, Math.random);
+  console.log({ sequence });
   const predictor = JsRandomnessPredictor.node(sequence);
   const expected = Array.from({ length: 10 }, Math.random);
 
@@ -38,10 +39,10 @@ if (arg_version) {
   }
 
   if (expected.every((v, i) => predictions[i] === v)) {
-    console.log({ sequence, predictions, expected, result: `[SUCCESS] Predictions are accurate.` });
+    console.log({ predictions, expected, result: `[SUCCESS] Predictions are accurate.` });
     process.exit(0);
   } else {
-    console.log({ sequence, predictions, expected, result: `[FAILURE] Predictions not accurate.` });
+    console.log({ predictions, expected, result: `[FAILURE] Predictions not accurate.` });
     process.exit(1);
   }
 })();
