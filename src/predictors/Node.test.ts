@@ -20,7 +20,6 @@ describe("Node", () => {
   // TESTS WHATEVER CURRENT NODE VERSION YOU ARE ON
   describe(`Current Runtime Version : Dynamically Generated Sequence`, () => {
     it("predicts the next 5 numbers correctly", async () => {
-      console.log(`Testing version : ${process.versions.node}`);
       const v8 = new NodeRandomnessPredictor();
       const expected = Array.from({ length: 5 }, Math.random);
       const predictions: number[] = [];
@@ -35,12 +34,6 @@ describe("Node", () => {
     const VERSION = 10;
     // THESE NUMBERS WERE GENERATED IN NODE v10.x
     const { sequence, expected } = getSequenceAndExpectedFromDatabase(VERSION);
-
-    console.log({
-      VERSION,
-      sequence,
-      expected,
-    });
 
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
