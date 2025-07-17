@@ -4,8 +4,9 @@ import assert from "node:assert";
 
 describe("Node", () => {
   // TESTS WHATEVER CURRENT NODE VERSION YOU ARE ON
-  describe(`v${process.versions.node} (current runtime version) : Dynamically Generated Sequence`, () => {
+  describe(`Current Runtime Version : Dynamically Generated Sequence`, () => {
     it("predicts the next 5 numbers correctly", async () => {
+      console.log(`Testing version : ${process.versions.node}`);
       const v8 = new NodeRandomnessPredictor();
       const expected = Array.from({ length: 5 }, Math.random);
       const predictions: number[] = [];
