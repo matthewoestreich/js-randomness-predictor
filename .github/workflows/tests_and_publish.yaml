@@ -7,59 +7,7 @@ on:
     branches:
       - main
 jobs:
-  #get-random-numbers-for-older-versions:
-  #  runs-on: ubuntu-latest
-  #  strategy:
-  #    matrix:
-  #      node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x]
-  #  steps:
-  #    - uses: actions/checkout@v4
-  #    - name: Use Node.js ${{ matrix.node-version }}
-  #      uses: actions/setup-node@v4
-  #      with:
-  #        node-version: ${{ matrix.node-version }}
-  #    - name: Get random numbers
-  #      shell: bash
-  #      run: node scripts/log_random_numbers.cjs
-  #    - name: Setup new node instance
-  #      uses: actions/setup-node@v4
-  #      with:
-  #        node-version: ${{ matrix.node-version }}
-  #    - name: Get random numbers with --random-seed=123
-  #      shell: bash
-  #      run: node --random-seed=123 scripts/log_random_numbers.cjs
-
-  test-various-node-versions:
-    #needs: get-random-numbers-for-older-versions
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16.x, 17.x, 18.x, 20.x, 21.x, 22.x, 23.x, 24.x]
-    env:
-      GREATER_OR_EQUAL_17: '["17.x", "18.x", "20.x", "21.x", "22.x", "23.x", "24.x"]'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-        if: ${{ contains(fromJson(env.GREATER_OR_EQUAL_17), matrix.node-version) }}
-      - name: Use Node.js 24.x (for versions < 17)
-        # We can still test versions < 17, we just can't build the project with versions < 17.
-        # This lets us do just that and test random numbers from older versions of Node, but
-        # on code that was built using newer versions of Node.
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24.x
-        if: ${{ !contains(fromJson(env.GREATER_OR_EQUAL_17), matrix.node-version) }}
-      - name: Install deps, build, and test
-        shell: bash
-        run: |
-          npm install
-          npm run build
-          npm run test:current:nodejs:version -- ${{ matrix.node-version }}
   test-js-and-maybe-publish:
-    needs: test-various-node-versions
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

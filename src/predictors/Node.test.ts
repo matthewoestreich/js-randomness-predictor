@@ -1,6 +1,20 @@
 import NodeRandomnessPredictor from "./Node";
 import { describe, it } from "node:test";
 import assert from "node:assert";
+import randomNumberDatabase from "../../scripts/random-numbers.json";
+
+function getSequenceAndExpectedFromDatabase(nodeJsMajorVersion: number, isCustomSeed?: boolean): { sequence: number[]; expected: number[] } {
+  const found = randomNumberDatabase.find((db) => db.nodeVersion === nodeJsMajorVersion);
+  if (!found) {
+    throw new Error(`Unable to find random numbers for Node.js v${nodeJsMajorVersion}`);
+  }
+  const isSeeded = isCustomSeed === undefined ? false : isCustomSeed;
+  const rands = found.randomNumbers.find((r) => r.isCustomSeed === isSeeded);
+  if (!rands) {
+    throw new Error(`Unable to find random numbers for Node.js v${nodeJsMajorVersion}`);
+  }
+  return { sequence: rands.sequence, expected: rands.expected };
+}
 
 describe("Node", () => {
   // TESTS WHATEVER CURRENT NODE VERSION YOU ARE ON
@@ -17,14 +31,129 @@ describe("Node", () => {
     });
   });
 
-  /*
+  describe("v10.x : User Provided Sequence", () => {
+    const VERSION = 10;
+    // THESE NUMBERS WERE GENERATED IN NODE v10.x
+    const { sequence, expected } = getSequenceAndExpectedFromDatabase(VERSION);
+
+    console.log({
+      VERSION,
+      sequence,
+      expected,
+    });
+
+    it("should predict accurately", async () => {
+      const predictor = new NodeRandomnessPredictor(sequence);
+      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        const prediction = await predictor.predictNext();
+        predictions.push(prediction);
+      }
+
+      assert.deepStrictEqual(predictions, expected);
+    });
+  });
+
+  describe("v11.x : User Provided Sequence", () => {
+    const VERSION = 11;
+    // THESE NUMBERS WERE GENERATED IN NODE v11.x
+    const { sequence, expected } = getSequenceAndExpectedFromDatabase(VERSION);
+
+    it("should predict accurately", async () => {
+      const predictor = new NodeRandomnessPredictor(sequence);
+      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        const prediction = await predictor.predictNext();
+        predictions.push(prediction);
+      }
+
+      assert.deepStrictEqual(predictions, expected);
+    });
+  });
+
+  describe("v12.x : User Provided Sequence", () => {
+    const VERSION = 12;
+    // THESE NUMBERS WERE GENERATED IN NODE v12.x
+    const { sequence, expected } = getSequenceAndExpectedFromDatabase(VERSION);
+
+    it("should predict accurately", async () => {
+      const predictor = new NodeRandomnessPredictor(sequence);
+      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        const prediction = await predictor.predictNext();
+        predictions.push(prediction);
+      }
+
+      assert.deepStrictEqual(predictions, expected);
+    });
+  });
+
+  describe("v13.x : User Provided Sequence", () => {
+    const VERSION = 13;
+    // THESE NUMBERS WERE GENERATED IN NODE v13.x
+    const { sequence, expected } = getSequenceAndExpectedFromDatabase(VERSION);
+
+    it("should predict accurately", async () => {
+      const predictor = new NodeRandomnessPredictor(sequence);
+      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        const prediction = await predictor.predictNext();
+        predictions.push(prediction);
+      }
+
+      assert.deepStrictEqual(predictions, expected);
+    });
+  });
+
+  describe("v14.x : User Provided Sequence", () => {
+    const VERSION = 14;
+    // THESE NUMBERS WERE GENERATED IN NODE v14.x
+    const { sequence, expected } = getSequenceAndExpectedFromDatabase(VERSION);
+
+    it("should predict accurately", async () => {
+      const predictor = new NodeRandomnessPredictor(sequence);
+      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        const prediction = await predictor.predictNext();
+        predictions.push(prediction);
+      }
+
+      assert.deepStrictEqual(predictions, expected);
+    });
+  });
+
+  describe("v15.x : User Provided Sequence", () => {
+    const VERSION = 15;
+    // THESE NUMBERS WERE GENERATED IN NODE v15.x
+    const { sequence, expected } = getSequenceAndExpectedFromDatabase(VERSION);
+
+    it("should predict accurately", async () => {
+      const predictor = new NodeRandomnessPredictor(sequence);
+      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        const prediction = await predictor.predictNext();
+        predictions.push(prediction);
+      }
+
+      assert.deepStrictEqual(predictions, expected);
+    });
+  });
+
   describe("v16.x : User Provided Sequence", () => {
     // THESE NUMBERS WERE GENERATED IN NODE v16.x
-    const sequence = [0.4704950319621287, 0.6526547689991911, 0.46883543179825504, 0.3531505491001201];
-    const expected = [
-      0.7984361564955742, 0.45749221884786195, 0.6039614844578337, 0.9168810868791469, 0.20127740671764283, 0.8783028395378837, 0.10436210497856946,
-      0.3910436176013258, 0.9635685123508106, 0.20655151006897665,
-    ];
+    const { sequence, expected } = getSequenceAndExpectedFromDatabase(16);
 
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
@@ -39,7 +168,6 @@ describe("Node", () => {
       assert.deepStrictEqual(predictions, expected);
     });
   });
-  */
 
   // TESTS NODE VERSION 22
   describe("v22.0.0 : User Provided Sequence", () => {

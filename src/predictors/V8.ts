@@ -4,7 +4,18 @@ import { UnsatError } from "../errors.js";
 
 /**
  *
- * 1. In Node v24.x.x (commit was in Feb2025), V8 updated their impl of the `ToDouble` method. The old method was in use since 2022.
+ *  In Node versions <= 11 the ToDouble method was different : https://github.com/nodejs/node/blob/v10.0.0/deps/v8/src/base/utils/random-number-generator.h#L114-L120
+ *      ```
+ *      static inline double ToDouble(uint64_t state0, uint64_t state1) {
+ *         // Exponent for double values for [1.0 .. 2.0)
+ *         static const uint64_t kExponentBits = uint64_t{0x3FF0000000000000};
+ *         static const uint64_t kMantissaMask = uint64_t{0x000FFFFFFFFFFFFF};
+ *         uint64_t random = ((state0 + state1) & kMantissaMask) | kExponentBits;
+ *         return bit_cast<double>(random) - 1;
+ *      }
+ *      ```
+ *
+ *  In Node v24.x.x (commit was in Feb2025), V8 updated their impl of the `ToDouble` method. The old method was in use since 2022.
  *    This caused breaking changes to this predictor, so we now have to detect node version so we can choose which ToDouble to implement.
  *   - Old Impl: https://github.com/v8/v8/blob/e99218a1cca470ddec1931547b36a256f3450078/src/base/utils/random-number-generator.h#L111
  *      ```
@@ -129,7 +140,9 @@ export default class V8RandomnessPredictor {
 
   // Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
   #xorShift128PlusConcrete(): bigint {
-    const result = this.#concreteState0!;
+    const ogConcreteState0 = this.#concreteState0;
+    const ogConcreteState1 = this.#concreteState1;
+
     let ps1 = this.#concreteState0!;
     let ps0 = this.#concreteState1! ^ (ps1 >> 26n);
     ps0 ^= ps1;
@@ -137,38 +150,67 @@ export default class V8RandomnessPredictor {
     ps0 = (ps0 ^ (ps0 << 23n) ^ (ps0 << 46n)) & this.#mask;
     this.#concreteState0 = ps0;
     this.#concreteState1 = ps1;
-    return result;
+
+    // Very old logic that goes back to at least v10
+    if (this.#nodeVersion.major <= 11) {
+      return ogConcreteState0 + ogConcreteState1;
+    }
+    // Newer logic
+    return ogConcreteState0;
   }
 
   #recoverMantissaAndAddToSolver(n: number): void {
     const majorVersion = this.#nodeVersion.major;
 
-    if (majorVersion >= 24) {
-      // New `ToDouble` logic (Feb 2025) introduced to V8.
-      const mantissa = Math.floor(n * Math.pow(2, 53));
-      this.#solver!.add(this.#seState0!.lshr(11).eq(this.#context!.BitVec.val(BigInt(mantissa), 64)));
+    // Very old logic that goes back to at least v10
+    if (majorVersion <= 11) {
+      const buffer = Buffer.alloc(8);
+      buffer.writeDoubleLE(n + 1, 0);
+      const rawBits = (BigInt(buffer.readUInt32LE(4)) << 32n) | BigInt(buffer.readUInt32LE(0));
+      const mantissaMask = 0x000fffffffffffffn;
+      const mantissa = rawBits & mantissaMask;
+
+      const sum = this.#seState0!.add(this.#seState1!).and(this.#context!.BitVec.val(mantissaMask, 64));
+      this.#solver!.add(sum.eq(this.#context!.BitVec.val(mantissa, 64)));
       return;
     }
 
-    // Old `ToDouble` logic (in use from ~2022 - Feb 2025)
-    const buffer = Buffer.alloc(8);
-    buffer.writeDoubleLE(n + 1, 0);
-    const uint64 = (BigInt(buffer.readUInt32LE(4)) << 32n) | BigInt(buffer.readUInt32LE(0));
-    const mantissa = uint64 & ((1n << 52n) - 1n);
-    this.#solver!.add(this.#seState0!.lshr(12).eq(this.#context!.BitVec.val(mantissa, 64)));
+    // Old-ish `ToDouble` logic (in use from ~2022 - Feb 2025)
+    if (majorVersion <= 23) {
+      const buffer = Buffer.alloc(8);
+      buffer.writeDoubleLE(n + 1, 0);
+      const uint64 = (BigInt(buffer.readUInt32LE(4)) << 32n) | BigInt(buffer.readUInt32LE(0));
+      const mantissa = uint64 & ((1n << 52n) - 1n);
+      this.#solver!.add(this.#seState0!.lshr(12).eq(this.#context!.BitVec.val(mantissa, 64)));
+      return;
+    }
+
+    // New `ToDouble` logic (Feb 2025) introduced to V8.
+    const mantissa = Math.floor(n * Math.pow(2, 53));
+    this.#solver!.add(this.#seState0!.lshr(11).eq(this.#context!.BitVec.val(BigInt(mantissa), 64)));
   }
 
   #toDouble(n: bigint): number {
     const majorVersion = this.#nodeVersion.major;
 
-    if (majorVersion >= 24) {
-      /* New ToDouble logic (Feb 2025+) */
-      return Number(n >> 11n) / Math.pow(2, 53);
+    // Very old logic that goes back to at least v10
+    if (majorVersion <= 11) {
+      const kExponentBits = 0x3ff0000000000000n;
+      const kMantissaMask = 0x000fffffffffffffn;
+      const random = (n & kMantissaMask) | kExponentBits;
+      const buffer = Buffer.alloc(8);
+      buffer.writeBigUInt64LE(random, 0);
+      return buffer.readDoubleLE(0) - 1;
     }
 
-    /* Old logic (pre-Feb 2025) */
-    const buffer = Buffer.allocUnsafe(8);
-    buffer.writeBigUInt64LE((n >> 12n) | 0x3ff0000000000000n, 0);
-    return buffer.readDoubleLE(0) - 1;
+    /* Old-ish logic (pre-Feb 2025) */
+    if (majorVersion <= 23) {
+      const buffer = Buffer.allocUnsafe(8);
+      buffer.writeBigUInt64LE((n >> 12n) | 0x3ff0000000000000n, 0);
+      return buffer.readDoubleLE(0) - 1;
+    }
+
+    /* New ToDouble logic (Feb 2025+) */
+    return Number(n >> 11n) / Math.pow(2, 53);
   }
 }
