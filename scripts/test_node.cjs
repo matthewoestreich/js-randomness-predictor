@@ -9,14 +9,31 @@ const JsRandomnessPredictor = require("../dist/cjs/index.js");
  * to test versions.
  */
 
+// The only arg we expect is one in the followng format : '14.x'
+// It represents the Node.js version.
+
+let VERSION = null;
+
+const arg_version = process.argv[2];
+if (arg_version) {
+  VERSION = Number(arg_version.split(".")[0]);
+}
+
 (async () => {
   const seq = Array.from({ length: 4 }, Math.random);
-  const nodePredictor = JsRandomnessPredictor.node(seq);
+  const predictor = JsRandomnessPredictor.node(seq);
   const expected = Array.from({ length: 10 }, Math.random);
+
+  if (VERSION !== null) {
+    predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+    console.log(`Testing Node.js v${VERSION}`);
+  } else {
+    console.log(`Testing Node.js v${process.versions.node.split(".")[0]}`);
+  }
 
   const predictions = [];
   for (let i = 0; i < 10; i++) {
-    const prediction = await nodePredictor.predictNext();
+    const prediction = await predictor.predictNext();
     predictions.push(prediction);
   }
 
