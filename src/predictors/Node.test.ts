@@ -17,6 +17,30 @@ describe("Node", () => {
     });
   });
 
+  /*
+  describe("v16.x : User Provided Sequence", () => {
+    // THESE NUMBERS WERE GENERATED IN NODE v16.x
+    const sequence = [0.4704950319621287, 0.6526547689991911, 0.46883543179825504, 0.3531505491001201];
+    const expected = [
+      0.7984361564955742, 0.45749221884786195, 0.6039614844578337, 0.9168810868791469, 0.20127740671764283, 0.8783028395378837, 0.10436210497856946,
+      0.3910436176013258, 0.9635685123508106, 0.20655151006897665,
+    ];
+
+    it("should predict accurately", async () => {
+      const predictor = new NodeRandomnessPredictor(sequence);
+      predictor.setNodeVersion({ major: 16, minor: 0, patch: 0 });
+
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        const prediction = await predictor.predictNext();
+        predictions.push(prediction);
+      }
+
+      assert.deepStrictEqual(predictions, expected);
+    });
+  });
+  */
+
   // TESTS NODE VERSION 22
   describe("v22.0.0 : User Provided Sequence", () => {
     // THESE NUMBERS WERE GENERATED IN NODE v22.x.x

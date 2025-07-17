@@ -21,6 +21,7 @@ if (arg_version) {
 
 (async () => {
   const sequence = Array.from({ length: 4 }, Math.random);
+  console.log({ v8_version: process.versions.v8 });
   console.log({ sequence });
   const predictor = JsRandomnessPredictor.node(sequence);
   const expected = Array.from({ length: 10 }, Math.random);
