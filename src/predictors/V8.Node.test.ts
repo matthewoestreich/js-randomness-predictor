@@ -17,6 +17,12 @@ function getSequenceAndExpectedFromDatabase(nodeJsMajorVersion: number, isCustom
 }
 
 describe("Node", () => {
+  it("should throw an error if sequence.length >= 64", () => {
+    assert.throws(() => {
+      new NodeRandomnessPredictor(Array.from({ length: 64 }, () => 0.0));
+    });
+  });
+
   // TESTS WHATEVER CURRENT NODE VERSION YOU ARE ON
   describe(`Current Runtime Version : Dynamically Generated Sequence`, () => {
     it("predicts the next 5 numbers correctly", async () => {
@@ -162,6 +168,8 @@ describe("Node", () => {
     });
   });
 
+  /* GITHUB ACTIONS TESTS VERSIONS 17 - CURRENT
+
   // TESTS NODE VERSION 22
   describe("v22.0.0 : User Provided Sequence", () => {
     // THESE NUMBERS WERE GENERATED IN NODE v22.x.x
@@ -208,4 +216,5 @@ describe("Node", () => {
       assert.deepStrictEqual(nextFive, EXPECTED_NEXT_FIVE_NUMBERS);
     });
   });
+  */
 });

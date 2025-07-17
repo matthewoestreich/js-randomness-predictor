@@ -7,6 +7,23 @@ on:
     branches:
       - main
 jobs:
+  test-various-node-versions:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install deps, build, and test
+        shell: bash
+        run: |
+          npm install
+          npm run build
+          npm run test:current:nodejs:version
   test-js-and-maybe-publish:
     runs-on: ubuntu-latest
     steps:
