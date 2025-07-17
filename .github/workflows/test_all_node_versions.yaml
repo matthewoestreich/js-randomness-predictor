@@ -8,21 +8,46 @@ on:
       - main
   workflow_dispatch:
 jobs:
-  test-node-versions:
+  build:
+    name: Build Project
     runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.set-output.outputs.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      - name: Install & Build
+        run: |
+          npm install
+          npm run build
+      - name: Save artifact name
+        id: set-output
+        run: echo "name=built-js-randomness-predictor" >> "$GITHUB_OUTPUT"
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.set-output.outputs.name }}
+          path: dist/
 
+  test-node-versions:
+    needs: build
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [17.x, 18.x, 20.x, 21.x, 22.x, 23.x, 24.x]
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-
-      - run: npm install
-      - run: npm run build
-      - run: npm run test:current:nodejs:version
+      - name: Download built files
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact-name }}
+          path: ./dist
+      - name: Run test
+        run: npm run test:current:nodejs:version
