@@ -26,7 +26,6 @@ if (arg_version) {
   let predictor = JsRandomnessPredictor.node(sequence);
 
   console.log({ v8_version: process.versions.v8 });
-  console.log({ sequence });
 
   if (VERSION !== null && VERSION <= 16) {
     const randsForThisVersion = randomNumbers.find((r) => r.nodeVersion === VERSION);
@@ -47,10 +46,10 @@ if (arg_version) {
   }
 
   if (expected.every((v, i) => predictions[i] === v)) {
-    console.log({ predictions, expected, result: `[SUCCESS] Predictions are accurate.` });
+    console.log({ sequence, predictions, expected, result: `[SUCCESS] Predictions are accurate.` });
     process.exit(0);
   } else {
-    console.log({ predictions, expected, result: `[FAILURE] Predictions not accurate.` });
+    console.log({ sequence, predictions, expected, result: `[FAILURE] Predictions not accurate.` });
     process.exit(1);
   }
 })();
