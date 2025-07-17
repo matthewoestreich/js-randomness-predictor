@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [17.x, 18.x, 20.x, 21.x, 22.x, 23.x, 24.x]
+        node-version: [16.x, 17.x, 18.x, 20.x, 21.x, 22.x, 23.x, 24.x]
     env:
       GREATER_OR_EQUAL_17: '["17.x", "18.x", "20.x", "21.x", "22.x", "23.x", "24.x"]'
     steps:
