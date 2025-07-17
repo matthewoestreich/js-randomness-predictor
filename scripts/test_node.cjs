@@ -40,7 +40,7 @@ if (arg_version) {
   }
 
   const predictions = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < expected.length; i++) {
     const prediction = await predictor.predictNext();
     predictions.push(prediction);
   }
