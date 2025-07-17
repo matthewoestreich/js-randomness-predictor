@@ -8,32 +8,7 @@ on:
       - main
   workflow_dispatch:
 jobs:
-  build:
-    name: Build Project
-    runs-on: ubuntu-latest
-    outputs:
-      artifact-name: ${{ steps.set-output.outputs.name }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24.x
-      - name: Install & Build
-        run: |
-          npm install
-          npm run build
-      - name: Save artifact name
-        id: set-output
-        run: echo "name=built-js-randomness-predictor" >> "$GITHUB_OUTPUT"
-      - name: Upload build
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.set-output.outputs.name }}
-          path: dist/
-
   test-node-versions:
-    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -52,4 +27,5 @@ jobs:
       - name: Run test
         run: |
           npm install
+          npm run build
           npm run test:current:nodejs:version
