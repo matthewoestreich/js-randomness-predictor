@@ -50,4 +50,6 @@ jobs:
           name: ${{ needs.build.outputs.artifact-name }}
           path: ./dist
       - name: Run test
-        run: npm run test:current:nodejs:version
+        run: |
+          npm install
+          npm run test:current:nodejs:version
