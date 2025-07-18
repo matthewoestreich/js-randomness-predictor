@@ -3,8 +3,9 @@
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, SequenceNotFoundError, NodeJsMajorVersion, PredictorResult } from "../types.js";
+import { PredictorArgs, NodeJsMajorVersion, PredictorResult } from "../types.js";
 import { PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS } from "../constants.js";
+import { SequenceNotFoundError } from "../errors.js";
 import Logger from "../logger.js";
 
 const predictCommand: CommandModule = {

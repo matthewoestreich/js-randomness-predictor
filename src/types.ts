@@ -26,11 +26,3 @@ export type PredictorResult = {
   isCorrect?: boolean;
   _warnings?: string[];
 };
-
-export class SequenceNotFoundError extends Error {
-  constructor(message?: string) {
-    super(message);
-    this.name = "SequenceNotFoundError";
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}
