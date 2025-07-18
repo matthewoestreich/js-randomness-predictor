@@ -9,9 +9,6 @@ const JsRandomnessPredictor = require("../dist/cjs/index.js");
  * to test versions.
  */
 
-// The only arg we expect is one in the followng format : '14.x'
-// It represents the Node.js version.
-
 if (Number(process.versions.node.split(".")[0]) < 17) {
   console.log(`Only versions >= 17 are supported! Current version : ${process.versions.node.split(".")[0]}`);
   process.exit(1);
