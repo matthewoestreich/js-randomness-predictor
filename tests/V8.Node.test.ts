@@ -8,17 +8,14 @@ describe("Node", () => {
       new NodeRandomnessPredictor(Array.from({ length: 64 }, () => 0.0));
     });
   });
-
-  // TESTS WHATEVER CURRENT NODE VERSION YOU ARE ON
-  describe(`Current Runtime Version : Dynamically Generated Sequence`, () => {
-    it("predicts the next 5 numbers correctly", async () => {
-      const v8 = new NodeRandomnessPredictor();
-      const expected = Array.from({ length: 5 }, Math.random);
-      const predictions: number[] = [];
-      for (let i = 0; i < expected.length; i++) {
-        predictions.push(await v8.predictNext());
-      }
-      assert.deepStrictEqual(expected, predictions);
-    });
+  
+  it("predicts the next 5 numbers correctly", async () => {
+    const v8 = new NodeRandomnessPredictor();
+    const expected = Array.from({ length: 5 }, Math.random);
+    const predictions: number[] = [];
+    for (let i = 0; i < expected.length; i++) {
+      predictions.push(await v8.predictNext());
+    }
+    assert.deepStrictEqual(expected, predictions);
   });
 });

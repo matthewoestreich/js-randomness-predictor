@@ -8,11 +8,7 @@ const JsRandomnessPredictor = require("../dist/cjs/index.js");
  */
 
 const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
-
-if (NODE_MAJOR_VERSION < 17 || NODE_MAJOR_VERSION > 20) {
-  console.log(`Only versions >= 17 and <= 20 are supported! Current version : ${NODE_MAJOR_VERSION}`);
-  process.exit(1);
-}
+console.log("#".repeat(200), `\nTesting Node.js v${NODE_MAJOR_VERSION} with an auto generated sequence & expected\n`, "#".repeat(200));
 
 (async () => {
   const seq = Array.from({ length: 4 }, Math.random);

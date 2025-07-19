@@ -29,6 +29,7 @@
     "test": "tsx --test tests/*.test.ts",
     "test:legacy": "tsx --test tests/legacy/*.test.ts --color",
     "test:script": "node scripts/testVersionsWithoutNodeTest.cjs",
+    "test:all": "npm run test:legacy && npm run test:script && npm run test",
     "format": "prettier . --write",
     "lint": "eslint .",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
