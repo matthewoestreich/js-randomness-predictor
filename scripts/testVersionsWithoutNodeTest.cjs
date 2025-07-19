@@ -8,7 +8,7 @@ const JsRandomnessPredictor = require("../dist/cjs/index.js");
  */
 
 const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
-console.log("#".repeat(200), `\nTesting Node.js v${NODE_MAJOR_VERSION} with an auto generated sequence & expected\n`, "#".repeat(200));
+console.log("#".repeat(100), `\nTesting Node.js v${NODE_MAJOR_VERSION} with an auto generated sequence & expected\n`, "#".repeat(100));
 
 (async () => {
   const seq = Array.from({ length: 4 }, Math.random);
