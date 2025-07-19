@@ -1,12 +1,10 @@
 const JsRandomnessPredictor = require("../dist/cjs/index.js");
 
 /**
- * This script is used in a GitHub action that is meant to
- * test a wide variety of Node versions.
+ * This script is used in GitHub Actions.
  *
- * Since we use node:test for our main tests, and it is not
- * available in Node.js versions <18, we have to use a script
- * to test versions.
+ * Since `node:test` came out in Node v20 we can't use it in versions 17-19.
+ * Therefore, we have to use this script.
  */
 
 const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
