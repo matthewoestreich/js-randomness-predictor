@@ -30,20 +30,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x]
+        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, node] # 'node' means latest stable version
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Echo Node.js version
+        run: echo "Node.js version = ${{ matrix.node-version }}"
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Build
         shell: bash
         run: npm run build
       - name: Run tests (v20.x and above)
-        if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' }}
+        if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
         shell: bash
         run: npm run test
         env:
