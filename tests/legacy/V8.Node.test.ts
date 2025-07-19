@@ -1,6 +1,6 @@
 /**
  *
- * This file is meant to test older, unsupported versions of Node.
+ * This file is meant to test older, unsupported (meaning, unsupported by this package) versions of Node.
  *
  * While these versions are unsupported (due to being unable to build Z3), you can still
  * make predictions with numbers generated in those legacy versions.
