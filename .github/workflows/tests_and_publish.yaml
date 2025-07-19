@@ -7,7 +7,26 @@ on:
     branches:
       - main
 jobs:
-  test-various-node-versions:
+  test-legacy-node-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        shell: bash
+        run: npm run build
+      - name: Run tests
+        shell: bash
+        run: npm run test:legacy
+        env:
+          FORCE_COLOR: "1"
+  test-supported-node-versions:
+    needs: test-legacy-node-versions
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,22 +37,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install deps, build, and test
-        shell: bash
-        run: |
-          npm install
-          npm run build
-          npm run test:current:nodejs:version
-  test-js-and-maybe-publish:
-    needs: test-various-node-versions
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24.2.0
-          registry-url: "https://registry.npmjs.org/"
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Build
@@ -44,6 +47,10 @@ jobs:
         run: npm run test
         env:
           FORCE_COLOR: "1"
+  maybe-publish:
+    needs: test-supported-node-versions
+    runs-on: ubuntu-latest
+    steps:
       - name: Automated Version Bump
         if: startsWith(github.event.head_commit.message, '[publish] ')
         uses: phips28/gh-action-bump-version@v11.0.7
