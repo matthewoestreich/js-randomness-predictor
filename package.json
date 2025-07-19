@@ -28,6 +28,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "test": "tsx --test tests/*.test.ts",
     "test:legacy": "tsx --test tests/legacy/*.test.ts",
+    "test:script": "node scripts/testVersionsWithoutNodeTest.cjs",
     "format": "prettier . --write",
     "lint": "eslint .",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
