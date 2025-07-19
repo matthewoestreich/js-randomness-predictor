@@ -8,7 +8,7 @@ describe("Node", () => {
       new NodeRandomnessPredictor(Array.from({ length: 64 }, () => 0.0));
     });
   });
-  
+
   it("predicts the next 5 numbers correctly", async () => {
     const v8 = new NodeRandomnessPredictor();
     const expected = Array.from({ length: 5 }, Math.random);
