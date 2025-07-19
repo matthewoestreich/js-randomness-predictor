@@ -3,9 +3,9 @@ import assert from "node:assert";
 import { spawnSync, SpawnSyncReturns } from "node:child_process";
 import path from "node:path";
 import fs from "node:fs";
-import { PREDICTOR_ENVIRONMENTS } from "../constants.ts";
+import { PREDICTOR_ENVIRONMENTS } from "../src/constants.ts";
 
-const BIN_PATH = path.resolve(import.meta.dirname, "../../dist/esm/cli/js-randomness-predictor.js");
+const BIN_PATH = path.resolve(import.meta.dirname, "../dist/esm/cli/js-randomness-predictor.js");
 
 type Flags = {
   environment?: NonNullable<(typeof PREDICTOR_ENVIRONMENTS)[number]>;

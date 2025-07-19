@@ -3,7 +3,6 @@
     "nodeVersion": 10,
     "randomNumbers": [
       {
-        "isCustomSeed": false,
         "customSeed": null,
         "sequence": [0.43572314429566683, 0.5870318283674891, 0.25695468575733926, 0.10419387273282354],
         "expected": [
@@ -14,7 +13,6 @@
         ]
       },
       {
-        "isCustomSeed": true,
         "customSeed": 123,
         "sequence": [0.356331924601351, 0.3677281421400078, 0.8726225972881951, 0.4576586538675331],
         "expected": [
@@ -30,7 +28,6 @@
     "nodeVersion": 11,
     "randomNumbers": [
       {
-        "isCustomSeed": false,
         "customSeed": null,
         "sequence": [0.18353492585419806, 0.897850208560347, 0.19150477111992759, 0.39445817742300937],
         "expected": [
@@ -40,7 +37,6 @@
         ]
       },
       {
-        "isCustomSeed": true,
         "customSeed": 123,
         "sequence": [0.356331924601351, 0.3677281421400078, 0.8726225972881951, 0.4576586538675331],
         "expected": [
@@ -56,7 +52,6 @@
     "nodeVersion": 12,
     "randomNumbers": [
       {
-        "isCustomSeed": false,
         "customSeed": null,
         "sequence": [0.48852413557944496, 0.3935107867303671, 0.41542118225325186, 0.5768713491448079],
         "expected": [
@@ -67,7 +62,6 @@
         ]
       },
       {
-        "isCustomSeed": true,
         "customSeed": 123,
         "sequence": [0.5985569033918585, 0.0701684046878579, 0.1472069832427052, 0.7187475579086708],
         "expected": [
@@ -82,7 +76,6 @@
     "nodeVersion": 13,
     "randomNumbers": [
       {
-        "isCustomSeed": false,
         "customSeed": null,
         "sequence": [0.8374098816935616, 0.7356046396912304, 0.34769954681184445, 0.4597942311795724],
         "expected": [
@@ -92,7 +85,6 @@
         ]
       },
       {
-        "isCustomSeed": true,
         "customSeed": 123,
         "sequence": [0.5985569033918585, 0.0701684046878579, 0.1472069832427052, 0.7187475579086708],
         "expected": [
@@ -107,7 +99,6 @@
     "nodeVersion": 14,
     "randomNumbers": [
       {
-        "isCustomSeed": false,
         "customSeed": null,
         "sequence": [0.7203538808155276, 0.41676463607144165, 0.7627190433448563, 0.4510278527273146],
         "expected": [
@@ -118,7 +109,6 @@
         ]
       },
       {
-        "isCustomSeed": true,
         "customSeed": 123,
         "sequence": [0.5985569033918585, 0.0701684046878579, 0.1472069832427052, 0.7187475579086708],
         "expected": [
@@ -133,7 +123,6 @@
     "nodeVersion": 15,
     "randomNumbers": [
       {
-        "isCustomSeed": false,
         "customSeed": null,
         "sequence": [0.9204326764429986, 0.02831798811054731, 0.3465909604655759, 0.23393874075317056],
         "expected": [
@@ -144,7 +133,6 @@
         ]
       },
       {
-        "isCustomSeed": true,
         "customSeed": 123,
         "sequence": [0.5985569033918585, 0.0701684046878579, 0.1472069832427052, 0.7187475579086708],
         "expected": [
@@ -159,7 +147,6 @@
     "nodeVersion": 16,
     "randomNumbers": [
       {
-        "isCustomSeed": false,
         "customSeed": null,
         "sequence": [0.6196993486942468, 0.586351348669683, 0.5645179265333811, 0.548564856380128],
         "expected": [
@@ -169,7 +156,6 @@
         ]
       },
       {
-        "isCustomSeed": true,
         "customSeed": 123,
         "sequence": [0.5985569033918585, 0.0701684046878579, 0.1472069832427052, 0.7187475579086708],
         "expected": [

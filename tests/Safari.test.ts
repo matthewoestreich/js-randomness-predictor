@@ -1,4 +1,4 @@
-import SafariRandomnessPredictor from "./Safari";
+import SafariRandomnessPredictor from "../src/predictors/Safari";
 import { describe, it } from "node:test";
 import assert from "node:assert";
 

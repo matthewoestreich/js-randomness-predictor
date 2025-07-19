@@ -1,4 +1,4 @@
-import ChromeRandomnessPredictor from "./Chrome";
+import ChromeRandomnessPredictor from "../src/predictors/Chrome";
 import { describe, it } from "node:test";
 import assert from "node:assert";
 

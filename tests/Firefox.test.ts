@@ -1,4 +1,4 @@
-import FirefoxRandomnessPredictor from "./Firefox";
+import FirefoxRandomnessPredictor from "../src/predictors/Firefox";
 import { describe, it } from "node:test";
 import assert from "node:assert";
 
