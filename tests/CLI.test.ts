@@ -8,7 +8,7 @@ import { PREDICTOR_ENVIRONMENTS } from "../src/constants.ts";
 const BIN_PATH = path.resolve(import.meta.dirname, "../dist/esm/cli/js-randomness-predictor.js");
 
 type Flags = {
-  environment?: NonNullable<(typeof PREDICTOR_ENVIRONMENTS)[number]>;
+  environment: NonNullable<(typeof PREDICTOR_ENVIRONMENTS)[number]>;
   envVersion?: number;
   sequence?: number[];
   predictions?: number;
