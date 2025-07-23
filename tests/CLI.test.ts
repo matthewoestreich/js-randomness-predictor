@@ -20,10 +20,7 @@ type Flags = {
  */
 function jsRandomnessPredictor(flags: Flags) {
   const { environment, envVersion, sequence, predictions } = flags;
-  const args: string[] = [];
-  if (environment) {
-    args.push("-e", environment);
-  }
+  const args: string[] = ["-e", environment];
   if (envVersion) {
     args.push("-v", envVersion.toString());
   }
