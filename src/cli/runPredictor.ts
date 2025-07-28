@@ -1,6 +1,6 @@
 import JSRandomnessPredictor from "../index.js";
 import { Predictor, PredictorArgs, PredictorResult } from "../types.js";
-import { DEFAULT_NUM_PREDICTIONS, DEFAULT_SEQUENCE_LENGTH, MAX_NODE_V8_PREDICTIONS } from "../constants.js";
+import { DEFAULT_NUM_PREDICTIONS, DEFAULT_SEQUENCE_LENGTH, MAX_NODE_PREDICTIONS } from "../constants.js";
 
 export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult> {
   try {
@@ -13,23 +13,23 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       _warnings: [],
     };
 
-    const isNodeOrV8 = argv.environment === "node" || argv.environment === "v8";
+    const isNode = argv.environment === "node";
     const isNodeVersionMatch = argv._currentNodeJsMajorVersion === argv.envVersion;
 
     let numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUM_PREDICTIONS;
 
     // * If:
-    //    - '--environment' is "node" or "v8"
+    //    - '--environment' is "node"
     //    - numPredictions + sequence.length > 64
     // * Then:
     //    We cannot predict accurately.
     //    See here for why https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
-    if (isNodeOrV8 && numPredictions + RESULT.sequence.length > MAX_NODE_V8_PREDICTIONS) {
+    if (isNode && numPredictions + RESULT.sequence.length > MAX_NODE_PREDICTIONS) {
       // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
-      if (RESULT.sequence.length >= MAX_NODE_V8_PREDICTIONS) {
-        throw new Error(`Sequence too large! Sequence length must be less than '${MAX_NODE_V8_PREDICTIONS}', got '${RESULT.sequence.length}'`);
+      if (RESULT.sequence.length >= MAX_NODE_PREDICTIONS) {
+        throw new Error(`Sequence too large! Sequence length must be less than '${MAX_NODE_PREDICTIONS}', got '${RESULT.sequence.length}'`);
       }
-      const maxAllowedPredictions = MAX_NODE_V8_PREDICTIONS - RESULT.sequence.length;
+      const maxAllowedPredictions = MAX_NODE_PREDICTIONS - RESULT.sequence.length;
       numPredictions = maxAllowedPredictions; // Truncate predictions to fit bounds.
       RESULT._warnings!.push(
         `Exceeded max predictions!\n` +
@@ -44,22 +44,13 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
 
     // * If:
     //    - The --env-version is defined
-    //    - The --environment is v8 OR node
+    //    - The --environment is node
     //    - The --env-version is NOT equal to the users current running node version
     // * Then:
     //    We need to set the --env-version that was provided on the predictor itself.
-    if (argv.envVersion && isNodeOrV8 && !isNodeVersionMatch) {
+    if (argv.envVersion && isNode && !isNodeVersionMatch) {
       const v = { major: Number(argv.envVersion), minor: 0, patch: 0 };
-      switch (argv.environment) {
-        case "v8":
-          (predictor as ReturnType<typeof JSRandomnessPredictor.v8>).setNodeVersion(v);
-          break;
-        case "node":
-          (predictor as ReturnType<typeof JSRandomnessPredictor.node>).setNodeVersion(v);
-          break;
-        default:
-          throw new Error(`Expected 'node' or 'v8', got '${argv.environment}'`);
-      }
+      (predictor as ReturnType<typeof JSRandomnessPredictor.node>).setNodeVersion(v);
     }
 
     // Make predictions
@@ -69,13 +60,13 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
     }
 
     // * If:
-    //    - The --environment is v8 or node
+    //    - The --environment is node
     //    - The --sequence was NOT provided
     //    - The --env-version was not provided OR the --env-version is equal to the users current running node version
     // * Then:
     //    We can generate the expected results and determine their accuracy.
     //    This is because we are currently running in the correct Node version.
-    if (isNodeOrV8 && !argv.sequence && (!argv.envVersion || isNodeVersionMatch)) {
+    if (isNode && !argv.sequence && (!argv.envVersion || isNodeVersionMatch)) {
       RESULT.actual = Array.from({ length: numPredictions }, Math.random);
       RESULT.isCorrect = RESULT.actual.every((v, i) => v === RESULT.predictions[i]);
     }

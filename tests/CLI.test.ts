@@ -58,9 +58,9 @@ describe("CLI", () => {
     });
   });
 
-  describe("V8/Node", () => {
+  describe("Node", () => {
     const CURR_NODE_MAJOR_VER = Number(process.versions.node.split(".")[0]);
-    const environment = "v8";
+    const environment = "node";
 
     it("predicts dynamic sequence", () => {
       const result = jsRandomnessPredictor({ environment });

@@ -54,22 +54,22 @@ const predictCommand: CommandModule = {
       })
       .check((argv) => {
         argv._currentNodeJsMajorVersion = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
-        const isNodeOrV8 = argv.environment === "node" || argv.environment === "v8";
+        const isNode = argv.environment === "node";
         const isNodeVersionMatch = argv.envVersion === argv._currentNodeJsMajorVersion;
 
-        // If the --environment is not v8 or node the --sequence is required!
-        if (!argv.sequence && !isNodeOrV8) {
+        // If the --environment is not node the --sequence is required!
+        if (!argv.sequence && !isNode) {
           throw new SequenceNotFoundError(`'--sequence' is required when '--environment' is '${argv.environment}'`);
         }
 
         // * If:
-        //    - The --environment is v8 or node
+        //    - The --environment is node
         //    - The --env-version was provided
         //    - The --sequence was NOT provided
         //    - The --env-version does NOT match the users current running node version
         // * Then:
-        //    Throw an error. Sequence is required when doing `-e (v8|node) -v X` where `X` is != current nodejs major version.
-        if (isNodeOrV8 && argv.envVersion && !argv.sequence && !isNodeVersionMatch) {
+        //    Throw an error. Sequence is required when doing `-e node -v X` where `X` is != current nodejs major version.
+        if (isNode && argv.envVersion && !argv.sequence && !isNodeVersionMatch) {
           throw new SequenceNotFoundError(
             `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version!`,
           );

@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  Predict Math.random output in Node/V8, Chrome, Firefox, and Safari
+  Predict Math.random output in Node, Chrome, Firefox, and Safari
 </p>
 
 ---
@@ -16,6 +16,7 @@
 
 - Use the predictor that matches the environment where the sequence was originally generated. **Meaning, if it came from Chrome, use the Chrome predictor, etc...**.
 - We recommend at least 4 numbers in the initial sequence.
+- Breaking changes in `v2.0.0`! The V8 Predictor was deprecated - please use the Node Predictor instead.
 - [See all known issues here](.github/KNOWN_ISSUES.md)
 
 # Installation
@@ -43,16 +44,18 @@ import JSRandomnessPredictor from "js-randomness-predictor";
 const JSRandomnessPredictor = require("js-randomness-predictor");
 ```
 
-# Node & V8 Predictors
+# V8 Predictor
 
-**[See known Node/V8 issues here](.github/KNOWN_ISSUES.md#nodev8)**
+Deprecated in `v2.0`. Please use the Node Predictor instead - it works just like the V8 Predictor.
 
-Both `JSRandomnessPredictor.v8()` and `JSRandomnessPredictor.node()` target Node.js. You can use them interchangeably.
+# Node Predictor
 
-Since we're running in Node/V8, you can dynamically generate the initial sequence by calling the `v8()` or `node()` method without any parameters. This will automatically produce a sequence behind the scenes. **Alternatively, you can manually provide a sequence if you prefer.**
+**[See known Node issues here](.github/KNOWN_ISSUES.md#node)**
+
+Since we're running in Node, you can dynamically generate the initial sequence by calling the `node()` method without any parameters. This will automatically produce a sequence behind the scenes. **Alternatively, you can manually provide a sequence if you prefer.**
 <br/>
 
-**Node & V8 : Provide Your Own Sequence**
+**Node : Provide Your Own Sequence**
 
 <!-- prettier-ignore -->
 ```js
@@ -60,35 +63,23 @@ const providedSequence = Array.from({ length: 4 }, Math.random);
 // Or...
 const providedSequence = [/* copy & paste from REPL */];
 
-const v8Predictor = JSRandomnessPredictor.v8(providedSequence);
-const nextPrediction = await v8Predictor.predictNext();
-// We can programmatically verify since we are running in Node.
-const isAccurate = nextPrediction === Math.random();
-
-// Node equivalent
 const nodePredictor = JSRandomnessPredictor.node(providedSequence);
 const nextPrediction = await nodePredictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
 ```
 
-**Node & V8 : Automatically Generate Sequence**
+**Node : Automatically Generate Sequence**
 
 ```js
 // Automatically creates sequence behind the scenes
-const v8Predictor = JSRandomnessPredictor.v8();
-const nextPrediction = await v8Predictor.predictNext();
-// We can programmatically verify since we are running in Node.
-const isAccurate = nextPrediction === Math.random();
-
-// Node equivalent
 const nodePredictor = JSRandomnessPredictor.node();
 const nextPrediction = await nodePredictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
 ```
 
-**Node & V8 : Targeting a Different Node.js Version**
+**Node : Targeting a Different Node.js Version**
 
 You can target Node.js versions that are either **older or newer** than your current version.
 
@@ -105,11 +96,11 @@ Essentially, setting the Node.js version tells the predictor: **"The sequence I 
 <!-- prettier-ignore -->
 ```js
 // Current Node.js: v24.x.x
-const v8 = JSRandomnessPredictor.v8(sequenceFromNodeV22);
-v8.setNodeVersion({ major: 22, minor: 0, patch: 0 });
+const nodePredictor = JSRandomnessPredictor.node(sequenceFromNodeV22);
+nodePredictor.setNodeVersion({ major: 22, minor: 0, patch: 0 });
 
 const expectedPredictionsFromNodeV22 = [/* Copied from Node.js v22 */];
-const nextPrediction = await v8.predictNext();
+const nextPrediction = await nodePredictor.predictNext();
 const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 ```
 
@@ -177,22 +168,15 @@ node_modules/.bin/js-randomness-predictor [options]
 
 ## CLI Examples
 
-**Node & V8**
-
-If you're targeting Node.js, you can use either `v8` or `node` as the `--environment`. They are interchangeable.
+**Node**
 
 When no `--sequence` is provided, a sequence will be generated automatically based on the current runtime.
 
 ```bash
 # Auto-generate sequence
-js-randomness-predictor --environment v8
+js-randomness-predictor --environment node
 
 # Provide your own sequence and prediction count
-js-randomness-predictor --environment v8 --sequence 1 2 3 4
-js-randomness-predictor --environment v8 --sequence 1 2 3 4 --predictions 15
-
-# Equivalent using "node"
-js-randomness-predictor --environment node
 js-randomness-predictor --environment node --sequence 1 2 3 4
 js-randomness-predictor --environment node --sequence 1 2 3 4 --predictions 15
 ```
@@ -228,7 +212,7 @@ js-randomness-predictor -e node -v 22 # ERROR!
 
 **Chrome**
 
-If the `--env-version` flag is provided and the `--environment` flag is not `node` or `v8`, the `--env-version` flag is ignored!
+If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
@@ -241,7 +225,7 @@ js-randomness-predictor -e chrome -v 23 -s 1 2 3 4
 
 **Firefox**
 
-If the `--env-version` flag is provided and the `--environment` flag is not `node` or `v8`, the `--env-version` flag is ignored!
+If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
@@ -254,7 +238,7 @@ js-randomness-predictor -e firefox -v 23 -s 1 2 3 4
 
 **Safari**
 
-If the `--env-version` flag is provided and the `--environment` flag is not `node` or `v8`, the `--env-version` flag is ignored!
+If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default

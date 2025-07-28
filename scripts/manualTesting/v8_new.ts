@@ -1,4 +1,4 @@
-import V8RandomnessPredictor from "../../src/predictors/V8";
+import V8RandomnessPredictor from "../../src/predictors/Node";
 
 Main();
 async function Main() {

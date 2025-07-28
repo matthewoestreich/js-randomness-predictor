@@ -14,3 +14,11 @@ export class SequenceNotFoundError extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
+
+export class SymbolicStateEmpty extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = "SymbolicStateEmpty";
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}

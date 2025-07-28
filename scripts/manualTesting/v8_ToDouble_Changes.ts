@@ -1,4 +1,4 @@
-import JSRandomnessPredictor from "../src";
+import JSRandomnessPredictor from "../../src";
 
 const SEQ_GEN_IN_V_22 = [0.6741138824350359, 0.3952693448013418, 0.2364392230042982, 0.19928567609774994];
 const EXP_GEN_IN_V_22 = [0.42090241809523987, 0.602480621528513, 0.8144029534899446, 0.0406815112412624, 0.00198684380476144, 0.30686059799018595];
@@ -8,7 +8,7 @@ const EXP_GEN_IN_V_24 = [0.6807144253791263, 0.6236518270040349, 0.9584939203835
 Main();
 
 async function Main() {
-  const v8_v24 = JSRandomnessPredictor.v8(SEQ_GEN_IN_V_24);
+  const v8_v24 = JSRandomnessPredictor.node(SEQ_GEN_IN_V_24);
   const v8_v24_NextPred = await v8_v24.predictNext();
   console.log({
     version: "v24.2.0",
@@ -18,7 +18,7 @@ async function Main() {
     isCorrect: v8_v24_NextPred === EXP_GEN_IN_V_24[0],
   });
 
-  const v8_v22 = JSRandomnessPredictor.v8(SEQ_GEN_IN_V_22);
+  const v8_v22 = JSRandomnessPredictor.node(SEQ_GEN_IN_V_22);
   v8_v22.setNodeVersion({ major: 22, minor: 0, patch: 0 });
   const v8_v22_NextPred = await v8_v22.predictNext();
   console.log({
@@ -29,7 +29,7 @@ async function Main() {
     isCorrect: v8_v22_NextPred === EXP_GEN_IN_V_22[0],
   });
 
-  const v8 = JSRandomnessPredictor.v8();
+  const v8 = JSRandomnessPredictor.node();
   const NUM_PREDS = 10;
   const predictions: number[] = [];
   for (let i = 0; i < NUM_PREDS; i++) {
