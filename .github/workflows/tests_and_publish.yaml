@@ -60,6 +60,8 @@ jobs:
     needs: test-supported-node-versions
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Automated Version Bump
         if: startsWith(github.event.head_commit.message, '[publish] ')
         uses: phips28/gh-action-bump-version@v11.0.7
