@@ -10,11 +10,11 @@ describe("Node", () => {
   });
 
   it("predicts the next 5 numbers correctly", async () => {
-    const v8 = new NodeRandomnessPredictor();
+    const nodePredictor = new NodeRandomnessPredictor();
     const expected = Array.from({ length: 5 }, Math.random);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {
-      predictions.push(await v8.predictNext());
+      predictions.push(await nodePredictor.predictNext());
     }
     assert.deepStrictEqual(expected, predictions);
   });

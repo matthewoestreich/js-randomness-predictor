@@ -1,4 +1,4 @@
-# Node/V8
+# Node
 
 ## Random Number Pool Exhaustion
 
@@ -6,7 +6,7 @@ TLDR; If `number of predictions` + `sequence length` > `64`, we cannot make accu
 
 **Why does this happen?**
 
-- Node/V8 generate 64 "random" numbers at a time, which they cache in a "pool"
+- Node generate 64 "random" numbers at a time, which they cache in a "pool"
   - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=17-27) that shows how they build the cache
   - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.h;l=24;drc=75a8035abe03764596f30424030465636e82aa70;bpv=0) showing cache size
 - A seed is used to generate these "random" numbers
