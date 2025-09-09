@@ -29,4 +29,10 @@ export type PredictorResult = {
 
 export type NodeJsRecoverMantissaImpl = (n: number) => bigint;
 export type NodeJsConstrainMantissaImpl = (n: bigint) => void;
-export type NodeJsToDoubleImpl = (n: bigint) => number;
+export type NodeJsToDoubleImpl = (concreteState0: bigint, concreteState1: bigint) => number;
+
+export type NodeJsVersionSpecificMethods = {
+  recoverMantissa: NodeJsRecoverMantissaImpl;
+  constrainMantissa: NodeJsConstrainMantissaImpl;
+  toDouble: NodeJsToDoubleImpl;
+};

@@ -15,7 +15,7 @@ export class SequenceNotFoundError extends Error {
   }
 }
 
-export class SymbolicStateEmpty extends Error {
+export class SymbolicStateEmptyError extends Error {
   constructor(message?: string) {
     super(message);
     this.name = "SymbolicStateEmpty";
