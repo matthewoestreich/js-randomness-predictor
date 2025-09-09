@@ -26,3 +26,7 @@ export type PredictorResult = {
   isCorrect?: boolean;
   _warnings?: string[];
 };
+
+export type NodeJsRecoverMantissaImpl = (n: number) => bigint;
+export type NodeJsConstrainMantissaImpl = (n: bigint) => void;
+export type NodeJsToDoubleImpl = (n: bigint) => number;

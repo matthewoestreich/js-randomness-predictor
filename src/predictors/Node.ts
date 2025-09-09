@@ -1,5 +1,5 @@
 import * as z3 from "z3-solver";
-import { NodeJsVersion } from "../types.js";
+import { NodeJsVersion, NodeJsConstrainMantissaImpl, NodeJsRecoverMantissaImpl, NodeJsToDoubleImpl } from "../types.js";
 import { SymbolicStateEmpty, UnsatError } from "../errors.js";
 
 /**
@@ -46,11 +46,15 @@ export default class NodeRandomnessPredictor {
   // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
   #MAX_SEQUENCE_LENGTH = 64;
   #DEFAULT_SEQUENCE_LENGTH = 4;
+  #recoverMantissa: NodeJsRecoverMantissaImpl | undefined;
+  #toDouble: NodeJsToDoubleImpl | undefined;
+  #constrainMantissa: NodeJsConstrainMantissaImpl | undefined;
   #nodeVersion: NodeJsVersion = this.#getNodeVersion();
-  #isInitialized = false;
+  #isSymbolicStateSolved = false;
   #concreteState0 = 0n;
   #concreteState1 = 0n;
-  #mask = 0xffffffffffffffffn;
+  #xorShiftConcreteMask = 0xffffffffffffffffn;
+  #exponentBits = 0x3ff0000000000000n;
   #internalSequence: number[] = [];
   #seState0: z3.BitVec | undefined;
   #seState1: z3.BitVec | undefined;
@@ -70,16 +74,18 @@ export default class NodeRandomnessPredictor {
     }
     this.sequence = sequence;
     this.#internalSequence = [...sequence.reverse()];
+    this.#initializeImplementations();
   }
 
   async predictNext(): Promise<number> {
-    await this.#initialize();
-    return this.#toDouble(this.#xorShift128PlusConcrete());
+    await this.#solveSymbolicState();
+    return this.#toDouble!(this.#xorShift128PlusConcrete());
   }
 
   // For testing - DO NOT USE IF YOU DON'T WANT TO BREAK THINGS.
   setNodeVersion(version: NodeJsVersion): void {
     this.#nodeVersion = version;
+    this.#initializeImplementations();
   }
 
   #getNodeVersion(): NodeJsVersion {
@@ -87,11 +93,69 @@ export default class NodeRandomnessPredictor {
     return { major, minor, patch };
   }
 
-  // `#initialize()` essentially solves symbolic state so we can move forward using
-  // concrete state (which is way faster than having to recompute symbolic state
-  // for every prediction).
-  async #initialize(): Promise<boolean> {
-    if (this.#isInitialized) {
+  // Set up method implementations based upon Node versions.
+  #initializeImplementations(): void {
+    if (this.#nodeVersion.major <= 11) {
+      // Storiing this here because it is specific to versions <= 11.
+      const MANTISSA_MASK = 0x000fffffffffffffn;
+      this.#recoverMantissa = (n: number): bigint => {
+        const buffer = Buffer.alloc(8);
+        buffer.writeDoubleLE(n + 1, 0);
+        const rawBits = (BigInt(buffer.readUInt32LE(4)) << 32n) | BigInt(buffer.readUInt32LE(0));
+        return rawBits & MANTISSA_MASK; // This is the mantissa
+      };
+      this.#toDouble = (n: bigint): number => {
+        const random = (n & MANTISSA_MASK) | this.#exponentBits;
+        const buffer = Buffer.alloc(8);
+        buffer.writeBigUInt64LE(random, 0);
+        return buffer.readDoubleLE(0) - 1;
+      };
+      this.#constrainMantissa = (mantissa: bigint): void => {
+        const sum = this.#seState0!.add(this.#seState1!).and(this.#context!.BitVec.val(MANTISSA_MASK, 64));
+        this.#solver!.add(sum.eq(this.#context!.BitVec.val(mantissa, 64)));
+      };
+      return;
+    }
+
+    if (this.#nodeVersion.major <= 23) {
+      this.#recoverMantissa = (n: number): bigint => {
+        const buffer = Buffer.alloc(8);
+        buffer.writeDoubleLE(n + 1, 0);
+        const uint64 = (BigInt(buffer.readUInt32LE(4)) << 32n) | BigInt(buffer.readUInt32LE(0));
+        return uint64 & ((1n << 52n) - 1n); // This is the mantissa
+      };
+      this.#toDouble = (n: bigint): number => {
+        const buffer = Buffer.alloc(8);
+        buffer.writeBigUInt64LE((n >> 12n) | this.#exponentBits, 0);
+        return buffer.readDoubleLE(0) - 1;
+      };
+      this.#constrainMantissa = (mantissa: bigint): void => {
+        this.#solver!.add(this.#seState0!.lshr(12).eq(this.#context!.BitVec.val(mantissa, 64)));
+      };
+      return;
+    }
+
+    if (this.#nodeVersion.major >= 24) {
+      this.#recoverMantissa = (n: number): bigint => {
+        const mantissa = Math.floor(n * Math.pow(2, 53));
+        return BigInt(mantissa);
+      };
+
+      this.#toDouble = (n: bigint): number => {
+        return Number(n >> 11n) / Math.pow(2, 53);
+      };
+
+      this.#constrainMantissa = (mantissa: bigint): void => {
+        this.#solver!.add(this.#seState0!.lshr(11).eq(this.#context!.BitVec.val(BigInt(mantissa), 64)));
+      };
+      return;
+    }
+  }
+
+  // Solves symbolic state so we can move forward using concrete state, which
+  // is way faster than having to recompute symbolic state for every prediction.
+  async #solveSymbolicState(): Promise<boolean> {
+    if (this.#isSymbolicStateSolved) {
       return true;
     }
     try {
@@ -105,7 +169,7 @@ export default class NodeRandomnessPredictor {
 
       for (let i = 0; i < this.#internalSequence.length; i++) {
         this.#xorShift128PlusSymbolic();
-        this.#recoverMantissaAndAddToSolver(this.#internalSequence[i]);
+        this.#constrainMantissa!(this.#recoverMantissa!(this.#internalSequence[i]));
       }
 
       const check = await this.#solver.check();
@@ -116,7 +180,7 @@ export default class NodeRandomnessPredictor {
       const model = this.#solver.model();
       this.#concreteState0 = (model.get(this.#s0Ref!) as z3.BitVecNum).value();
       this.#concreteState1 = (model.get(this.#s1Ref!) as z3.BitVecNum).value();
-      this.#isInitialized = true;
+      this.#isSymbolicStateSolved = true;
       return true;
     } catch (e) {
       return Promise.reject(e);
@@ -146,8 +210,8 @@ export default class NodeRandomnessPredictor {
     let ps1 = this.#concreteState0!;
     let ps0 = this.#concreteState1! ^ (ps1 >> 26n);
     ps0 ^= ps1;
-    ps0 = (ps0 ^ (ps0 >> 17n) ^ (ps0 >> 34n) ^ (ps0 >> 51n)) & this.#mask;
-    ps0 = (ps0 ^ (ps0 << 23n) ^ (ps0 << 46n)) & this.#mask;
+    ps0 = (ps0 ^ (ps0 >> 17n) ^ (ps0 >> 34n) ^ (ps0 >> 51n)) & this.#xorShiftConcreteMask;
+    ps0 = (ps0 ^ (ps0 << 23n) ^ (ps0 << 46n)) & this.#xorShiftConcreteMask;
     this.#concreteState0 = ps0;
     this.#concreteState1 = ps1;
 
@@ -157,60 +221,5 @@ export default class NodeRandomnessPredictor {
     }
     // Newer logic
     return ogConcreteState0;
-  }
-
-  #recoverMantissaAndAddToSolver(n: number): void {
-    const majorVersion = this.#nodeVersion.major;
-
-    // Very old logic that goes back to at least v10
-    if (majorVersion <= 11) {
-      const buffer = Buffer.alloc(8);
-      buffer.writeDoubleLE(n + 1, 0);
-      const rawBits = (BigInt(buffer.readUInt32LE(4)) << 32n) | BigInt(buffer.readUInt32LE(0));
-      const mantissaMask = 0x000fffffffffffffn;
-      const mantissa = rawBits & mantissaMask;
-
-      const sum = this.#seState0!.add(this.#seState1!).and(this.#context!.BitVec.val(mantissaMask, 64));
-      this.#solver!.add(sum.eq(this.#context!.BitVec.val(mantissa, 64)));
-      return;
-    }
-
-    // Old-ish `ToDouble` logic (in use from ~2022 - Feb 2025)
-    if (majorVersion <= 23) {
-      const buffer = Buffer.alloc(8);
-      buffer.writeDoubleLE(n + 1, 0);
-      const uint64 = (BigInt(buffer.readUInt32LE(4)) << 32n) | BigInt(buffer.readUInt32LE(0));
-      const mantissa = uint64 & ((1n << 52n) - 1n);
-      this.#solver!.add(this.#seState0!.lshr(12).eq(this.#context!.BitVec.val(mantissa, 64)));
-      return;
-    }
-
-    // New `ToDouble` logic (Feb 2025) introduced to V8.
-    const mantissa = Math.floor(n * Math.pow(2, 53));
-    this.#solver!.add(this.#seState0!.lshr(11).eq(this.#context!.BitVec.val(BigInt(mantissa), 64)));
-  }
-
-  #toDouble(n: bigint): number {
-    const majorVersion = this.#nodeVersion.major;
-
-    // Very old logic that goes back to at least v10
-    if (majorVersion <= 11) {
-      const kExponentBits = 0x3ff0000000000000n;
-      const kMantissaMask = 0x000fffffffffffffn;
-      const random = (n & kMantissaMask) | kExponentBits;
-      const buffer = Buffer.alloc(8);
-      buffer.writeBigUInt64LE(random, 0);
-      return buffer.readDoubleLE(0) - 1;
-    }
-
-    /* Old-ish logic (pre-Feb 2025) */
-    if (majorVersion <= 23) {
-      const buffer = Buffer.allocUnsafe(8);
-      buffer.writeBigUInt64LE((n >> 12n) | 0x3ff0000000000000n, 0);
-      return buffer.readDoubleLE(0) - 1;
-    }
-
-    /* New ToDouble logic (Feb 2025+) */
-    return Number(n >> 11n) / Math.pow(2, 53);
   }
 }
