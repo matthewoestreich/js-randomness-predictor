@@ -140,11 +140,9 @@ export default class NodeRandomnessPredictor {
         const mantissa = Math.floor(n * Math.pow(2, 53));
         return BigInt(mantissa);
       };
-
       this.#toDouble = (n: bigint): number => {
         return Number(n >> 11n) / Math.pow(2, 53);
       };
-
       this.#constrainMantissa = (mantissa: bigint): void => {
         this.#solver!.add(this.#seState0!.lshr(11).eq(this.#context!.BitVec.val(BigInt(mantissa), 64)));
       };
