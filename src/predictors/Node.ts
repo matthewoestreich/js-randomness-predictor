@@ -49,9 +49,9 @@ export default class NodeRandomnessPredictor {
   // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
   #UINT64_MASK = 0xffffffffffffffffn;
   // The mantissa bits (lower 52 bits) for doubles as defined in IEEE-754
-  #IEEE754_MANTISSA_BITS = 0x000fffffffffffffn;
+  #IEEE754_MANTISSA_BITS_MASK = 0x000fffffffffffffn;
   // The exponent bits (bits 52–62) for 1.0 as defined in IEEE-754 for double precision
-  #IEEE754_EXPONENT_BITS = 0x3ff0000000000000n;
+  #IEEE754_EXPONENT_BITS_MASK = 0x3ff0000000000000n;
   // Map a 53-bit integer into the range [0, 1) as a double (same as `Math.pow(2, 53)`)
   #SCALING_FACTOR_53_BIT_INT = 0x20000000000000n;
   #versionSpecificMethods: NodeJsVersionSpecificMethods;
@@ -78,7 +78,7 @@ export default class NodeRandomnessPredictor {
     }
     this.sequence = sequence;
     this.#internalSequence = [...sequence.reverse()];
-    this.#versionSpecificMethods = this.#initializeImplementations();
+    this.#versionSpecificMethods = this.#getVersionSpecificMethods();
   }
 
   async predictNext(): Promise<number> {
@@ -89,14 +89,13 @@ export default class NodeRandomnessPredictor {
     const next = this.#versionSpecificMethods.toDouble(this.#concreteState0, this.#concreteState1);
     // Modify concrete state.
     this.#xorShift128PlusConcrete();
-    // Return original concrete state as double.
     return Promise.resolve(next);
   }
 
   setNodeVersion(version: NodeJsVersion): void {
     this.#nodeVersion = version;
-    // If the version is changed, we must initialize version specific methods again!
-    this.#versionSpecificMethods = this.#initializeImplementations();
+    // If the version is changed, we must set version specific methods!
+    this.#versionSpecificMethods = this.#getVersionSpecificMethods();
   }
 
   #getNodeVersion(): NodeJsVersion {
@@ -109,23 +108,23 @@ export default class NodeRandomnessPredictor {
     return n & this.#UINT64_MASK;
   }
 
-  // Set up method implementations based upon Node versions.
-  #initializeImplementations(): NodeJsVersionSpecificMethods {
+  // Get Node.js version-specific methods.
+  #getVersionSpecificMethods(): NodeJsVersionSpecificMethods {
     if (this.#nodeVersion.major <= 11) {
       return {
         recoverMantissa: (n: number): bigint => {
           const buffer = Buffer.alloc(8);
           buffer.writeDoubleLE(n + 1, 0);
-          return buffer.readBigUInt64LE(0) & this.#IEEE754_MANTISSA_BITS;
+          return buffer.readBigUInt64LE(0) & this.#IEEE754_MANTISSA_BITS_MASK;
         },
         toDouble: (concreteState0: bigint, concreteState1: bigint): number => {
           const n = concreteState0 + concreteState1;
           const buffer = Buffer.alloc(8);
-          buffer.writeBigUInt64LE((n & this.#IEEE754_MANTISSA_BITS) | this.#IEEE754_EXPONENT_BITS, 0);
+          buffer.writeBigUInt64LE((n & this.#IEEE754_MANTISSA_BITS_MASK) | this.#IEEE754_EXPONENT_BITS_MASK, 0);
           return buffer.readDoubleLE(0) - 1;
         },
         constrainMantissa: (mantissa: bigint): void => {
-          const sum = this.#seState0!.add(this.#seState1!).and(this.#context!.BitVec.val(this.#IEEE754_MANTISSA_BITS, 64));
+          const sum = this.#seState0!.add(this.#seState1!).and(this.#context!.BitVec.val(this.#IEEE754_MANTISSA_BITS_MASK, 64));
           this.#solver!.add(sum.eq(this.#context!.BitVec.val(mantissa, 64)));
         },
       };
@@ -136,11 +135,11 @@ export default class NodeRandomnessPredictor {
         recoverMantissa: (n: number): bigint => {
           const buffer = Buffer.alloc(8);
           buffer.writeDoubleLE(n + 1, 0);
-          return buffer.readBigUInt64LE(0) & this.#IEEE754_MANTISSA_BITS;
+          return buffer.readBigUInt64LE(0) & this.#IEEE754_MANTISSA_BITS_MASK;
         },
         toDouble: (concreteState0: bigint, _concreteState1: bigint): number => {
           const buffer = Buffer.alloc(8);
-          buffer.writeBigUInt64LE((concreteState0 >> 12n) | this.#IEEE754_EXPONENT_BITS, 0);
+          buffer.writeBigUInt64LE((concreteState0 >> 12n) | this.#IEEE754_EXPONENT_BITS_MASK, 0);
           return buffer.readDoubleLE(0) - 1;
         },
         constrainMantissa: (mantissa: bigint): void => {
@@ -159,13 +158,13 @@ export default class NodeRandomnessPredictor {
         return Number(concreteState0 >> 11n) / Number(this.#SCALING_FACTOR_53_BIT_INT);
       },
       constrainMantissa: (mantissa: bigint): void => {
-        this.#solver!.add(this.#seState0!.lshr(11).eq(this.#context!.BitVec.val(BigInt(mantissa), 64)));
+        this.#solver!.add(this.#seState0!.lshr(11).eq(this.#context!.BitVec.val(mantissa, 64)));
       },
     };
   }
 
   // Solves symbolic state so we can move forward using concrete state, which
-  // is way faster than having to recompute symbolic state for every prediction.
+  // is much faster than having to compute symbolic state for every prediction.
   async #solveSymbolicState(): Promise<boolean> {
     try {
       const { Context } = await z3.init();
