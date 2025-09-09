@@ -23,6 +23,7 @@ export default [
       "cypress/**",
       "node_modules/**",
       "scripts/**",
+      "tests/scripts/**",
     ],
     languageOptions: {
       parser: tsParser,

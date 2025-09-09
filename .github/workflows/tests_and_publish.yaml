@@ -24,7 +24,7 @@ jobs:
         run: npm run build
       - name: Run tests
         shell: bash
-        run: npm run test:legacy
+        run: npm run test:nodeVersions16andLess
         env:
           FORCE_COLOR: "1"
   test-supported-node-versions:
@@ -49,13 +49,13 @@ jobs:
       - name: Run tests (v20.x and above)
         if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
         shell: bash
-        run: npm run test
+        run: npm run test:nodeVersions20andGreaterAndBrowsers
         env:
           FORCE_COLOR: 1
       - name: Run tests (v17.x - v19.x) [node:test doesn't exist in these versions]
         if: ${{ matrix.node-version == '17.x' || matrix.node-version == '18.x' || matrix.node-version == '19.x' }}
         shell: bash
-        run: npm run test:script
+        run: npm run test:nodeVersions17to19
         env:
           FORCE_COLOR: 1
   maybe-publish:
