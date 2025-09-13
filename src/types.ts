@@ -1,5 +1,6 @@
 import JSRandomnessPredictor from "./index.js";
 import { PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS } from "./constants.js";
+import { BitVec, Solver, Context } from "z3-solver";
 
 export interface PredictorArgs {
   environment: PredictorEnvironment;
@@ -27,9 +28,11 @@ export type PredictorResult = {
   _warnings?: string[];
 };
 
+export type Pair<T> = [T, T];
+
 export type NodeJsRecoverMantissaImpl = (n: number) => bigint;
-export type NodeJsConstrainMantissaImpl = (n: bigint) => void;
-export type NodeJsToDoubleImpl = (concreteState0: bigint, concreteState1: bigint) => number;
+export type NodeJsConstrainMantissaImpl = (n: bigint, symbolicState: Pair<BitVec>, solver: Solver, context: Context) => void;
+export type NodeJsToDoubleImpl = (concreteState: Pair<bigint>) => number;
 
 export type NodeJsVersionSpecificMethods = {
   recoverMantissa: NodeJsRecoverMantissaImpl;

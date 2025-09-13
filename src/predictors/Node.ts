@@ -1,6 +1,6 @@
 import * as z3 from "z3-solver";
-import { NodeJsVersion, NodeJsVersionSpecificMethods } from "../types.js";
-import { SymbolicStateEmptyError, UnsatError } from "../errors.js";
+import { NodeJsVersion, NodeJsVersionSpecificMethods, Pair } from "../types.js";
+import { UnsatError } from "../errors.js";
 
 /**
  *
@@ -27,6 +27,7 @@ import { SymbolicStateEmptyError, UnsatError } from "../errors.js";
  *        return base::bit_cast<double>(random) - 1;
  *      }
  *      ```
+ *
  *   - New Impl: https://github.com/v8/v8/blob/1c3a9c08e932e87b04c7bf9ecc648e1f50d418fd/src/base/utils/random-number-generator.h#L111
  *      ```
  *      // Static and exposed for external use.
@@ -55,17 +56,9 @@ export default class NodeRandomnessPredictor {
   // Map a 53-bit integer into the range [0, 1) as a double (same as `Math.pow(2, 53)`)
   #SCALING_FACTOR_53_BIT_INT = 0x20000000000000n;
   #versionSpecificMethods: NodeJsVersionSpecificMethods;
-  #nodeVersion: NodeJsVersion = this.#getNodeVersion();
+  #nodeVersion: NodeJsVersion;
   #isSymbolicStateSolved = false;
-  #concreteState0 = 0n;
-  #concreteState1 = 0n;
-  #internalSequence: number[] = [];
-  #seState0: z3.BitVec | undefined;
-  #seState1: z3.BitVec | undefined;
-  #s0Ref: z3.BitVec | undefined;
-  #s1Ref: z3.BitVec | undefined;
-  #solver: z3.Solver | undefined;
-  #context: z3.Context | undefined;
+  #concreteState: Pair<bigint> = [0n, 0n];
 
   public sequence: number[];
 
@@ -77,7 +70,7 @@ export default class NodeRandomnessPredictor {
       sequence = Array.from({ length: this.#DEFAULT_SEQUENCE_LENGTH }, Math.random);
     }
     this.sequence = sequence;
-    this.#internalSequence = [...sequence.reverse()];
+    this.#nodeVersion = this.#getNodeVersion();
     this.#versionSpecificMethods = this.#getVersionSpecificMethods();
   }
 
@@ -86,10 +79,10 @@ export default class NodeRandomnessPredictor {
       await this.#solveSymbolicState();
     }
     // Calculate next random number before we modify concrete state.
-    const next = this.#versionSpecificMethods.toDouble(this.#concreteState0, this.#concreteState1);
+    const next = this.#versionSpecificMethods.toDouble(this.#concreteState);
     // Modify concrete state.
-    this.#xorShift128PlusConcrete();
-    return Promise.resolve(next);
+    this.#xorShift128PlusConcrete(this.#concreteState);
+    return next;
   }
 
   setNodeVersion(version: NodeJsVersion): void {
@@ -117,15 +110,15 @@ export default class NodeRandomnessPredictor {
           buffer.writeDoubleLE(n + 1, 0);
           return buffer.readBigUInt64LE(0) & this.#IEEE754_MANTISSA_BITS_MASK;
         },
-        toDouble: (concreteState0: bigint, concreteState1: bigint): number => {
-          const n = concreteState0 + concreteState1;
+        toDouble: (concreteState: Pair<bigint>): number => {
+          const n = concreteState[0] + concreteState[1];
           const buffer = Buffer.alloc(8);
           buffer.writeBigUInt64LE((n & this.#IEEE754_MANTISSA_BITS_MASK) | this.#IEEE754_EXPONENT_BITS_MASK, 0);
           return buffer.readDoubleLE(0) - 1;
         },
-        constrainMantissa: (mantissa: bigint): void => {
-          const sum = this.#seState0!.add(this.#seState1!).and(this.#context!.BitVec.val(this.#IEEE754_MANTISSA_BITS_MASK, 64));
-          this.#solver!.add(sum.eq(this.#context!.BitVec.val(mantissa, 64)));
+        constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+          const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(this.#IEEE754_MANTISSA_BITS_MASK, 64));
+          solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
         },
       };
     }
@@ -137,13 +130,13 @@ export default class NodeRandomnessPredictor {
           buffer.writeDoubleLE(n + 1, 0);
           return buffer.readBigUInt64LE(0) & this.#IEEE754_MANTISSA_BITS_MASK;
         },
-        toDouble: (concreteState0: bigint, _concreteState1: bigint): number => {
+        toDouble: (concreteState: Pair<bigint>): number => {
           const buffer = Buffer.alloc(8);
-          buffer.writeBigUInt64LE((concreteState0 >> 12n) | this.#IEEE754_EXPONENT_BITS_MASK, 0);
+          buffer.writeBigUInt64LE((concreteState[0] >> 12n) | this.#IEEE754_EXPONENT_BITS_MASK, 0);
           return buffer.readDoubleLE(0) - 1;
         },
-        constrainMantissa: (mantissa: bigint): void => {
-          this.#solver!.add(this.#seState0!.lshr(12).eq(this.#context!.BitVec.val(mantissa, 64)));
+        constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+          solver.add(symbolicState[0].lshr(12).eq(context.BitVec.val(mantissa, 64)));
         },
       };
     }
@@ -154,11 +147,11 @@ export default class NodeRandomnessPredictor {
         const mantissa = Math.floor(n * Number(this.#SCALING_FACTOR_53_BIT_INT));
         return BigInt(mantissa);
       },
-      toDouble: (concreteState0: bigint, _concreteState1: bigint): number => {
-        return Number(concreteState0 >> 11n) / Number(this.#SCALING_FACTOR_53_BIT_INT);
+      toDouble: (concreteState: Pair<bigint>): number => {
+        return Number(concreteState[0] >> 11n) / Number(this.#SCALING_FACTOR_53_BIT_INT);
       },
-      constrainMantissa: (mantissa: bigint): void => {
-        this.#solver!.add(this.#seState0!.lshr(11).eq(this.#context!.BitVec.val(mantissa, 64)));
+      constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+        solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
       },
     };
   }
@@ -168,28 +161,32 @@ export default class NodeRandomnessPredictor {
   async #solveSymbolicState(): Promise<boolean> {
     try {
       const { Context } = await z3.init();
-      this.#context = Context("main");
-      this.#solver = new this.#context.Solver();
-      this.#seState0 = this.#context.BitVec.const("se_state0", 64);
-      this.#seState1 = this.#context.BitVec.const("se_state1", 64);
-      this.#s0Ref = this.#seState0;
-      this.#s1Ref = this.#seState1;
+      const context = Context("main");
+      const solver = new context.Solver();
+      const symbolicState0 = context.BitVec.const("ss0", 64);
+      const symbolicState1 = context.BitVec.const("ss1", 64);
+      // We do not directly initialize symbolic states inside of our symbolic state Pair because
+      // we need references to the original state/BitVecs in order to be able to pull them out of our model.
+      const symbolicStatePair: Pair<z3.BitVec> = [symbolicState0, symbolicState1];
+      // Each Math.random() output comes from the PRNG state *after* it advances. To reconstruct the original
+      // hidden state, we must walk the PRNG backwards, which means processing the observed sequence in reverse order.
+      const sequence = [...this.sequence].reverse();
 
-      const { recoverMantissa, constrainMantissa } = this.#versionSpecificMethods;
-
-      for (let i = 0; i < this.#internalSequence.length; i++) {
-        this.#xorShift128PlusSymbolic();
-        constrainMantissa(recoverMantissa(this.#internalSequence[i]));
+      for (const n of sequence) {
+        this.#xorShift128PlusSymbolic(symbolicStatePair); // Modifies symbolic state
+        const mantissa = this.#versionSpecificMethods.recoverMantissa(n);
+        this.#versionSpecificMethods.constrainMantissa(mantissa, symbolicStatePair, solver, context);
       }
 
-      const check = await this.#solver.check();
-      if (check !== "sat") {
+      if ((await solver.check()) !== "sat") {
         return Promise.reject(new UnsatError());
       }
 
-      const model = this.#solver.model();
-      this.#concreteState0 = (model.get(this.#s0Ref!) as z3.BitVecNum).value();
-      this.#concreteState1 = (model.get(this.#s1Ref!) as z3.BitVecNum).value();
+      const model = solver.model();
+      // Use original, unmodified references to symbolic state to pull values from model.
+      const concreteState0 = (model.get(symbolicState0) as z3.BitVecNum).value();
+      const concreteState1 = (model.get(symbolicState1) as z3.BitVecNum).value();
+      this.#concreteState = [concreteState0, concreteState1];
       this.#isSymbolicStateSolved = true;
       return true;
     } catch (e) {
@@ -198,28 +195,25 @@ export default class NodeRandomnessPredictor {
   }
 
   // Performs XORShift128+ on symbolic state (z3).
-  #xorShift128PlusSymbolic(): void {
-    if (!this.#seState0 || !this.#seState1) {
-      throw new SymbolicStateEmptyError();
-    }
-    let s1 = this.#seState0;
-    let s0 = this.#seState1;
-    this.#seState0 = s0;
+  #xorShift128PlusSymbolic(symbolicState: Pair<z3.BitVec>): void {
+    let s1 = symbolicState[0];
+    let s0 = symbolicState[1];
     s1 = s1.xor(s1.shl(23));
     s1 = s1.xor(s1.lshr(17));
     s1 = s1.xor(s0);
     s1 = s1.xor(s0.lshr(26));
-    this.#seState1 = s1;
+    symbolicState[0] = s0;
+    symbolicState[1] = s1;
   }
 
   // Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
-  #xorShift128PlusConcrete(): void {
-    let ps1 = this.#concreteState0!;
-    let ps0 = this.#concreteState1! ^ (ps1 >> 26n);
-    ps0 ^= ps1;
-    ps0 = this.#uint64_t(ps0 ^ (ps0 >> 17n) ^ (ps0 >> 34n) ^ (ps0 >> 51n));
-    ps0 = this.#uint64_t(ps0 ^ (ps0 << 23n) ^ (ps0 << 46n));
-    this.#concreteState0 = ps0;
-    this.#concreteState1 = ps1;
+  #xorShift128PlusConcrete(concreteState: Pair<bigint>): void {
+    let cs1 = concreteState[0];
+    let cs0 = concreteState[1] ^ (cs1 >> 26n);
+    cs0 ^= cs1;
+    cs0 = this.#uint64_t(cs0 ^ (cs0 >> 17n) ^ (cs0 >> 34n) ^ (cs0 >> 51n));
+    cs0 = this.#uint64_t(cs0 ^ (cs0 << 23n) ^ (cs0 << 46n));
+    concreteState[0] = cs0;
+    concreteState[1] = cs1;
   }
 }
