@@ -9,7 +9,26 @@ on:
       - main
 
 jobs:
+  test-imports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        shell: bash
+        run: npm run build
+      - name: Run tests
+        shell: bash
+        run: npm run test:imports
+        env:
+          FORCE_COLOR: "1"
   test-legacy-node-versions:
+    needs: test-imports
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
