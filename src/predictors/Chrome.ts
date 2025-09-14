@@ -72,12 +72,12 @@ export default class ChromeRandomnessPredictor {
   #xorShift128PlusSymbolic(symbolicState: Pair<z3.BitVec>): void {
     const state1 = symbolicState[0];
     const state0 = symbolicState[1];
-    let nextState0 = state1.xor(state1.shl(23));
-    nextState0 = nextState0.xor(nextState0.lshr(17));
-    nextState0 = nextState0.xor(state0);
-    nextState0 = nextState0.xor(state0.lshr(26));
+    let nextState1 = state1.xor(state1.shl(23));
+    nextState1 = nextState1.xor(nextState1.lshr(17));
+    nextState1 = nextState1.xor(state0);
+    nextState1 = nextState1.xor(state0.lshr(26));
     symbolicState[0] = state0;
-    symbolicState[1] = nextState0;
+    symbolicState[1] = nextState1;
   }
 
   // Modifies concrete state. Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
