@@ -44,6 +44,8 @@ import { UnsatError } from "../errors.js";
  */
 
 export default class NodeRandomnessPredictor {
+  public sequence: number[];
+
   // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
   #MAX_SEQUENCE_LENGTH = 64;
   #DEFAULT_SEQUENCE_LENGTH = 4;
@@ -59,8 +61,6 @@ export default class NodeRandomnessPredictor {
   #nodeVersion: NodeJsVersion;
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
-
-  public sequence: number[];
 
   constructor(sequence?: number[]) {
     if (sequence && sequence.length >= this.#MAX_SEQUENCE_LENGTH) {

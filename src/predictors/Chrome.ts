@@ -1,102 +1,101 @@
 import * as z3 from "z3-solver";
 import { UnsatError } from "../errors.js";
+import { Pair } from "../types.js";
 
 export default class ChromeRandomnessPredictor {
-  #isInitialized = false;
-  #mask = 0xffffffffffffffffn;
-  #concreteState0: bigint | undefined;
-  #concreteState1: bigint | undefined;
-  #context: z3.Context | undefined;
-  #solver: z3.Solver | undefined;
-  #seState0: z3.BitVec | undefined;
-  #seState1: z3.BitVec | undefined;
-  #s0Ref: z3.BitVec | undefined;
-  #s1Ref: z3.BitVec | undefined;
+  public sequence: number[];
 
-  public sequence: number[] | undefined = undefined;
+  // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
+  #UINT64_MASK = 0xffffffffffffffffn;
+  #isSymbolicStateSolved = false;
+  #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence: number[]) {
     this.sequence = sequence;
   }
 
-  async #initialize(): Promise<boolean> {
-    if (this.#isInitialized) {
-      return true;
+  public async predictNext(): Promise<number> {
+    if (!this.#isSymbolicStateSolved) {
+      await this.#solveSymbolicState();
     }
+    // Calculate next prediction, using first item in concrete state, before modifying concrete state.
+    const next = this.#toDouble(this.#concreteState[0]);
+    // Modify concrete state.
+    this.#xorShift128PlusConcrete(this.#concreteState);
+    return next;
+  }
+
+  // Solves symbolic state so we can move forward using concrete state, which
+  // is much faster than having to compute symbolic state for every prediction.
+  async #solveSymbolicState(): Promise<boolean> {
     try {
       const { Context } = await z3.init();
-      this.#context = Context("main");
-      this.#solver = new this.#context.Solver();
+      const context = Context("main");
+      const solver = new context.Solver();
+      const symbolicState0 = context.BitVec.const("ss0", 64);
+      const symbolicState1 = context.BitVec.const("ss1", 64);
+      // We do not directly initialize symbolic states inside of our symbolic state Pair because
+      // we need references to the original state/BitVecs in order to be able to pull them out of our model.
+      const symbolicStatePair: Pair<z3.BitVec> = [symbolicState0, symbolicState1];
+      // Each Math.random() output comes from the PRNG state *after* it advances. To reconstruct the original
+      // hidden state, we must walk the PRNG backwards, which means processing the observed sequence in reverse order.
+      const sequence = [...this.sequence].reverse();
 
-      this.#seState0 = this.#context.BitVec.const("se_state0", 64);
-      this.#seState1 = this.#context.BitVec.const("se_state1", 64);
-      this.#s0Ref = this.#seState0;
-      this.#s1Ref = this.#seState1;
-
-      const reversedSequence = [...(this.sequence || [])].reverse();
-
-      for (const value of reversedSequence) {
-        this.#xorShift128pSymbolic();
-        const mantissa = this.#recoverMantissa(value);
-        const state0Shifted = this.#context.BitVec.val(mantissa, 64);
-        this.#solver.add(this.#seState0!.lshr(11).eq(state0Shifted));
+      for (const n of sequence) {
+        this.#xorShift128PlusSymbolic(symbolicStatePair); // Modifies symbolic state pair.
+        const mantissa = this.#recoverMantissa(n);
+        solver.add(symbolicStatePair[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
       }
 
-      const result = await this.#solver.check();
-      if (result !== "sat") {
+      if ((await solver.check()) !== "sat") {
         return Promise.reject(new UnsatError());
       }
 
-      const model = this.#solver.model();
-      this.#concreteState0 = (model.get(this.#s0Ref!) as z3.BitVecNum).value();
-      this.#concreteState1 = (model.get(this.#s1Ref!) as z3.BitVecNum).value();
-
-      this.#isInitialized = true;
+      const model = solver.model();
+      // Use original, unmodified references to symbolic state(s) to pull values from model.
+      const concreteState0 = (model.get(symbolicState0) as z3.BitVecNum).value();
+      const concreteState1 = (model.get(symbolicState1) as z3.BitVecNum).value();
+      this.#concreteState = [concreteState0, concreteState1];
+      this.#isSymbolicStateSolved = true;
       return true;
     } catch (e) {
       return Promise.reject(e);
     }
   }
 
-  public async predictNext(): Promise<number> {
-    await this.#initialize();
-    if (this.#concreteState0 === undefined || this.#concreteState1 === undefined) {
-      throw new Error(`[Chrome Predictor] Concrete states not defined! Something went wrong.`);
-    }
-    return this.#toDouble(this.#xorShift128pConcreteBackwards());
+  // Simulates C/C++ uint64_t overflow (wrapping).
+  #uint64_t(n: bigint): bigint {
+    return n & this.#UINT64_MASK;
   }
 
-  #xorShift128pSymbolic(): void {
-    if (!this.#seState0 || !this.#seState1) {
-      throw new Error("[Chrome Predictor] Symbolic states not initialized");
-    }
-    const se_s1 = this.#seState0;
-    const se_s0 = this.#seState1;
-    this.#seState0 = se_s0;
-    let newS1 = se_s1.xor(se_s1.shl(23));
-    newS1 = newS1.xor(newS1.lshr(17));
-    newS1 = newS1.xor(se_s0);
-    newS1 = newS1.xor(se_s0.lshr(26));
-    this.#seState1 = newS1;
+  // Modifies symbolic state.
+  #xorShift128PlusSymbolic(symbolicState: Pair<z3.BitVec>): void {
+    const state1 = symbolicState[0];
+    const state0 = symbolicState[1];
+    let nextState0 = state1.xor(state1.shl(23));
+    nextState0 = nextState0.xor(nextState0.lshr(17));
+    nextState0 = nextState0.xor(state0);
+    nextState0 = nextState0.xor(state0.lshr(26));
+    symbolicState[0] = state0;
+    symbolicState[1] = nextState0;
   }
 
-  #xorShift128pConcreteBackwards(): bigint {
-    const result = this.#concreteState0!;
-    let ps1 = this.#concreteState0!;
-    let ps0 = this.#concreteState1! ^ (ps1 >> 26n);
-    ps0 ^= ps1;
-    ps0 = (ps0 ^ (ps0 >> 17n) ^ (ps0 >> 34n) ^ (ps0 >> 51n)) & this.#mask;
-    ps0 = (ps0 ^ (ps0 << 23n) ^ (ps0 << 46n)) & this.#mask;
-    this.#concreteState0 = ps0;
-    this.#concreteState1 = ps1;
-    return result;
+  // Modifies concrete state. Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
+  #xorShift128PlusConcrete(concreteState: Pair<bigint>): void {
+    const state1 = concreteState[0];
+    let state0 = concreteState[1] ^ (state1 >> 26n);
+    state0 ^= state1;
+    state0 = this.#uint64_t(state0 ^ (state0 >> 17n) ^ (state0 >> 34n) ^ (state0 >> 51n));
+    state0 = this.#uint64_t(state0 ^ (state0 << 23n) ^ (state0 << 46n));
+    concreteState[0] = state0;
+    concreteState[1] = state1;
   }
 
-  #recoverMantissa(double: number): bigint {
-    return BigInt(Math.floor(double * Number(1n << 53n)));
+  #recoverMantissa(n: number): bigint {
+    return BigInt(Math.floor(n * Number(1n << 53n)));
   }
 
-  #toDouble(val: bigint): number {
-    return Number(val >> 11n) / Math.pow(2, 53);
+  #toDouble(n: bigint): number {
+    return Number(n >> 11n) / Math.pow(2, 53);
   }
 }
