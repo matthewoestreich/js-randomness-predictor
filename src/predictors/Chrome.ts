@@ -3,7 +3,7 @@ import { UnsatError } from "../errors.js";
 import { Pair } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 
-export default class ChromeRandomnessPredictor extends XorShift128Plus {
+export default class ChromeRandomnessPredictor {
   public sequence: number[];
 
   // Map a 53-bit integer into the range [0, 1) as a double.
@@ -13,7 +13,6 @@ export default class ChromeRandomnessPredictor extends XorShift128Plus {
   #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence: number[]) {
-    super();
     this.sequence = sequence;
   }
 

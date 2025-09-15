@@ -44,7 +44,7 @@ import XorShift128Plus from "../XorShift128Plus.js";
  *
  */
 
-export default class NodeRandomnessPredictor extends XorShift128Plus {
+export default class NodeRandomnessPredictor {
   public sequence: number[];
 
   // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
@@ -63,7 +63,6 @@ export default class NodeRandomnessPredictor extends XorShift128Plus {
   #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence?: number[]) {
-    super();
     if (sequence && sequence.length >= this.#MAX_SEQUENCE_LENGTH) {
       throw new Error(`sequence.length must be less than '${this.#MAX_SEQUENCE_LENGTH}', got '${sequence.length}'`);
     }
