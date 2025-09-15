@@ -23,7 +23,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
-    "postbuild": "node scripts/postbuild.cjs",
+    "postbuild": "node postbuild.cjs",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "test:nodeVersions20andGreaterAndBrowsers": "tsx --test tests/*.test.ts",

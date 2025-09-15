@@ -24,6 +24,7 @@ export default [
       "node_modules/**",
       "scripts/**",
       "tests/scripts/**",
+      "postbuild.cjs",
     ],
     languageOptions: {
       parser: tsParser,

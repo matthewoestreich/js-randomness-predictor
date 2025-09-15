@@ -1,4 +1,4 @@
-import JSRandomnessPredictor from "../../src";
+import JSRandomnessPredictor from "../../../src";
 
 Main();
 
