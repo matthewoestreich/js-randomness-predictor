@@ -8,6 +8,7 @@ export default class ChromeRandomnessPredictor extends XorShift128Plus {
 
   // Map a 53-bit integer into the range [0, 1) as a double.
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
+  #xorShift: XorShift128Plus = new XorShift128Plus();
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
 
@@ -23,7 +24,7 @@ export default class ChromeRandomnessPredictor extends XorShift128Plus {
     // Calculate next prediction, using first item in concrete state, before modifying concrete state.
     const next = this.#toDouble(this.#concreteState[0]);
     // Modify concrete state.
-    this.xorShift128PlusConcreteBackwards(this.#concreteState);
+    this.#xorShift.concreteBackwards(this.#concreteState);
     return next;
   }
 
@@ -45,7 +46,7 @@ export default class ChromeRandomnessPredictor extends XorShift128Plus {
       const sequence = [...this.sequence].reverse();
 
       for (const n of sequence) {
-        this.xorShift128PlusSymbolic(symbolicStatePair); // Modifies symbolic state pair.
+        this.#xorShift.symbolic(symbolicStatePair); // Modifies symbolic state pair.
         const mantissa = this.#recoverMantissa(n);
         solver.add(symbolicStatePair[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
       }
