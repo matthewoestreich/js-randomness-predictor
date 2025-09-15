@@ -2,12 +2,11 @@ import * as z3 from "z3-solver";
 import { UnsatError } from "../errors.js";
 import { Pair } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
+import uint64 from "../uint64.js";
 
 export default class FirefoxRandomnessPredictor {
   public sequence: number[];
 
-  // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
-  #UINT64_MASK = 0xffffffffffffffffn;
   // The mantissa bits (53 effective bits = 52 stored + 1 implicit) for doubles as defined in IEEE-754
   #IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
   // Map a 53-bit integer into the range [0, 1) as a double.
@@ -26,8 +25,7 @@ export default class FirefoxRandomnessPredictor {
     }
     // Modify concrete state before calculating our next prediction.
     this.#xorShift.concrete(this.#concreteState);
-    const uint64 = this.#uint64_t(this.#concreteState[0] + this.#concreteState[1]);
-    return this.#toDouble(uint64);
+    return this.#toDouble(uint64(this.#concreteState[0] + this.#concreteState[1]));
   }
 
   // Solves symbolic state so we can move forward using concrete state, which
@@ -73,11 +71,6 @@ export default class FirefoxRandomnessPredictor {
     } catch (e) {
       return Promise.reject(e);
     }
-  }
-
-  // Simulates C/C++ uint64_t overflow (wrapping).
-  #uint64_t(n: bigint): bigint {
-    return n & this.#UINT64_MASK;
   }
 
   #recoverMantissa(double: number): bigint {

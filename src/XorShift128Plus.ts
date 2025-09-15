@@ -1,17 +1,10 @@
 import { BitVec } from "z3-solver";
 import { Pair } from "./types.js";
+import uint64 from "./uint64.js";
 
 // Encapsulate all XorShift128+ methods here.
 
 export default class XorShift128Plus {
-  // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
-  #UINT64_MASK = 0xffffffffffffffffn;
-
-  // Simulates C/C++ uint64_t overflow (wrapping).
-  #uint64_t(n: bigint): bigint {
-    return n & this.#UINT64_MASK;
-  }
-
   // Modifies symbolicState! Performs XORShift128+ on symbolic state (z3).
   symbolic(symbolicState: Pair<BitVec>): void {
     let temp = symbolicState[0];
@@ -31,9 +24,9 @@ export default class XorShift128Plus {
   concreteBackwards(concreteState: Pair<bigint>): void {
     let temp = concreteState[1] ^ (concreteState[0] >> 26n) ^ concreteState[0];
     // Undo the right-shift/xor steps from forward XORShift128+ to recover the previous state
-    temp = this.#uint64_t(temp ^ (temp >> 17n) ^ (temp >> 34n) ^ (temp >> 51n));
+    temp = uint64(temp ^ (temp >> 17n) ^ (temp >> 34n) ^ (temp >> 51n));
     // Undo the left-shift/xor steps from forward XORShift128+ to recover the previous state
-    temp = this.#uint64_t(temp ^ (temp << 23n) ^ (temp << 46n));
+    temp = uint64(temp ^ (temp << 23n) ^ (temp << 46n));
     // Order matters here!!
     // First, assign concrete state 1 to the value of concrete state 0. This moves state forward, but since we
     // are performing XorShift128+ backwards, we assign concrete state 1 first.
@@ -45,10 +38,10 @@ export default class XorShift128Plus {
   // Modifies concreteState.
   concrete(concreteState: Pair<bigint>): void {
     let temp = concreteState[0];
-    temp ^= this.#uint64_t(temp << 23n);
-    temp ^= this.#uint64_t(temp >> 17n);
+    temp ^= uint64(temp << 23n);
+    temp ^= uint64(temp >> 17n);
     temp ^= concreteState[1];
-    temp ^= this.#uint64_t(concreteState[1] >> 26n);
+    temp ^= uint64(concreteState[1] >> 26n);
     // Order matters here!!
     // First, assign concrete state 0 to the value of concrete state 1. This moves state forward.
     concreteState[0] = concreteState[1];
