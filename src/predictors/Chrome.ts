@@ -1,9 +1,9 @@
 import * as z3 from "z3-solver";
 import { UnsatError } from "../errors.js";
 import { Pair } from "../types.js";
-import V8XorShift128Plus from "../V8XorShift128Plus.js";
+import XorShift128Plus from "../XorShift128Plus.js";
 
-export default class ChromeRandomnessPredictor extends V8XorShift128Plus {
+export default class ChromeRandomnessPredictor extends XorShift128Plus {
   public sequence: number[];
 
   // Map a 53-bit integer into the range [0, 1) as a double.
@@ -23,7 +23,7 @@ export default class ChromeRandomnessPredictor extends V8XorShift128Plus {
     // Calculate next prediction, using first item in concrete state, before modifying concrete state.
     const next = this.#toDouble(this.#concreteState[0]);
     // Modify concrete state.
-    this.xorShift128PlusConcrete(this.#concreteState);
+    this.xorShift128PlusConcreteBackwards(this.#concreteState);
     return next;
   }
 

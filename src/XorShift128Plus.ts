@@ -1,9 +1,9 @@
 import { BitVec } from "z3-solver";
 import { Pair } from "./types.js";
 
-// Since both Chrome and Node use V8, we can implement shared methods here.
+// Encapsulate all XorShift128+ methods here.
 
-export default class V8XorShift128Plus {
+export default class XorShift128Plus {
   // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
   #UINT64_MASK = 0xffffffffffffffffn;
 
@@ -28,16 +28,31 @@ export default class V8XorShift128Plus {
   }
 
   // Modifies `concreteState`! Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
-  protected xorShift128PlusConcrete(concreteState: Pair<bigint>): void {
+  protected xorShift128PlusConcreteBackwards(concreteState: Pair<bigint>): void {
     let temp = concreteState[1] ^ (concreteState[0] >> 26n) ^ concreteState[0];
     // Undo the right-shift/xor steps from forward XORShift128+ to recover the previous state
     temp = this.#uint64_t(temp ^ (temp >> 17n) ^ (temp >> 34n) ^ (temp >> 51n));
     // Undo the left-shift/xor steps from forward XORShift128+ to recover the previous state
     temp = this.#uint64_t(temp ^ (temp << 23n) ^ (temp << 46n));
     // Order matters here!!
-    // First, assign concrete state 1 to the value of concrete state 0. This moves state forward.
+    // First, assign concrete state 1 to the value of concrete state 0. This moves state forward, but since we
+    // are performing XorShift128+ backwards, we assign concrete state 1 first.
     concreteState[1] = concreteState[0];
     // Last, update concrete state 0 with our temp state value.
     concreteState[0] = temp;
+  }
+
+  // Modifies concreteState.
+  protected xorShift128PlusConcrete(concreteState: Pair<bigint>): void {
+    let temp = concreteState[0];
+    temp ^= this.#uint64_t(temp << 23n);
+    temp ^= this.#uint64_t(temp >> 17n);
+    temp ^= concreteState[1];
+    temp ^= this.#uint64_t(concreteState[1] >> 26n);
+    // Order matters here!!
+    // First, assign concrete state 0 to the value of concrete state 1. This moves state forward.
+    concreteState[0] = concreteState[1];
+    // Last, update concrete state 0 with our temp state value.
+    concreteState[1] = temp;
   }
 }
