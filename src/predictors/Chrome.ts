@@ -55,10 +55,11 @@ export default class ChromeRandomnessPredictor {
       }
 
       const model = solver.model();
-      // Use original, unmodified references to symbolic state(s) to pull values from model.
-      const concreteState0 = (model.get(symbolicState0) as z3.BitVecNum).value();
-      const concreteState1 = (model.get(symbolicState1) as z3.BitVecNum).value();
-      this.#concreteState = [concreteState0, concreteState1];
+      this.#concreteState = [
+        // Order matters here!
+        (model.get(symbolicState0) as z3.BitVecNum).value(),
+        (model.get(symbolicState1) as z3.BitVecNum).value(),
+      ];
       this.#isSymbolicStateSolved = true;
       return true;
     } catch (e) {

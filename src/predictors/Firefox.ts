@@ -56,6 +56,7 @@ export default class FirefoxRandomnessPredictor {
 
       const model = solver.model();
       const concreteStatePair: Pair<bigint> = [
+        // Order matters here!
         (model.get(symbolicState0) as z3.BitVecNum).value(),
         (model.get(symbolicState1) as z3.BitVecNum).value(),
       ];
