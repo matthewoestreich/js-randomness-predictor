@@ -8,7 +8,7 @@ export default class ChromeRandomnessPredictor {
 
   // Map a 53-bit integer into the range [0, 1) as a double.
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
-  #xorShift: XorShift128Plus = new XorShift128Plus();
+  #xorShift = new XorShift128Plus();
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
 

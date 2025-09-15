@@ -56,9 +56,9 @@ export default class NodeRandomnessPredictor {
   #IEEE754_EXPONENT_BITS_MASK = 0x3ff0000000000000n;
   // Map a 53-bit integer into the range [0, 1) as a double
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
-  #xorShift: XorShift128Plus = new XorShift128Plus();
+  #xorShift = new XorShift128Plus();
+  #nodeVersion = this.#getNodeVersion();
   #versionSpecificMethods: NodeJsVersionSpecificMethods;
-  #nodeVersion: NodeJsVersion;
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
 
@@ -70,7 +70,6 @@ export default class NodeRandomnessPredictor {
       sequence = Array.from({ length: this.#DEFAULT_SEQUENCE_LENGTH }, Math.random);
     }
     this.sequence = sequence;
-    this.#nodeVersion = this.#getNodeVersion();
     this.#versionSpecificMethods = this.#getVersionSpecificMethods();
   }
 
@@ -98,7 +97,9 @@ export default class NodeRandomnessPredictor {
 
   // Get Node.js version-specific methods.
   #getVersionSpecificMethods(): NodeJsVersionSpecificMethods {
-    if (this.#nodeVersion.major <= 11) {
+    const { major } = this.#nodeVersion;
+
+    if (major <= 11) {
       return {
         recoverMantissa: (n: number): bigint => {
           const buffer = Buffer.alloc(8);
@@ -118,7 +119,7 @@ export default class NodeRandomnessPredictor {
       };
     }
 
-    if (this.#nodeVersion.major <= 23) {
+    if (major <= 23) {
       return {
         recoverMantissa: (n: number): bigint => {
           const buffer = Buffer.alloc(8);
