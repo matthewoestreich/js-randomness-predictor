@@ -1,13 +1,7 @@
-<h1 align="center">js-randomness-predictor</h1>
-
 <p align="center">
   <a href="https://www.npmjs.com/package/js-randomness-predictor">
     <img src="https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000" alt="npm version" />
   </a>
-</p>
-
-<p align="center">
-  Predict Math.random output in Node, Chrome, Firefox, and Safari
 </p>
 
 ---
