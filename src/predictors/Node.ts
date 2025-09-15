@@ -1,7 +1,7 @@
 import * as z3 from "z3-solver";
 import { NodeJsVersion, NodeJsVersionSpecificMethods, Pair } from "../types.js";
 import { UnsatError } from "../errors.js";
-import V8XorShift128Plus from "../V8XorShift128Plus.js";
+import XorShift128Plus from "../XorShift128Plus.js";
 
 /**
  *
@@ -44,7 +44,7 @@ import V8XorShift128Plus from "../V8XorShift128Plus.js";
  *
  */
 
-export default class NodeRandomnessPredictor extends V8XorShift128Plus {
+export default class NodeRandomnessPredictor extends XorShift128Plus {
   public sequence: number[];
 
   // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
@@ -81,7 +81,7 @@ export default class NodeRandomnessPredictor extends V8XorShift128Plus {
     // Calculate next random number before we modify concrete state.
     const next = this.#versionSpecificMethods.toDouble(this.#concreteState);
     // Modify concrete state.
-    this.xorShift128PlusConcrete(this.#concreteState);
+    this.xorShift128PlusConcreteBackwards(this.#concreteState);
     return next;
   }
 

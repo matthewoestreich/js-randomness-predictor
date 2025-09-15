@@ -1,8 +1,9 @@
 import * as z3 from "z3-solver";
 import { UnsatError } from "../errors.js";
 import { Pair } from "../types.js";
+import XorShift128Plus from "../XorShift128Plus.js";
 
-export default class FirefoxRandomnessPredictor {
+export default class FirefoxRandomnessPredictor extends XorShift128Plus {
   public sequence: number[];
 
   // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
@@ -15,6 +16,7 @@ export default class FirefoxRandomnessPredictor {
   #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence: number[]) {
+    super();
     this.sequence = sequence;
   }
 
@@ -23,7 +25,7 @@ export default class FirefoxRandomnessPredictor {
       await this.#solveSymbolicState();
     }
     // Modify concrete state before calculating our next prediction.
-    this.#xorShift128PlusConcrete(this.#concreteState);
+    this.xorShift128PlusConcrete(this.#concreteState);
     const uint64 = this.#uint64_t(this.#concreteState[0] + this.#concreteState[1]);
     return this.#toDouble(uint64);
   }
@@ -42,7 +44,7 @@ export default class FirefoxRandomnessPredictor {
       const symbolicStatePair: Pair<z3.BitVec> = [symbolicState0, symbolicState1];
 
       for (const n of this.sequence) {
-        this.#xorShift128PlusSymbolic(symbolicStatePair); // Modifies symbolc state pair.
+        this.xorShift128PlusSymbolic(symbolicStatePair); // Modifies symbolc state pair.
         const mantissa = this.#recoverMantissa(n);
         const sum = symbolicStatePair[0].add(symbolicStatePair[1]).and(context!.BitVec.val(this.#IEEE754_MANTISSA_BITS_MASK, 64));
         solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
@@ -61,7 +63,7 @@ export default class FirefoxRandomnessPredictor {
       // Advance concrete state to the next unseen number. Z3 returns state at sequence start,
       // so we have to advance concrete state up to the same point as our initial sequence length.
       for (const _ of this.sequence) {
-        this.#xorShift128PlusConcrete(concreteStatePair);
+        this.xorShift128PlusConcrete(concreteStatePair);
       }
 
       this.#concreteState = concreteStatePair;
@@ -75,30 +77,6 @@ export default class FirefoxRandomnessPredictor {
   // Simulates C/C++ uint64_t overflow (wrapping).
   #uint64_t(n: bigint): bigint {
     return n & this.#UINT64_MASK;
-  }
-
-  // Modifies symbolicState.
-  #xorShift128PlusSymbolic(symbolicState: Pair<z3.BitVec>): void {
-    const state0 = symbolicState[1];
-    let state1 = symbolicState[0];
-    state1 = state1.xor(state1.shl(23));
-    state1 = state1.xor(state1.lshr(17));
-    state1 = state1.xor(state0);
-    state1 = state1.xor(state0.lshr(26));
-    symbolicState[0] = symbolicState[1];
-    symbolicState[1] = state1;
-  }
-
-  // Modifies concreteState.
-  #xorShift128PlusConcrete(concreteState: Pair<bigint>): void {
-    const state0 = concreteState[1];
-    let state1 = concreteState[0];
-    state1 ^= this.#uint64_t(state1 << 23n);
-    state1 ^= this.#uint64_t(state1 >> 17n);
-    state1 ^= state0;
-    state1 ^= this.#uint64_t(state0 >> 26n);
-    concreteState[0] = state0;
-    concreteState[1] = state1;
   }
 
   #recoverMantissa(double: number): bigint {
