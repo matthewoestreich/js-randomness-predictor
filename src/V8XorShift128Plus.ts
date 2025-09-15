@@ -1,0 +1,43 @@
+import { BitVec } from "z3-solver";
+import { Pair } from "./types.js";
+
+// Since both Chrome and Node use V8, we can implement shared methods here.
+
+export default class V8XorShift128Plus {
+  // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
+  #UINT64_MASK = 0xffffffffffffffffn;
+
+  // Simulates C/C++ uint64_t overflow (wrapping).
+  #uint64_t(n: bigint): bigint {
+    return n & this.#UINT64_MASK;
+  }
+
+  // Modifies symbolicState! Performs XORShift128+ on symbolic state (z3).
+  protected xorShift128PlusSymbolic(symbolicState: Pair<BitVec>): void {
+    let temp = symbolicState[0];
+    temp = temp.xor(temp.shl(23));
+    temp = temp.xor(temp.lshr(17));
+    temp = temp.xor(symbolicState[1]);
+    temp = temp.xor(symbolicState[1].lshr(26));
+    // Order matters here!
+    // First, move symbolic state 1 into symbolic state 0. This moves state "backwards", thus
+    // allowing us to solve the PRNG seed(s).
+    symbolicState[0] = symbolicState[1];
+    // Last, update symbolic state 1 with our temp state value.
+    symbolicState[1] = temp;
+  }
+
+  // Modifies `concreteState`! Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
+  protected xorShift128PlusConcrete(concreteState: Pair<bigint>): void {
+    let temp = concreteState[1] ^ (concreteState[0] >> 26n) ^ concreteState[0];
+    // Undo the right-shift/xor steps from forward XORShift128+ to recover the previous state
+    temp = this.#uint64_t(temp ^ (temp >> 17n) ^ (temp >> 34n) ^ (temp >> 51n));
+    // Undo the left-shift/xor steps from forward XORShift128+ to recover the previous state
+    temp = this.#uint64_t(temp ^ (temp << 23n) ^ (temp << 46n));
+    // Order matters here!!
+    // First, assign concrete state 1 to the value of concrete state 0. This moves state forward.
+    concreteState[1] = concreteState[0];
+    // Last, update concrete state 0 with our temp state value.
+    concreteState[0] = temp;
+  }
+}

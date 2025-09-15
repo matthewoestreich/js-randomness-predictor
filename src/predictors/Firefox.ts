@@ -1,108 +1,111 @@
 import * as z3 from "z3-solver";
 import { UnsatError } from "../errors.js";
+import { Pair } from "../types.js";
 
 export default class FirefoxRandomnessPredictor {
-  #isInitialized = false;
-  #mask = 0xffffffffffffffffn;
-  #seState0: z3.BitVec | undefined;
-  #seState1: z3.BitVec | undefined;
-  #s0Ref: z3.BitVec | undefined;
-  #s1Ref: z3.BitVec | undefined;
-  #solver: z3.Solver | undefined;
-  #context: z3.Context | undefined;
-  #concreteState0 = 0n;
-  #concreteState1 = 0n;
+  public sequence: number[];
 
-  public sequence: number[] = [];
+  // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
+  #UINT64_MASK = 0xffffffffffffffffn;
+  // The mantissa bits (53 effective bits = 52 stored + 1 implicit) for doubles as defined in IEEE-754
+  #IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
+  // Map a 53-bit integer into the range [0, 1) as a double.
+  #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
+  #isSymbolicStateSolved = false;
+  #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence: number[]) {
     this.sequence = sequence;
   }
 
-  async #initialize(): Promise<boolean> {
-    if (this.#isInitialized) {
-      return true;
+  public async predictNext(): Promise<number> {
+    if (!this.#isSymbolicStateSolved) {
+      await this.#solveSymbolicState();
     }
+    // Modify concrete state before calculating our next prediction.
+    this.#xorShift128PlusConcrete(this.#concreteState);
+    const uint64 = this.#uint64_t(this.#concreteState[0] + this.#concreteState[1]);
+    return this.#toDouble(uint64);
+  }
+
+  // Solves symbolic state so we can move forward using concrete state, which
+  // is much faster than having to compute symbolic state for every prediction.
+  async #solveSymbolicState(): Promise<boolean> {
     try {
       const { Context } = await z3.init();
-      this.#context = Context("main");
-      this.#solver = new this.#context.Solver();
-      this.#seState0 = this.#context.BitVec.const("se_state0", 64);
-      this.#seState1 = this.#context.BitVec.const("se_state1", 64);
-      this.#s0Ref = this.#seState0;
-      this.#s1Ref = this.#seState1;
+      const context = Context("main");
+      const solver = new context.Solver();
+      const symbolicState0 = context.BitVec.const("ss0", 64);
+      const symbolicState1 = context.BitVec.const("ss1", 64);
+      // We do not directly initialize symbolic states inside of our symbolic state Pair because
+      // we need references to the original state/BitVecs in order to be able to pull them out of our model.
+      const symbolicStatePair: Pair<z3.BitVec> = [symbolicState0, symbolicState1];
 
-      for (let i = 0; i < this.sequence.length; i++) {
-        this.#xorShift128PlusSymbolic();
-        const mantissa = this.#recoverMantissa(this.sequence[i]);
-        const state = this.#seState0.add(this.#seState1).and(this.#context!.BitVec.val(0x1fffffffffffff, 64));
-        this.#solver.add(state.eq(this.#context.BitVec.val(mantissa, 64)));
+      for (const n of this.sequence) {
+        this.#xorShift128PlusSymbolic(symbolicStatePair); // Modifies symbolc state pair.
+        const mantissa = this.#recoverMantissa(n);
+        const sum = symbolicStatePair[0].add(symbolicStatePair[1]).and(context!.BitVec.val(this.#IEEE754_MANTISSA_BITS_MASK, 64));
+        solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
       }
 
-      const check = await this.#solver.check();
-      if (check !== "sat") {
+      if ((await solver.check()) !== "sat") {
         return Promise.reject(new UnsatError());
       }
 
-      const model = this.#solver.model();
-      this.#concreteState0 = (model.get(this.#s0Ref) as z3.BitVecNum).value();
-      this.#concreteState1 = (model.get(this.#s1Ref) as z3.BitVecNum).value();
+      const model = solver.model();
+      const concreteStatePair: Pair<bigint> = [
+        (model.get(symbolicState0) as z3.BitVecNum).value(),
+        (model.get(symbolicState1) as z3.BitVecNum).value(),
+      ];
 
-      // We have to get our concrete state up to the same point as our symbolic state,
-      // therefore, we discard as many concrete XOR shift calls as we have `this.sequence.length`
-      // Otherwise, we would return random numbers to the caller that they already have.
-      // Now, when we return from predictNext() we get the actual next.
-      for (let i = 0; i < this.sequence.length; i++) {
-        this.#xorShift128PlusConcrete();
+      // Advance concrete state to the next unseen number. Z3 returns state at sequence start,
+      // so we have to advance concrete state up to the same point as our initial sequence length.
+      for (const _ of this.sequence) {
+        this.#xorShift128PlusConcrete(concreteStatePair);
       }
 
-      this.#isInitialized = true;
+      this.#concreteState = concreteStatePair;
+      this.#isSymbolicStateSolved = true;
       return true;
     } catch (e) {
       return Promise.reject(e);
     }
   }
 
-  /**
-   * Predict next random number.
-   * @returns {Promise<number>}
-   */
-  public async predictNext(): Promise<number> {
-    await this.#initialize();
-    return this.#toDouble(this.#xorShift128PlusConcrete());
+  // Simulates C/C++ uint64_t overflow (wrapping).
+  #uint64_t(n: bigint): bigint {
+    return n & this.#UINT64_MASK;
   }
 
-  #xorShift128PlusSymbolic(): void {
-    if (this.#seState0 === undefined || this.#seState1 === undefined) {
-      throw new Error("States are not defined!");
-    }
-    let s1 = this.#seState0;
-    let s0 = this.#seState1;
-    s1 = s1.xor(s1.shl(23));
-    s1 = s1.xor(s1.lshr(17));
-    s1 = s1.xor(s0);
-    s1 = s1.xor(s0.lshr(26));
-    this.#seState0 = this.#seState1;
-    this.#seState1 = s1;
+  // Modifies symbolicState.
+  #xorShift128PlusSymbolic(symbolicState: Pair<z3.BitVec>): void {
+    const state0 = symbolicState[1];
+    let state1 = symbolicState[0];
+    state1 = state1.xor(state1.shl(23));
+    state1 = state1.xor(state1.lshr(17));
+    state1 = state1.xor(state0);
+    state1 = state1.xor(state0.lshr(26));
+    symbolicState[0] = symbolicState[1];
+    symbolicState[1] = state1;
   }
 
-  #xorShift128PlusConcrete(): bigint {
-    let s1 = this.#concreteState0 & this.#mask;
-    let s0 = this.#concreteState1 & this.#mask;
-    s1 ^= (s1 << 23n) & this.#mask;
-    s1 ^= (s1 >> 17n) & this.#mask;
-    s1 ^= s0 & this.#mask;
-    s1 ^= (s0 >> 26n) & this.#mask;
-    this.#concreteState0 = s0 & this.#mask;
-    this.#concreteState1 = s1 & this.#mask;
-    return (this.#concreteState0 + this.#concreteState1) & this.#mask;
+  // Modifies concreteState.
+  #xorShift128PlusConcrete(concreteState: Pair<bigint>): void {
+    const state0 = concreteState[1];
+    let state1 = concreteState[0];
+    state1 ^= this.#uint64_t(state1 << 23n);
+    state1 ^= this.#uint64_t(state1 >> 17n);
+    state1 ^= state0;
+    state1 ^= this.#uint64_t(state0 >> 26n);
+    concreteState[0] = state0;
+    concreteState[1] = state1;
   }
 
   #recoverMantissa(double: number): bigint {
-    return BigInt(Math.floor(double * Math.pow(2, 53)));
+    return BigInt(Math.floor(double * this.#SCALING_FACTOR_53_BIT_INT));
   }
 
   #toDouble(n: bigint): number {
-    return Number(n & 0x1fffffffffffffn) / Number(1n << 53n);
+    return Number(n & this.#IEEE754_MANTISSA_BITS_MASK) / this.#SCALING_FACTOR_53_BIT_INT;
   }
 }

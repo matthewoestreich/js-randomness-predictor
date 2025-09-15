@@ -1,6 +1,7 @@
 import * as z3 from "z3-solver";
 import { NodeJsVersion, NodeJsVersionSpecificMethods, Pair } from "../types.js";
 import { UnsatError } from "../errors.js";
+import V8XorShift128Plus from "../V8XorShift128Plus.js";
 
 /**
  *
@@ -43,26 +44,25 @@ import { UnsatError } from "../errors.js";
  *
  */
 
-export default class NodeRandomnessPredictor {
+export default class NodeRandomnessPredictor extends V8XorShift128Plus {
   public sequence: number[];
 
   // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
   #MAX_SEQUENCE_LENGTH = 64;
   #DEFAULT_SEQUENCE_LENGTH = 4;
-  // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
-  #UINT64_MASK = 0xffffffffffffffffn;
   // The mantissa bits (lower 52 bits) for doubles as defined in IEEE-754
   #IEEE754_MANTISSA_BITS_MASK = 0x000fffffffffffffn;
   // The exponent bits (bits 52–62) for 1.0 as defined in IEEE-754 for double precision
   #IEEE754_EXPONENT_BITS_MASK = 0x3ff0000000000000n;
-  // Map a 53-bit integer into the range [0, 1) as a double (same as `Math.pow(2, 53)`)
-  #SCALING_FACTOR_53_BIT_INT = 0x20000000000000n;
+  // Map a 53-bit integer into the range [0, 1) as a double
+  #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
   #versionSpecificMethods: NodeJsVersionSpecificMethods;
   #nodeVersion: NodeJsVersion;
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence?: number[]) {
+    super();
     if (sequence && sequence.length >= this.#MAX_SEQUENCE_LENGTH) {
       throw new Error(`sequence.length must be less than '${this.#MAX_SEQUENCE_LENGTH}', got '${sequence.length}'`);
     }
@@ -81,7 +81,7 @@ export default class NodeRandomnessPredictor {
     // Calculate next random number before we modify concrete state.
     const next = this.#versionSpecificMethods.toDouble(this.#concreteState);
     // Modify concrete state.
-    this.#xorShift128PlusConcrete(this.#concreteState);
+    this.xorShift128PlusConcrete(this.#concreteState);
     return next;
   }
 
@@ -94,11 +94,6 @@ export default class NodeRandomnessPredictor {
   #getNodeVersion(): NodeJsVersion {
     const [major, minor, patch] = process.versions.node.split(".").map(Number);
     return { major, minor, patch };
-  }
-
-  // Simulates C/C++ uint64_t overflow (wrapping).
-  #uint64_t(n: bigint): bigint {
-    return n & this.#UINT64_MASK;
   }
 
   // Get Node.js version-specific methods.
@@ -144,11 +139,11 @@ export default class NodeRandomnessPredictor {
     // Latest Node version (major version >= 24)
     return {
       recoverMantissa: (n: number): bigint => {
-        const mantissa = Math.floor(n * Number(this.#SCALING_FACTOR_53_BIT_INT));
+        const mantissa = Math.floor(n * this.#SCALING_FACTOR_53_BIT_INT);
         return BigInt(mantissa);
       },
       toDouble: (concreteState: Pair<bigint>): number => {
-        return Number(concreteState[0] >> 11n) / Number(this.#SCALING_FACTOR_53_BIT_INT);
+        return Number(concreteState[0] >> 11n) / this.#SCALING_FACTOR_53_BIT_INT;
       },
       constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
         solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
@@ -168,12 +163,13 @@ export default class NodeRandomnessPredictor {
       // We do not directly initialize symbolic states inside of our symbolic state Pair because
       // we need references to the original state/BitVecs in order to be able to pull them out of our model.
       const symbolicStatePair: Pair<z3.BitVec> = [symbolicState0, symbolicState1];
-      // Each Math.random() output comes from the PRNG state *after* it advances. To reconstruct the original
-      // hidden state, we must walk the PRNG backwards, which means processing the observed sequence in reverse order.
+      // V8’s Math.random() returns a number derived from the state *after* advancing the PRNG.
+      // To reconstruct the original hidden state for the solver, we must process the observed
+      // sequence in reverse order: last observed number first, first observed number last.
       const sequence = [...this.sequence].reverse();
 
       for (const n of sequence) {
-        this.#xorShift128PlusSymbolic(symbolicStatePair); // Modifies symbolic state
+        this.xorShift128PlusSymbolic(symbolicStatePair); // Modifies symbolic state
         const mantissa = this.#versionSpecificMethods.recoverMantissa(n);
         this.#versionSpecificMethods.constrainMantissa(mantissa, symbolicStatePair, solver, context);
       }
@@ -192,28 +188,5 @@ export default class NodeRandomnessPredictor {
     } catch (e) {
       return Promise.reject(e);
     }
-  }
-
-  // Performs XORShift128+ on symbolic state (z3).
-  #xorShift128PlusSymbolic(symbolicState: Pair<z3.BitVec>): void {
-    let s1 = symbolicState[0];
-    let s0 = symbolicState[1];
-    s1 = s1.xor(s1.shl(23));
-    s1 = s1.xor(s1.lshr(17));
-    s1 = s1.xor(s0);
-    s1 = s1.xor(s0.lshr(26));
-    symbolicState[0] = s0;
-    symbolicState[1] = s1;
-  }
-
-  // Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
-  #xorShift128PlusConcrete(concreteState: Pair<bigint>): void {
-    let cs1 = concreteState[0];
-    let cs0 = concreteState[1] ^ (cs1 >> 26n);
-    cs0 ^= cs1;
-    cs0 = this.#uint64_t(cs0 ^ (cs0 >> 17n) ^ (cs0 >> 34n) ^ (cs0 >> 51n));
-    cs0 = this.#uint64_t(cs0 ^ (cs0 << 23n) ^ (cs0 << 46n));
-    concreteState[0] = cs0;
-    concreteState[1] = cs1;
   }
 }
