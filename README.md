@@ -17,7 +17,7 @@
 - Use the predictor that matches the environment where the sequence was originally generated. **Meaning, if it came from Chrome, use the Chrome predictor, etc...**.
 - We recommend at least 4 numbers in the initial sequence.
 - Breaking changes in `v2.0.0`! The V8 Predictor was deprecated - please use the Node Predictor instead.
-- [See all known issues here](.github/KNOWN_ISSUES.md)
+- [See all known issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md)
 
 # Installation
 
@@ -50,7 +50,7 @@ Deprecated in `v2.0`. Please use the Node Predictor instead - it works just like
 
 # Node Predictor
 
-**[See known Node issues here](.github/KNOWN_ISSUES.md#node)**
+**[See known Node issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#node)**
 
 Since we're running in Node, you can dynamically generate the initial sequence by calling the `node()` method without any parameters. This will automatically produce a sequence behind the scenes. **Alternatively, you can manually provide a sequence if you prefer.**
 <br/>
@@ -106,7 +106,7 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 
 # Chrome Predictor
 
-**[See known Chrome issues here](.github/KNOWN_ISSUES.md#chrome)**
+**[See known Chrome issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#chrome)**
 
 ```js
 const chromePredictor = JSRandomnessPredictor.chrome([...]);
@@ -116,7 +116,7 @@ const nextPrediction = await chromePredictor.predictNext();
 
 # Firefox Predictor
 
-**[See known Firefox issues here](.github/KNOWN_ISSUES.md#firefox)**
+**[See known Firefox issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#firefox)**
 
 ```js
 const firefoxPredictor = JSRandomnessPredictor.firefox([...]);
@@ -126,7 +126,7 @@ const nextPrediction = await firefoxPredictor.predictNext();
 
 # Safari Predictor
 
-**[See known Safari issues here](.github/KNOWN_ISSUES.md#safari)**
+**[See known Safari issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)**
 
 ```js
 const safariPredictor = JSRandomnessPredictor.safari([...]);
