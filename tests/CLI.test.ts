@@ -16,9 +16,10 @@ type Flags = {
 
 /**
  * Programmatically call js-randomness-predictor CLI
+ * @param {string} jsRandomnessPredictorCliPath : path to js-randomness-predictor.js script
  * @param {Flags} flags
  */
-function jsRandomnessPredictor(flags: Flags) {
+function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flags: Flags) {
   const { environment, envVersion, sequence, predictions } = flags;
   const args: string[] = ["-e", environment];
   if (envVersion) {
@@ -30,7 +31,7 @@ function jsRandomnessPredictor(flags: Flags) {
   if (predictions) {
     args.push("-p", predictions.toString());
   }
-  return spawnSync("node", [BIN_PATH, ...args], { encoding: "utf8" });
+  return spawnSync("node", [jsRandomnessPredictorCliPath, ...args], { encoding: "utf8" });
 }
 
 /**
@@ -53,7 +54,7 @@ describe("CLI", () => {
 
   it(`[${PREDICTOR_ENVIRONMENTS.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
     PREDICTOR_ENVIRONMENTS.forEach((e) => {
-      const result = jsRandomnessPredictor({ environment: e, predictions: -1, sequence: [1, 2, 3] });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment: e, predictions: -1, sequence: [1, 2, 3] });
       assert.throws(() => stderrThrows(result));
     });
   });
@@ -63,20 +64,20 @@ describe("CLI", () => {
     const environment = "node";
 
     it("predicts dynamic sequence", () => {
-      const result = jsRandomnessPredictor({ environment });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.strictEqual(jsonResult.isCorrect, true);
     });
 
     it("should automatically provide predictions and accuracy when a sequence is not provided and env-version is not provided", () => {
-      const result = jsRandomnessPredictor({ environment });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.strictEqual(jsonResult.isCorrect, true);
     });
 
     it("should error when sequence is >= 64", () => {
       const seq = Array.from({ length: 64 }, Math.random);
-      const result = jsRandomnessPredictor({ environment, sequence: seq });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq });
       assert.throws(() => stderrThrows(result));
     });
 
@@ -86,7 +87,7 @@ describe("CLI", () => {
       const expectedNumPreds = 64 - seqLength;
       const seq = Array.from({ length: seqLength }, Math.random);
       const expected = Array.from({ length: expectedNumPreds }, Math.random);
-      const result = jsRandomnessPredictor({ environment, sequence: seq, predictions: numPreds });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: numPreds });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.equal(jsonResult.predictions.length, expectedNumPreds);
       assert.deepStrictEqual(jsonResult.predictions, expected);
@@ -96,12 +97,12 @@ describe("CLI", () => {
       // We need to ensure we have a node version that is different than our current version.
       // So we get our current version, then subtract 1.
       const diffNodeMajor = CURR_NODE_MAJOR_VER - 1;
-      const result = jsRandomnessPredictor({ environment, envVersion: diffNodeMajor });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, envVersion: diffNodeMajor });
       assert.throws(() => stderrThrows(result));
     });
 
     it("should not require a sequence if specified --env-version matches our current version", () => {
-      const result = jsRandomnessPredictor({ environment, envVersion: CURR_NODE_MAJOR_VER });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, envVersion: CURR_NODE_MAJOR_VER });
       assert.doesNotThrow(() => stderrThrows(result));
     });
   });
@@ -115,13 +116,13 @@ describe("CLI", () => {
         0.8479779907956815, 0.13963871472821332, 0.25068024611907636, 0.6656237481612675, 0.7381091878692425, 0.8709382509549467, 0.49171337524788294,
         0.6991749430716799, 0.9530887478758369, 0.781511163650037, 0.699311162730038,
       ];
-      const result = jsRandomnessPredictor({ environment, sequence: seq, predictions: exp.length });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, exp);
     });
 
     it("enforces sequence", () => {
-      const result = jsRandomnessPredictor({ environment });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment });
       assert.throws(() => stderrThrows(result));
     });
   });
@@ -130,7 +131,7 @@ describe("CLI", () => {
     const environment = "chrome";
 
     it("enforces sequence", () => {
-      const result = jsRandomnessPredictor({ environment });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment });
       assert.throws(() => stderrThrows(result));
     });
   });
@@ -139,7 +140,7 @@ describe("CLI", () => {
     const environment = "safari";
 
     it("enforces sequence", () => {
-      const result = jsRandomnessPredictor({ environment });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment });
       assert.throws(() => stderrThrows(result));
     });
   });
