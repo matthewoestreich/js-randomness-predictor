@@ -3,7 +3,7 @@ import { UnsatError } from "../errors.js";
 import { Pair } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 
-export default class FirefoxRandomnessPredictor extends XorShift128Plus {
+export default class FirefoxRandomnessPredictor {
   public sequence: number[];
 
   // 64 bit mask to wrap a BigInt as an unsigned 64 bit integer (uint64)
@@ -17,7 +17,6 @@ export default class FirefoxRandomnessPredictor extends XorShift128Plus {
   #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence: number[]) {
-    super();
     this.sequence = sequence;
   }
 
