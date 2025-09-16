@@ -30,7 +30,7 @@ export default defineConfig({
       formats: ["umd"],
       fileName: () => "js-randomness-predictor.js",
     },
-    outDir: "dist/umd",
+    outDir: "cdn",
     emptyOutDir: true,
   },
 });

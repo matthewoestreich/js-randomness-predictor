@@ -27,6 +27,7 @@ export default [
       "tests/browser/coi.serviceworker.js",
       "postbuild.cjs",
       "src/browser/coi/**/*",
+      "cdn/**/*",
     ],
     languageOptions: {
       parser: tsParser,

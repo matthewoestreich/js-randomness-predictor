@@ -33,11 +33,11 @@
     "test:nodeVersions17to19": "node tests/scripts/testVersionsWithoutNodeTest.cjs",
     "test:imports": "node --test tests/import/*.test.*",
     "test": "npm run test:nodeVersions16andLess && npm run test:nodeVersions17to19 && npm run test:nodeVersions20andGreaterAndBrowsers",
-    "format": "prettier . --write",
+    "format": "prettier . \"!cdn/**/*\" --write",
     "lint": "eslint .",
-    "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
-    "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
-    "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
+    "publish:main:major": "npm run build:browser && git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
+    "publish:main:minor": "npm run build:browser && git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
+    "publish:main:patch": "npm run build:browser && git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
   },
   "keywords": [
     "predict-javascript-math-random",
