@@ -24,12 +24,14 @@ export default [
       "node_modules/**",
       "scripts/**",
       "tests/scripts/**",
+      "tests/browser/coi.serviceworker.js",
       "postbuild.cjs",
+      "src/browser/coi/**/*",
     ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: "./tsconfig.esm.json",
+        project: "./tsconfig.base.json",
       },
     },
     plugins: {
