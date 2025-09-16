@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Ignore 'cdn' folder from counting towards "languages"
+cdn/** linguist-vendored
