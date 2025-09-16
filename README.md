@@ -12,7 +12,6 @@
 - We recommend at least 4 numbers in the initial sequence.
 - Breaking changes in `v2.0.0`! The V8 Predictor was deprecated - please use the Node Predictor instead.
 - [See all known issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md)
-- Browser support added in `v2.1.0`
 
 # Installation
 

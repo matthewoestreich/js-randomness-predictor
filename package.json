@@ -21,7 +21,7 @@
     "README.md"
   ],
   "scripts": {
-    "prepublishOnly": "npm run build && npm run build:browser",
+    "prepublishOnly": "npm run build",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "postbuild": "node postbuild.cjs",
     "build:esm": "tsc -p tsconfig.esm.json",
