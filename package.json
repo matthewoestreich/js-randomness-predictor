@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rimraf dist && npm run build:esm && npm run build:cjs",
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:browser",
     "postbuild": "node postbuild.cjs",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
