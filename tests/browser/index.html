@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <table border="1" cellpadding="8" cellspacing="0">
+      <thead>
+        <tr>
+          <th>Browser</th>
+          <th>Supported?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="your-current-browser"></td>
+          <td id="is-your-current-browser-supported"></td>
+        </tr>
+      </tbody>
+    </table>
+    <br />
+    <div id="predictor-section" style="display: none">
+      <h1>hi</h1>
+    </div>
+    <script src="/coi.serviceworker.js"></script>
+    <script src="/dist/umd/z3-built.js"></script>
+    <script src="/dist/umd/js-randomness-predictor.js"></script>
+    <script>
+      const currentBrowser = getCurrentBrowser();
+      const isSupportedBrowser = isCurrentBrowserSupported(currentBrowser);
+
+      document.getElementById("your-current-browser").innerText = currentBrowser === "" ? "UNRECOGNIZED BROWSER" : currentBrowser;
+      document.getElementById("is-your-current-browser-supported").innerText = isSupportedBrowser ? "Yes" : "No";
+
+      if (isSupportedBrowser) {
+        Main();
+      }
+
+      function getCurrentBrowser() {
+        const userAgent = navigator.userAgent;
+        if (userAgent.indexOf("Chrome") > -1) {
+          return "Chrome";
+        } else if (userAgent.indexOf("Firefox") > -1) {
+          return "Firefox";
+        } else if (userAgent.indexOf("Safari") > -1) {
+          return "Safari";
+        } else if (userAgent.indexOf("Edge") > -1) {
+          return "Edge";
+        } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
+          return "Opera";
+        } else if (userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident/") > -1) {
+          return "Internet Explorer";
+        }
+        return "";
+      }
+
+      function isCurrentBrowserSupported(currentBrowser = "") {
+        const supportedBrowsers = ["Chrome", "Firefox", "Safari"];
+        return !(currentBrowser === "" || !currentBrowser) && supportedBrowsers.includes(currentBrowser);
+      }
+
+      /**
+       * Main function
+       */
+      async function Main() {
+        try {
+          console.log({ status: "In Main.." });
+          console.log({ status: "Initing from JSRandomnessPredictor.." });
+          await JSRandomnessPredictor.init();
+          console.log({ status: "Innitedd.." });
+          console.log({ status: "about to create firefox pred", JSRandomnessPredictor });
+          const ffp = JSRandomnessPredictor.firefox(Array.from({ length: 4 }, Math.random));
+          console.log({ status: "created firefox pred.." });
+
+          const predictions = [];
+          console.log("Making first prediction");
+          const first = await ffp.predictNext();
+          predictions.push(first);
+          console.log("made first prediction");
+
+          for (let i = 0; i < 9; i++) {
+            predictions.push(await ffp.predictNext());
+            console.log(`${i + 1}. Prediction Made`);
+          }
+
+          const actuals = Array.from({ length: 10 }, Math.random);
+
+          console.log({ predictions, actuals, isAccurate: predictions.every((v, i) => actuals[i] === v) });
+        } catch (e) {
+          console.log("ERROR IN PREDICTOR", e);
+        }
+      }
+    </script>
+  </body>
+</html>
