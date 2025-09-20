@@ -4,24 +4,6 @@ import uint64 from "./uint64.js";
 
 // Encapsulate all XorShift128+ methods here.
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars
-function arithRShift(context: any, x: any, shift: number, width = 64) {
-  if (shift === 0) return x;
-  // logical right shift
-  const logical = x.lshr(shift);
-
-  // sign bit (1-bit BV)
-  const sign = x.extract(width - 1, width - 1);
-
-  // ones = (1 << shift) - 1  as a width-bit BV
-  const ones = context.BitVec.val(1n, width).shl(shift).sub(context.BitVec.val(1n, width));
-  // mask = ones << (width - shift)
-  const mask = ones.shl(width - shift);
-
-  // if sign == 1 then logical | mask else logical
-  return context.If(sign.eq(context.BitVec.val(1n, 1)), logical.or(mask), logical);
-}
-
 export default class XorShift128Plus {
   // Modifies symbolicState! Performs XORShift128+ on symbolic state (z3).
   symbolic(symbolicState: Pair<BitVec>): void {
