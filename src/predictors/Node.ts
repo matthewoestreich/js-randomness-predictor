@@ -56,7 +56,6 @@ export default class NodeRandomnessPredictor {
   #IEEE754_EXPONENT_BITS_MASK = 0x3ff0000000000000n;
   // Map a 53-bit integer into the range [0, 1) as a double
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
-  #xorShift = new XorShift128Plus();
   #nodeVersion = this.#getNodeVersion();
   #versionSpecificMethods: NodeJsVersionSpecificMethods;
   #isSymbolicStateSolved = false;
@@ -80,7 +79,7 @@ export default class NodeRandomnessPredictor {
     // Calculate next random number before we modify concrete state.
     const next = this.#versionSpecificMethods.toDouble(this.#concreteState);
     // Modify concrete state.
-    this.#xorShift.concreteBackwards(this.#concreteState);
+    XorShift128Plus.concreteBackwards(this.#concreteState);
     return next;
   }
 
@@ -170,7 +169,8 @@ export default class NodeRandomnessPredictor {
       const sequence = [...this.sequence].reverse();
 
       for (const n of sequence) {
-        this.#xorShift.symbolic(symbolicStatePair); // Modifies symbolic state
+        //XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state
+        XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state
         const mantissa = this.#versionSpecificMethods.recoverMantissa(n);
         this.#versionSpecificMethods.constrainMantissa(mantissa, symbolicStatePair, solver, context);
       }

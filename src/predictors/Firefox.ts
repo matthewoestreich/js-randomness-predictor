@@ -11,7 +11,6 @@ export default class FirefoxRandomnessPredictor {
   #IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
   // Map a 53-bit integer into the range [0, 1) as a double.
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
-  #xorShift = new XorShift128Plus();
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
 
@@ -24,7 +23,7 @@ export default class FirefoxRandomnessPredictor {
       await this.#solveSymbolicState();
     }
     // Modify concrete state before calculating our next prediction.
-    this.#xorShift.concrete(this.#concreteState);
+    XorShift128Plus.concrete(this.#concreteState);
     return this.#toDouble(uint64(this.#concreteState[0] + this.#concreteState[1]));
   }
 
@@ -42,7 +41,7 @@ export default class FirefoxRandomnessPredictor {
       const symbolicStatePair: Pair<z3.BitVec> = [symbolicState0, symbolicState1];
 
       for (const n of this.sequence) {
-        this.#xorShift.symbolic(symbolicStatePair); // Modifies symbolc state pair.
+        XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolc state pair.
         const mantissa = this.#recoverMantissa(n);
         const sum = symbolicStatePair[0].add(symbolicStatePair[1]).and(context!.BitVec.val(this.#IEEE754_MANTISSA_BITS_MASK, 64));
         solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
@@ -62,7 +61,7 @@ export default class FirefoxRandomnessPredictor {
       // Advance concrete state to the next unseen number. Z3 returns state at sequence start,
       // so we have to advance concrete state up to the same point as our initial sequence length.
       for (const _ of this.sequence) {
-        this.#xorShift.concrete(concreteStatePair);
+        XorShift128Plus.concrete(concreteStatePair);
       }
 
       this.#concreteState = concreteStatePair;

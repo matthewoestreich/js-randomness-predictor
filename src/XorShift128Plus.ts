@@ -5,8 +5,11 @@ import uint64 from "./uint64.js";
 // Encapsulate all XorShift128+ methods here.
 
 export default class XorShift128Plus {
+  // Mimic static class
+  private constructor() {}
+
   // Modifies symbolicState! Performs XORShift128+ on symbolic state (z3).
-  symbolic(symbolicState: Pair<BitVec>): void {
+  static symbolic(symbolicState: Pair<BitVec>): void {
     let temp = symbolicState[0];
     temp = temp.xor(temp.shl(23));
     temp = temp.xor(temp.lshr(17));
@@ -20,7 +23,7 @@ export default class XorShift128Plus {
     symbolicState[1] = temp;
   }
 
-  symbolicArithmeticShiftRight(symbolicState: Pair<BitVec>): void {
+  static symbolicArithmeticShiftRight(symbolicState: Pair<BitVec>): void {
     let temp = symbolicState[0];
     temp = temp.xor(temp.shl(23));
     temp = temp.xor(temp.shr(17));
@@ -31,7 +34,7 @@ export default class XorShift128Plus {
   }
 
   // Modifies `concreteState`! Performs XORShift128+ backwards on concrete state, due to how V8 provides random numbers.
-  concreteBackwards(concreteState: Pair<bigint>): void {
+  static concreteBackwards(concreteState: Pair<bigint>): void {
     let temp = concreteState[1] ^ (concreteState[0] >> 26n) ^ concreteState[0];
     // Undo the right-shift/xor steps from forward XORShift128+ to recover the previous state
     temp = uint64(temp ^ (temp >> 17n) ^ (temp >> 34n) ^ (temp >> 51n));
@@ -46,7 +49,7 @@ export default class XorShift128Plus {
   }
 
   // Modifies concreteState.
-  concrete(concreteState: Pair<bigint>): void {
+  static concrete(concreteState: Pair<bigint>): void {
     let temp = concreteState[0];
     temp ^= uint64(temp << 23n);
     temp ^= uint64(temp >> 17n);
@@ -59,7 +62,7 @@ export default class XorShift128Plus {
     concreteState[1] = temp;
   }
 
-  concreteArithmeticShiftRight(concreteState: Pair<bigint>): void {
+  static concreteArithmeticShiftRight(concreteState: Pair<bigint>): void {
     let temp = uint64(concreteState[0]);
     temp ^= uint64(temp << 23n);
     temp ^= this.#arithmeticShiftRight(temp, 17n);
@@ -70,7 +73,7 @@ export default class XorShift128Plus {
   }
 
   // Arithmetically shift 'x' to the right 'n' amount.
-  #arithmeticShiftRight(x: bigint, n: bigint): bigint {
+  static #arithmeticShiftRight(x: bigint, n: bigint): bigint {
     const signMask = 1n << 63n;
     // positive, normal shift
     if ((x & signMask) === 0n) {

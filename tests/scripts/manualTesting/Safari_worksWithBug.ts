@@ -6,7 +6,6 @@ import XorShift128Plus from "../../../src/XorShift128Plus.js";
 
 export default class SafariRandomnessPredictor_worksWithBug {
   sequence: number[];
-  #xorShift = new XorShift128Plus();
 
   constructor(sequence: number[]) {
     this.sequence = sequence;
@@ -33,7 +32,7 @@ export default class SafariRandomnessPredictor_worksWithBug {
       const observed = this.sequence[i];
 
       // Advance symbolic state one step (mutates symbolicState)
-      this.#xorShift.symbolicArithmeticShiftRight(symbolicState);
+      XorShift128Plus.symbolicArithmeticShiftRight(symbolicState);
 
       // sum = m_high + m_low (BitVec addition, wraps mod 2^64)
       let sum = symbolicState[1].add(symbolicState[0]);

@@ -9,13 +9,12 @@ import uint64 from "../uint64.js";
 export default class SafariRandomnessPredictor {
   public sequence: number[];
 
-  #xorShift = new XorShift128Plus();
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
   // TODO : COMMENT WHY WE HAVE TO HAVE RETRIES
   #hasRetried = false;
-  #symbolicXor: SymbolicXorShiftImpl = (ss: Pair<z3.BitVec>): void => this.#xorShift.symbolicArithmeticShiftRight(ss);
-  #concreteXor: ConcreteXorShiftImpl = (cs: Pair<bigint>): void => this.#xorShift.concreteArithmeticShiftRight(cs);
+  #symbolicXor: SymbolicXorShiftImpl = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolicArithmeticShiftRight(ss);
+  #concreteXor: ConcreteXorShiftImpl = (cs: Pair<bigint>): void => XorShift128Plus.concreteArithmeticShiftRight(cs);
 
   // The mantissa bits (53 effective bits = 52 stored + 1 implicit) for doubles as defined in IEEE-754
   #IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
@@ -37,8 +36,8 @@ export default class SafariRandomnessPredictor {
 
   async #retrySolveSymbolicStateUsingLogicalShifts(): Promise<boolean> {
     this.#hasRetried = true;
-    this.#symbolicXor = (ss: Pair<z3.BitVec>): void => this.#xorShift.symbolic(ss);
-    this.#concreteXor = (cs: Pair<bigint>): void => this.#xorShift.concrete(cs);
+    this.#symbolicXor = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(ss);
+    this.#concreteXor = (cs: Pair<bigint>): void => XorShift128Plus.concrete(cs);
     return this.#solveSymbolicState();
   }
 
