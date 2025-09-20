@@ -30,6 +30,8 @@ export type PredictorResult = {
 
 export type Pair<T> = [T, T];
 
+export type SymbolicXorShiftImpl = (symbolicState: Pair<BitVec>) => void;
+export type ConcreteXorShiftImpl = (concreteState: Pair<bigint>) => void;
 export type NodeJsRecoverMantissaImpl = (n: number) => bigint;
 export type NodeJsConstrainMantissaImpl = (n: bigint, symbolicState: Pair<BitVec>, solver: Solver, context: Context) => void;
 export type NodeJsToDoubleImpl = (concreteState: Pair<bigint>) => number;

@@ -12,10 +12,10 @@ export default defineConfig({
   plugins: [
     viteStaticCopy({
       targets: [
-        {
-          src: "node_modules/z3-solver/build/z3-built*",
-          dest: "", // Relative to `build.outDir`.
-        },
+        //{
+        //  src: "node_modules/z3-solver/build/z3-built*",
+        //  dest: "", // Relative to `build.outDir`.
+        //},
         {
           src: "src/browser/coi/coi.serviceworker.js",
           dest: "", // Relative to `build.outDir`.
@@ -30,7 +30,7 @@ export default defineConfig({
       formats: ["umd"],
       fileName: () => "js-randomness-predictor.js",
     },
-    outDir: "cdn",
+    outDir: "dist/umd",
     emptyOutDir: true,
   },
 });
