@@ -21,12 +21,12 @@
     "README.md"
   ],
   "scripts": {
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm run build:umd",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "postbuild": "node postbuild.cjs",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:browser": "vite build",
+    "build:umd": "vite build",
     "vite:serve": "vite serve",
     "test:nodeVersions20andGreaterAndBrowsers": "tsx --test tests/*.test.ts",
     "test:nodeVersions16andLess": "tsx --test tests/legacy/*.test.ts --color",
@@ -35,9 +35,9 @@
     "test": "npm run test:nodeVersions16andLess && npm run test:nodeVersions17to19 && npm run test:nodeVersions20andGreaterAndBrowsers",
     "format": "prettier . \"!cdn/**/*\" --write",
     "lint": "eslint .",
-    "publish:main:major": "npm run build:browser && git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
-    "publish:main:minor": "npm run build:browser && git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
-    "publish:main:patch": "npm run build:browser && git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
+    "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
+    "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
+    "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
   },
   "keywords": [
     "predict-javascript-math-random",

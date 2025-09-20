@@ -28,6 +28,7 @@ export default [
       "postbuild.cjs",
       "src/browser/coi/**/*",
       "cdn/**/*",
+      "tests/browser/z3-built.*",
     ],
     languageOptions: {
       parser: tsParser,

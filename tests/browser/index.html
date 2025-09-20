@@ -22,42 +22,65 @@
     </table>
     <br />
     <div id="predictor-section" style="display: none">
-      <h1>hi</h1>
+      <button id="make-prediction">Make Prediction</button>
+      <button id="call-math-random">Call Math.random()</button>
+      <h1>Predictions</h1>
+      <div id="predictions"></div>
+      <h1>Actual Rands</h1>
+      <div id="actual-randoms"></div>
     </div>
-    <script src="/coi.serviceworker.js"></script>
-    <script src="/dist/umd/z3-built.js"></script>
+    <script src="/tests/browser/coi.serviceworker.js"></script>
+    <script src="/tests/browser/z3-built.js"></script>
     <script src="/dist/umd/js-randomness-predictor.js"></script>
     <script>
-      const currentBrowser = getCurrentBrowser();
-      const isSupportedBrowser = isCurrentBrowserSupported(currentBrowser);
+      const CURRENT_BROWSER = getCurrentBrowser();
+      const IS_SUPPORTED_BROWSER = isCurrentBrowserSupported(CURRENT_BROWSER);
 
-      document.getElementById("your-current-browser").innerText = currentBrowser === "" ? "UNRECOGNIZED BROWSER" : currentBrowser;
-      document.getElementById("is-your-current-browser-supported").innerText = isSupportedBrowser ? "Yes" : "No";
+      let PREDICTOR = null;
 
-      if (isSupportedBrowser) {
-        Main();
+      document.getElementById("your-current-browser").innerText = CURRENT_BROWSER === "" ? "UNRECOGNIZED BROWSER" : CURRENT_BROWSER;
+      document.getElementById("is-your-current-browser-supported").innerText = IS_SUPPORTED_BROWSER ? "Yes" : "No";
+
+      const elPredictorSection = document.getElementById("predictor-section");
+      const elMakePrediction = document.getElementById("make-prediction");
+      const elCallMathRandom = document.getElementById("call-math-random");
+      const elPredictions = document.getElementById("predictions");
+      const elActualRandoms = document.getElementById("actual-randoms");
+
+      if (IS_SUPPORTED_BROWSER) {
+        elPredictorSection.style.display = "block";
+        PREDICTOR = JSRandomnessPredictor[CURRENT_BROWSER](Array.from({ length: 4 }, Math.random));
+
+        elMakePrediction.addEventListener("click", async (e) => {
+          const p = await PREDICTOR.predictNext();
+          elPredictions.innerText += p + "\n";
+        });
+
+        elCallMathRandom.addEventListener("click", (e) => {
+          elActualRandoms.innerText += Math.random() + "\n";
+        });
       }
 
       function getCurrentBrowser() {
         const userAgent = navigator.userAgent;
         if (userAgent.indexOf("Chrome") > -1) {
-          return "Chrome";
+          return "chrome";
         } else if (userAgent.indexOf("Firefox") > -1) {
-          return "Firefox";
+          return "firefox";
         } else if (userAgent.indexOf("Safari") > -1) {
-          return "Safari";
+          return "safari";
         } else if (userAgent.indexOf("Edge") > -1) {
-          return "Edge";
+          return "edge";
         } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
-          return "Opera";
+          return "opera";
         } else if (userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident/") > -1) {
-          return "Internet Explorer";
+          return "internetExplorer";
         }
         return "";
       }
 
       function isCurrentBrowserSupported(currentBrowser = "") {
-        const supportedBrowsers = ["Chrome", "Firefox", "Safari"];
+        const supportedBrowsers = ["chrome", "firefox", "safari"];
         return !(currentBrowser === "" || !currentBrowser) && supportedBrowsers.includes(currentBrowser);
       }
 
@@ -66,12 +89,7 @@
        */
       async function Main() {
         try {
-          console.log({ status: "In Main.." });
-          console.log({ status: "Initing from JSRandomnessPredictor.." });
-          await JSRandomnessPredictor.init();
-          console.log({ status: "Innitedd.." });
-          console.log({ status: "about to create firefox pred", JSRandomnessPredictor });
-          const ffp = JSRandomnessPredictor.firefox(Array.from({ length: 4 }, Math.random));
+          const ffp = JSRandomnessPredictor[CURRENT_BROWSER](Array.from({ length: 4 }, Math.random));
           console.log({ status: "created firefox pred.." });
 
           const predictions = [];

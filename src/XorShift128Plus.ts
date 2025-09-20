@@ -4,6 +4,24 @@ import uint64 from "./uint64.js";
 
 // Encapsulate all XorShift128+ methods here.
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars
+function arithRShift(context: any, x: any, shift: number, width = 64) {
+  if (shift === 0) return x;
+  // logical right shift
+  const logical = x.lshr(shift);
+
+  // sign bit (1-bit BV)
+  const sign = x.extract(width - 1, width - 1);
+
+  // ones = (1 << shift) - 1  as a width-bit BV
+  const ones = context.BitVec.val(1n, width).shl(shift).sub(context.BitVec.val(1n, width));
+  // mask = ones << (width - shift)
+  const mask = ones.shl(width - shift);
+
+  // if sign == 1 then logical | mask else logical
+  return context.If(sign.eq(context.BitVec.val(1n, 1)), logical.or(mask), logical);
+}
+
 export default class XorShift128Plus {
   // Modifies symbolicState! Performs XORShift128+ on symbolic state (z3).
   symbolic(symbolicState: Pair<BitVec>): void {
@@ -17,6 +35,16 @@ export default class XorShift128Plus {
     // allowing us to solve the PRNG seed(s).
     symbolicState[0] = symbolicState[1];
     // Last, update symbolic state 1 with our temp state value.
+    symbolicState[1] = temp;
+  }
+
+  symbolicArithmeticShiftRight(symbolicState: Pair<BitVec>): void {
+    let temp = symbolicState[0];
+    temp = temp.xor(temp.shl(23));
+    temp = temp.xor(temp.shr(17));
+    temp = temp.xor(symbolicState[1]);
+    temp = temp.xor(symbolicState[1].shr(26));
+    symbolicState[0] = symbolicState[1];
     symbolicState[1] = temp;
   }
 
@@ -47,5 +75,29 @@ export default class XorShift128Plus {
     concreteState[0] = concreteState[1];
     // Last, update concrete state 0 with our temp state value.
     concreteState[1] = temp;
+  }
+
+  concreteArithmeticShiftRight(concreteState: Pair<bigint>): void {
+    let x = uint64(concreteState[0]);
+    const y = uint64(concreteState[1]);
+    const newLow = y;
+    x ^= uint64(x << 23n);
+    x ^= this.#arithShiftRight64(x, 17n);
+    x ^= y;
+    x ^= this.#arithShiftRight64(y, 26n); // this.#arithShiftRight64(y, 26n);
+    concreteState[0] = newLow;
+    concreteState[1] = uint64(x);
+  }
+
+  #arithShiftRight64(x: bigint, n: bigint): bigint {
+    const signMask = 1n << 63n;
+    // positive, normal shift
+    if ((x & signMask) === 0n) {
+      return uint64(x >> n);
+    }
+    // negative, fill top bits with 1
+    const lshr = uint64(x >> n);
+    const fill = ((1n << n) - 1n) << (64n - n);
+    return lshr | fill;
   }
 }
