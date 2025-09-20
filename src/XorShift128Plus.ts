@@ -62,14 +62,15 @@ export default class XorShift128Plus {
   concreteArithmeticShiftRight(concreteState: Pair<bigint>): void {
     let temp = uint64(concreteState[0]);
     temp ^= uint64(temp << 23n);
-    temp ^= this.#arithShiftRight64(temp, 17n);
+    temp ^= this.#arithmeticShiftRight(temp, 17n);
     temp ^= concreteState[1];
-    temp ^= this.#arithShiftRight64(concreteState[1], 26n); // this.#arithShiftRight64(y, 26n);
+    temp ^= this.#arithmeticShiftRight(concreteState[1], 26n);
     concreteState[0] = concreteState[1];
     concreteState[1] = uint64(temp);
   }
 
-  #arithShiftRight64(x: bigint, n: bigint): bigint {
+  // Arithmetically shift 'x' to the right 'n' amount.
+  #arithmeticShiftRight(x: bigint, n: bigint): bigint {
     const signMask = 1n << 63n;
     // positive, normal shift
     if ((x & signMask) === 0n) {
