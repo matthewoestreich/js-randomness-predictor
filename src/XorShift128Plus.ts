@@ -75,7 +75,7 @@ export default class XorShift128Plus {
   // Arithmetically shift 'x' to the right 'n' amount.
   static #arithmeticShiftRight(x: bigint, n: bigint): bigint {
     const shifted = uint64(x >> n);
-    const signBit = x & 1n << 63n;
+    const signBit = x & (1n << 63n);
     // If top bit (64th bit) is 0 (non-negative), no need to fill
     if (signBit === 0n) {
       return shifted;
