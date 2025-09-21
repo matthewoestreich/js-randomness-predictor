@@ -45,6 +45,12 @@ const seq = [0.34047130319549745, 0.4024046065628766, 0.5071264474284995, 0.5974
 // AFTER BUG FIX
 const emitRandomThunkUsingLogicalShift = [0.45298000010800177, 0.3592530179207556, 0.509406710556208, 0.40755724894877976];
 
+
+
+const NOT_WORKING_MATHRANDOM_STANDALONE = [0.46386126152939966, 0.5974321089613381, 0.22476738498765259, 0.3323801690684518];
+const SHOULD_WORK_MATHRANDOM_STANDALONE = [0.41815411750722586, 0.7314649296969568, 0.3454368329795394, 0.9112504409932133];
+const SHOULD_WORK_ARRAY_FROM = [0.6806781919543583,0.2729841437765109,0.4979057943189942,0.23591014421734935];
+
 function safariToDouble(n: bigint): number {
   return Number(n & 0x1fffffffffffffn) / Math.pow(2, 53);
 }
@@ -54,6 +60,11 @@ Main();
 async function Main() {
   //console.log(`3853851249242497042 -> toDouble -> ${safariToDouble(3853851249242497042n)}`);
 
+  const pred = new FirefoxRandomnessPredictor(SHOULD_WORK_MATHRANDOM_STANDALONE);
+  for (let i = 0; i < 10; i++) {
+    console.log(await pred.predictNext());
+  }
+
   /*
   const seq = [0.34047130319549745, 0.4024046065628766, 0.5071264474284995, 0.5974922278731108];
   const predictor = new SafariRandomnessPredictor_worksWithBug(seq);
@@ -62,6 +73,7 @@ async function Main() {
   SafariRandomnessPredictor_worksWithBug.predictFromSolvedState(solved.low, solved.high, seq.length, 10);
   */
 
+  /*
   const s = [0.34047130319549745, 0.4024046065628766, 0.5071264474284995, 0.5974922278731108];
   const pred = new SafariRandomnessPredictor(s);
   //const pred = new SafariRandomnessPredictor(generatedViaArrayFrom);
@@ -69,6 +81,7 @@ async function Main() {
     const prediction = await pred.predictNext();
     console.log(prediction);
   }
+  /*
 
   /*
   const pred = new SafariRandomnessPredictor([0.34047130319549745, 0.4024046065628766, 0.5071264474284995, 0.5974922278731108]);
