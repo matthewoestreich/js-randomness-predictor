@@ -98,6 +98,16 @@ const nextPrediction = await nodePredictor.predictNext();
 const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 ```
 
+# Bun Predictor
+
+**CANNOT USE BUN REPL TO GENERATE RANDOM NUMBERS, MUST USE A SCRIPT**
+
+```js
+const bunPredictor = JSRandomnessPredictor.bun([...]);
+const nextPrediction = await bunPredictor.predictNext();
+// You'll need to manually verify accuracy.
+```
+
 # Chrome Predictor
 
 **[See known Chrome issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#chrome)**
@@ -241,4 +251,17 @@ js-randomness-predictor --environment safari --sequence 1 2 3 4
 js-randomness-predictor --environment safari --sequence 1 2 3 4 --predictions 5
 # --env-version (-v) ignored
 js-randomness-predictor -e safari -v 23 -s 1 2 3 4
+```
+
+**Bun**
+
+If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
+
+```bash
+# Output 10 predictions by default
+js-randomness-predictor --environment bun --sequence 1 2 3 4
+# Output 5 predictions
+js-randomness-predictor --environment bun --sequence 1 2 3 4 --predictions 5
+# --env-version (-v) ignored
+js-randomness-predictor -e bun -v 23 -s 1 2 3 4
 ```

@@ -4,6 +4,7 @@ import {
   ChromeRandomnessPredictor, 
   NodeRandomnessPredictor,
   SafariRandomnessPredictor,
+  BunRandomnessPredictor,
 } from "./predictors/index.js";
 
 export type { NodeJsVersion } from "./types.js";
@@ -13,6 +14,7 @@ const JSRandomnessPredictor = {
   firefox: (sequence: number[]): FirefoxRandomnessPredictor => new FirefoxRandomnessPredictor(sequence),
   chrome: (sequence: number[]): ChromeRandomnessPredictor => new ChromeRandomnessPredictor(sequence),
   safari: (sequence: number[]): SafariRandomnessPredictor => new SafariRandomnessPredictor(sequence),
+  bun: (sequence: number[]): BunRandomnessPredictor => new BunRandomnessPredictor(sequence),
 };
 
 export default JSRandomnessPredictor;
@@ -20,3 +22,4 @@ export const node = JSRandomnessPredictor.node;
 export const firefox = JSRandomnessPredictor.firefox;
 export const chrome = JSRandomnessPredictor.chrome;
 export const safari = JSRandomnessPredictor.safari;
+export const bun = JSRandomnessPredictor.bun;
