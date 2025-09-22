@@ -1,4 +1,4 @@
-import NodeRandomnessPredictor from "../src/predictors/Node";
+import NodeRandomnessPredictor from "../../src/predictors/Node";
 import { describe, it } from "node:test";
 import assert from "node:assert";
 

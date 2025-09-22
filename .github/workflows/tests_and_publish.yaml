@@ -43,10 +43,10 @@ jobs:
         run: npm run build
       - name: Run tests
         shell: bash
-        run: npm run test:nodeVersions16andLess
+        run: npm run test:node:versions16andLess
         env:
           FORCE_COLOR: "1"
-  test-supported-node-versions:
+  main-tests:
     needs: test-legacy-node-versions
     runs-on: ubuntu-latest
     strategy:
@@ -65,20 +65,20 @@ jobs:
       - name: Build
         shell: bash
         run: npm run build
-      - name: Run tests (v20.x and above)
-        if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
+      - name: Run tests
+        # if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
         shell: bash
-        run: npm run test:nodeVersions20andGreaterAndBrowsers
+        run: npm run test
         env:
           FORCE_COLOR: 1
-      - name: Run tests (v17.x - v19.x) [node:test doesn't exist in these versions]
-        if: ${{ matrix.node-version == '17.x' || matrix.node-version == '18.x' || matrix.node-version == '19.x' }}
-        shell: bash
-        run: npm run test:nodeVersions17to19
-        env:
-          FORCE_COLOR: 1
+      #- name: Run tests (v17.x - v19.x) [node:test doesn't exist in these versions]
+      #  if: ${{ matrix.node-version == '17.x' || matrix.node-version == '18.x' || matrix.node-version == '19.x' }}
+      #  shell: bash
+      #  run: npm run test:node:versions17to19
+      #  env:
+      #    FORCE_COLOR: 1
   maybe-publish:
-    needs: test-supported-node-versions
+    needs: main-tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
