@@ -144,4 +144,31 @@ describe("CLI", () => {
       assert.throws(() => stderrThrows(result));
     });
   });
+
+  describe("Bun", () => {
+    const environment = "bun";
+    it("should be correct when using Array.fom", async () => {
+      // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS.
+      const seq = [0.1584019859484701, 0.5889908981279809, 0.5707594257373063, 0.2013679022755892];
+      const exp = [
+        0.22608010770344233, 0.6271766206083508, 0.982945852940786, 0.17311426646362216, 0.7612493609526688, 0.36855644622412276, 0.16106664697250717,
+        0.4819446119083074, 0.28600821056136283, 0.48136520285701956,
+      ];
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const jsonResult = JSON.parse(result.stdout.toString());
+      assert.deepStrictEqual(jsonResult.predictions, exp);
+    });
+
+    it("should be correct when using Math.random() standalone calls", async () => {
+      // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS.
+      const seq = [0.1399695243228144, 0.2014387671401643, 0.5305147829755276, 0.40869883030943166];
+      const exp = [
+        0.7208689709272236, 0.25435595786540255, 0.4120472933967687, 0.9931906335355927, 0.3605072878681843, 0.07740883327663006, 0.3845007845910927,
+        0.0006116039135406481, 0.7945175319163787, 0.2676487652727588,
+      ];
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const jsonResult = JSON.parse(result.stdout.toString());
+      assert.deepStrictEqual(jsonResult.predictions, exp);
+    });
+  });
 });
