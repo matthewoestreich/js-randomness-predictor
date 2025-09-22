@@ -100,8 +100,6 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 
 # Bun Predictor
 
-**CANNOT USE BUN REPL TO GENERATE RANDOM NUMBERS, MUST USE A SCRIPT**
-
 ```js
 const bunPredictor = JSRandomnessPredictor.bun([...]);
 const nextPrediction = await bunPredictor.predictNext();

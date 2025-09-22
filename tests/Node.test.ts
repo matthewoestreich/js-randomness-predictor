@@ -9,7 +9,7 @@ describe("Node", () => {
     });
   });
 
-  it("predicts the next 5 numbers correctly", async () => {
+  it("predict correctly when using auto-generated sequence", async () => {
     const nodePredictor = new NodeRandomnessPredictor();
     const expected = Array.from({ length: 5 }, Math.random);
     const predictions: number[] = [];

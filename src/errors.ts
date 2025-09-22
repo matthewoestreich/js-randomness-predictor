@@ -22,3 +22,11 @@ export class SymbolicStateEmptyError extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
+
+export class UnexpectedRuntimeError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = "UnexpectedRuntimeError";
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}

@@ -30,4 +30,32 @@ describe("Bun", () => {
     }
     assert.deepStrictEqual(predictions, EXP_MATH_RANDOM);
   });
+
+  it("should be correct when using Array.fom generated in REPL", async () => {
+    const SEQ_REPL_ARRAY_FROM = [0.1879561997434812, 0.9696638899742118, 0.8999015831921182, 0.15767627277617247];
+    const EXP_REPL_ARRAY_FROM = [
+      0.8814891927586603, 0.26957741879551234, 0.0662280044493414, 0.5203060860154335, 0.7156866413771543, 0.3395674692265831, 0.43468239915797724,
+      0.45853673597361955, 0.2725801467208847, 0.881593673939987,
+    ];
+    const bun = new BunRandomnessPredictor(SEQ_REPL_ARRAY_FROM);
+    const predictions: number[] = [];
+    for (let i = 0; i < EXP_REPL_ARRAY_FROM.length; i++) {
+      predictions.push(await bun.predictNext());
+    }
+    assert.deepStrictEqual(predictions, EXP_REPL_ARRAY_FROM);
+  });
+
+  it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
+    const SEQ_REPL_MATH_RANDOM = [0.2706624766889473, 0.527873627815387, 0.19488653995655314, 0.5975612586430014];
+    const EXP_REPL_MATH_RANDOM = [
+      0.19006852635524452, 0.5603843306948109, 0.10325369385339978, 0.550933841219919, 0.7839207772284974, 0.2387365891076061, 0.5578411892707478,
+      0.8566587007257023, 0.359662000709565, 0.5298349140555374,
+    ];
+    const bun = new BunRandomnessPredictor(SEQ_REPL_MATH_RANDOM);
+    const predictions: number[] = [];
+    for (let i = 0; i < EXP_REPL_MATH_RANDOM.length; i++) {
+      predictions.push(await bun.predictNext());
+    }
+    assert.deepStrictEqual(predictions, EXP_REPL_MATH_RANDOM);
+  });
 });
