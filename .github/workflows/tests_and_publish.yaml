@@ -111,6 +111,24 @@ jobs:
         run: npm run test:bun
         env:
           FORCE_COLOR: "1"
+  test-deno:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: node
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        shell: bash
+        run: npm run build
+      - name: Run tests
+        shell: bash
+        run: npm run test:deno
+        env:
+          FORCE_COLOR: "1"
   test-browsers:
     runs-on: ubuntu-latest
     steps:
@@ -130,7 +148,7 @@ jobs:
         env:
           FORCE_COLOR: "1"
   maybe-publish:
-    needs: [test-imports, test-cli, test-legacy-node-versions, test-supported-node-versions, test-bun, test-browsers]
+    needs: [test-imports, test-cli, test-legacy-node-versions, test-supported-node-versions, test-bun, test-browsers, test-deno]
     if: startsWith(github.event.head_commit.message, '[publish] ')
     runs-on: ubuntu-latest
     steps:

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import SafariRandomnessPredictor from "../../src/predictors/Safari";
 import SafariRandomnessPredictor_worksWithBug from "./Safari_worksWithBug";
 import FirefoxRandomnessPredictor from "../../src/predictors/Firefox";
