@@ -11,8 +11,6 @@ export default class SafariRandomnessPredictor {
 
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
-  // TODO : COMMENT WHY WE HAVE TO HAVE RETRIES
-  #hasRetried = false;
   #symbolicXor: SymbolicXorShiftImpl = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolicArithmeticShiftRight(ss);
   #concreteXor: ConcreteXorShiftImpl = (cs: Pair<bigint>): void => XorShift128Plus.concreteArithmeticShiftRight(cs);
 
@@ -27,18 +25,27 @@ export default class SafariRandomnessPredictor {
 
   public async predictNext(): Promise<number> {
     if (!this.#isSymbolicStateSolved) {
-      await this.#solveSymbolicState();
+      await this.#withRetry(
+        () => this.#solveSymbolicState(),
+        () => {
+          // Retry with logical right shifts
+          this.#symbolicXor = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(ss);
+          this.#concreteXor = (cs: Pair<bigint>): void => XorShift128Plus.concrete(cs);
+          return this.#solveSymbolicState();
+        },
+      );
     }
     // Modify concrete state before calculating our next prediction.
     this.#concreteXor(this.#concreteState);
     return this.#toDouble(uint64(this.#concreteState[0] + this.#concreteState[1]));
   }
 
-  async #retrySolveSymbolicStateUsingLogicalShifts(): Promise<boolean> {
-    this.#hasRetried = true;
-    this.#symbolicXor = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(ss);
-    this.#concreteXor = (cs: Pair<bigint>): void => XorShift128Plus.concrete(cs);
-    return this.#solveSymbolicState();
+  async #withRetry<BT, RT>(baseFn: () => Promise<BT>, retryFn: () => Promise<RT>): Promise<BT | RT> {
+    try {
+      return await baseFn();
+    } catch (_e: unknown) {
+      return await retryFn();
+    }
   }
 
   async #solveSymbolicState(): Promise<boolean> {
@@ -58,12 +65,7 @@ export default class SafariRandomnessPredictor {
       }
 
       if ((await solver.check()) !== "sat") {
-        // If we have already retried, we can respect the error.
-        if (this.#hasRetried) {
-          return Promise.reject(new UnsatError());
-        }
-        // We retry using logical shifts.
-        return this.#retrySolveSymbolicStateUsingLogicalShifts();
+        throw new UnsatError();
       }
 
       const model = solver.model();
