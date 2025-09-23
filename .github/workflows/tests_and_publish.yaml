@@ -54,7 +54,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 24.x
+          node-version: node
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Build
@@ -65,7 +65,7 @@ jobs:
         run: npm run test:node:versions16andLess
         env:
           FORCE_COLOR: "1"
-  main-tests:
+  test-supported-node-versions:
     needs: test-legacy-node-versions
     runs-on: ubuntu-latest
     strategy:
@@ -85,19 +85,57 @@ jobs:
         shell: bash
         run: npm run build
       - name: Run tests
-        # if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
+        if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
         shell: bash
-        run: npm run test:ci
+        run: npm run test:node:versions20AndGreater
         env:
           FORCE_COLOR: 1
-      #- name: Run tests (v17.x - v19.x) [node:test doesn't exist in these versions]
-      #  if: ${{ matrix.node-version == '17.x' || matrix.node-version == '18.x' || matrix.node-version == '19.x' }}
-      #  shell: bash
-      #  run: npm run test:node:versions17to19
-      #  env:
-      #    FORCE_COLOR: 1
+      - name: Run tests (v17.x - v19.x) [node:test doesn't exist in these versions]
+        if: ${{ matrix.node-version == '17.x' || matrix.node-version == '18.x' || matrix.node-version == '19.x' }}
+        shell: bash
+        run: npm run test:node:versions17to19
+        env:
+          FORCE_COLOR: 1
+  test-bun:
+    needs: test-supported-node-versions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: node
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        shell: bash
+        run: npm run build
+      - name: Run tests
+        shell: bash
+        run: npm run test:bun
+        env:
+          FORCE_COLOR: "1"
+  test-browsers:
+    needs: test-bun
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: node
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        shell: bash
+        run: npm run build
+      - name: Run tests
+        shell: bash
+        run: npm run test:chrome && npm run test:firefox && npm run test:safari
+        env:
+          FORCE_COLOR: "1"
   maybe-publish:
-    needs: main-tests
+    needs: test-browsers
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
