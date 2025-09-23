@@ -20,6 +20,9 @@
     "dist",
     "README.md"
   ],
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,tsx,json,yaml,yml,py,cpp,md}": "prettier --write"
+  },
   "scripts": {
     "prepublishOnly": "npm run build && npm run build:umd",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
@@ -44,7 +47,8 @@
     "lint": "eslint .",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
     "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
-    "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
+    "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main",
+    "prepare": "husky"
   },
   "keywords": [
     "predict-javascript-math-random",
@@ -80,7 +84,9 @@
     "@typescript-eslint/parser": "^8.43.0",
     "buffer": "^6.0.3",
     "eslint": "^9.35.0",
+    "husky": "^9.1.7",
     "jiti": "^2.5.1",
+    "lint-staged": "^16.2.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
     "tsx": "^4.20.5",
