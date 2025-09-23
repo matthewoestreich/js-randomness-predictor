@@ -1,61 +1,46 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { BunRandomnessPredictor } from "../../src/predictors";
+import queryDb from "../getRandomNumbersFromDatabase";
 
 describe("Bun", () => {
   it("should be correct when using Array.fom", async () => {
-    const SEQ_ARRAY_FROM = [0.1584019859484701, 0.5889908981279809, 0.5707594257373063, 0.2013679022755892];
-    const EXPECTED_ARRAY_FROM = [
-      0.22608010770344233, 0.6271766206083508, 0.982945852940786, 0.17311426646362216, 0.7612493609526688, 0.36855644622412276, 0.16106664697250717,
-      0.4819446119083074, 0.28600821056136283, 0.48136520285701956,
-    ];
-    const bun = new BunRandomnessPredictor(SEQ_ARRAY_FROM);
+    const { sequence, expected } = queryDb("bun", { arrayFrom: true });
+    const bun = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
-    for (let i = 0; i < EXPECTED_ARRAY_FROM.length; i++) {
+    for (let i = 0; i < expected.length; i++) {
       predictions.push(await bun.predictNext());
     }
-    assert.deepStrictEqual(predictions, EXPECTED_ARRAY_FROM);
+    assert.deepStrictEqual(predictions, expected);
   });
 
   it("should be correct when using Math.random() standalone calls", async () => {
-    const SEQ_MATH_RANDOM = [0.1399695243228144, 0.2014387671401643, 0.5305147829755276, 0.40869883030943166];
-    const EXP_MATH_RANDOM = [
-      0.7208689709272236, 0.25435595786540255, 0.4120472933967687, 0.9931906335355927, 0.3605072878681843, 0.07740883327663006, 0.3845007845910927,
-      0.0006116039135406481, 0.7945175319163787, 0.2676487652727588,
-    ];
-    const bun = new BunRandomnessPredictor(SEQ_MATH_RANDOM);
+    const { sequence, expected } = queryDb("bun", { mathRandomStandalone: true });
+    const bun = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
-    for (let i = 0; i < EXP_MATH_RANDOM.length; i++) {
+    for (let i = 0; i < expected.length; i++) {
       predictions.push(await bun.predictNext());
     }
-    assert.deepStrictEqual(predictions, EXP_MATH_RANDOM);
+    assert.deepStrictEqual(predictions, expected);
   });
 
   it("should be correct when using Array.fom generated in REPL", async () => {
-    const SEQ_REPL_ARRAY_FROM = [0.1879561997434812, 0.9696638899742118, 0.8999015831921182, 0.15767627277617247];
-    const EXP_REPL_ARRAY_FROM = [
-      0.8814891927586603, 0.26957741879551234, 0.0662280044493414, 0.5203060860154335, 0.7156866413771543, 0.3395674692265831, 0.43468239915797724,
-      0.45853673597361955, 0.2725801467208847, 0.881593673939987,
-    ];
-    const bun = new BunRandomnessPredictor(SEQ_REPL_ARRAY_FROM);
+    const { sequence, expected } = queryDb("bun", { arrayFrom: true, repl: true });
+    const bun = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
-    for (let i = 0; i < EXP_REPL_ARRAY_FROM.length; i++) {
+    for (let i = 0; i < expected.length; i++) {
       predictions.push(await bun.predictNext());
     }
-    assert.deepStrictEqual(predictions, EXP_REPL_ARRAY_FROM);
+    assert.deepStrictEqual(predictions, expected);
   });
 
   it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
-    const SEQ_REPL_MATH_RANDOM = [0.2706624766889473, 0.527873627815387, 0.19488653995655314, 0.5975612586430014];
-    const EXP_REPL_MATH_RANDOM = [
-      0.19006852635524452, 0.5603843306948109, 0.10325369385339978, 0.550933841219919, 0.7839207772284974, 0.2387365891076061, 0.5578411892707478,
-      0.8566587007257023, 0.359662000709565, 0.5298349140555374,
-    ];
-    const bun = new BunRandomnessPredictor(SEQ_REPL_MATH_RANDOM);
+    const { sequence, expected } = queryDb("bun", { mathRandomStandalone: true, repl: true });
+    const bun = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
-    for (let i = 0; i < EXP_REPL_MATH_RANDOM.length; i++) {
+    for (let i = 0; i < expected.length; i++) {
       predictions.push(await bun.predictNext());
     }
-    assert.deepStrictEqual(predictions, EXP_REPL_MATH_RANDOM);
+    assert.deepStrictEqual(predictions, expected);
   });
 });

@@ -1,51 +1,12 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { spawnSync, SpawnSyncReturns } from "node:child_process";
-import path from "node:path";
 import fs from "node:fs";
+import path from "node:path";
 import { PREDICTOR_ENVIRONMENTS } from "../../src/constants.ts";
+import { jsRandomnessPredictor, stderrThrows } from "./utils.ts";
+import queryDb from "../getRandomNumbersFromDatabase.ts";
 
 const BIN_PATH = path.resolve(import.meta.dirname, "../../dist/esm/cli/js-randomness-predictor.js");
-
-type Flags = {
-  environment: NonNullable<(typeof PREDICTOR_ENVIRONMENTS)[number]>;
-  envVersion?: number;
-  sequence?: number[];
-  predictions?: number;
-};
-
-/**
- * Programmatically call js-randomness-predictor CLI
- * @param {string} jsRandomnessPredictorCliPath : path to js-randomness-predictor.js script
- * @param {Flags} flags
- */
-function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flags: Flags) {
-  const { environment, envVersion, sequence, predictions } = flags;
-  const args: string[] = ["-e", environment];
-  if (envVersion) {
-    args.push("-v", envVersion.toString());
-  }
-  if (sequence?.length) {
-    args.push("-s", ...sequence.map(String));
-  }
-  if (predictions) {
-    args.push("-p", predictions.toString());
-  }
-  return spawnSync("node", [jsRandomnessPredictorCliPath, ...args], { encoding: "utf8" });
-}
-
-/**
- * Instead of just writing errors to stderr and silently continuing, we throw those errors.
- * @param {SpawnSyncReturns<T>} ssr
- */
-function stderrThrows<T>(ssr: SpawnSyncReturns<T>) {
-  if (ssr.stderr !== "") {
-    throw new Error((ssr.stderr as String).toString());
-  }
-  if (ssr.error !== undefined) {
-    throw ssr.error;
-  }
-}
 
 describe("CLI", () => {
   it("ensures built files exist", () => {
@@ -109,16 +70,11 @@ describe("CLI", () => {
 
   describe("Firefox", () => {
     const environment = "firefox";
-
     it("makes correct prediction(s)", () => {
-      const seq = [0.1321263101773572, 0.03366887439746058, 0.032596957696410134, 0.9986575482138969];
-      const exp = [
-        0.8479779907956815, 0.13963871472821332, 0.25068024611907636, 0.6656237481612675, 0.7381091878692425, 0.8709382509549467, 0.49171337524788294,
-        0.6991749430716799, 0.9530887478758369, 0.781511163650037, 0.699311162730038,
-      ];
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const { sequence, expected } = queryDb(environment, {});
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, exp);
+      assert.deepStrictEqual(jsonResult.predictions, expected);
     });
 
     it("enforces sequence", () => {
@@ -129,7 +85,6 @@ describe("CLI", () => {
 
   describe("Chrome", () => {
     const environment = "chrome";
-
     it("enforces sequence", () => {
       const result = jsRandomnessPredictor(BIN_PATH, { environment });
       assert.throws(() => stderrThrows(result));
@@ -138,7 +93,6 @@ describe("CLI", () => {
 
   describe("Safari", () => {
     const environment = "safari";
-
     it("enforces sequence", () => {
       const result = jsRandomnessPredictor(BIN_PATH, { environment });
       assert.throws(() => stderrThrows(result));
@@ -147,53 +101,36 @@ describe("CLI", () => {
 
   describe("Bun", () => {
     const environment = "bun";
-
     it("should be correct when using Array.fom", async () => {
       // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS.
-      const seq = [0.1584019859484701, 0.5889908981279809, 0.5707594257373063, 0.2013679022755892];
-      const exp = [
-        0.22608010770344233, 0.6271766206083508, 0.982945852940786, 0.17311426646362216, 0.7612493609526688, 0.36855644622412276, 0.16106664697250717,
-        0.4819446119083074, 0.28600821056136283, 0.48136520285701956,
-      ];
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const { sequence, expected } = queryDb(environment, { arrayFrom: true });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, exp);
+      assert.deepStrictEqual(jsonResult.predictions, expected);
     });
 
     it("should be correct when using Math.random() standalone calls", async () => {
       // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS.
-      const seq = [0.1399695243228144, 0.2014387671401643, 0.5305147829755276, 0.40869883030943166];
-      const exp = [
-        0.7208689709272236, 0.25435595786540255, 0.4120472933967687, 0.9931906335355927, 0.3605072878681843, 0.07740883327663006, 0.3845007845910927,
-        0.0006116039135406481, 0.7945175319163787, 0.2676487652727588,
-      ];
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const { sequence, expected } = queryDb(environment, { mathRandomStandalone: true });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, exp);
+      assert.deepStrictEqual(jsonResult.predictions, expected);
     });
 
     it("should be correct when using Array.fom generated in REPL", async () => {
       // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS IN BUN REPL.
-      const seq = [0.1879561997434812, 0.9696638899742118, 0.8999015831921182, 0.15767627277617247];
-      const exp = [
-        0.8814891927586603, 0.26957741879551234, 0.0662280044493414, 0.5203060860154335, 0.7156866413771543, 0.3395674692265831, 0.43468239915797724,
-        0.45853673597361955, 0.2725801467208847, 0.881593673939987,
-      ];
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const { sequence, expected } = queryDb(environment, { arrayFrom: true, repl: true });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, exp);
+      assert.deepStrictEqual(jsonResult.predictions, expected);
     });
 
     it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
       // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS IN BUN REPL
-      const seq = [0.2706624766889473, 0.527873627815387, 0.19488653995655314, 0.5975612586430014];
-      const exp = [
-        0.19006852635524452, 0.5603843306948109, 0.10325369385339978, 0.550933841219919, 0.7839207772284974, 0.2387365891076061, 0.5578411892707478,
-        0.8566587007257023, 0.359662000709565, 0.5298349140555374,
-      ];
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const { sequence, expected } = queryDb(environment, { mathRandomStandalone: true, repl: true });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, exp);
+      assert.deepStrictEqual(jsonResult.predictions, expected);
     });
   });
 
@@ -202,26 +139,18 @@ describe("CLI", () => {
 
     it("should be correct when using Array.fom generated in REPL", async () => {
       // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS IN DENO REPL.
-      const seq = [0.9774329605199243, 0.8675717483279107, 0.6122234727274231, 0.5218003723841141];
-      const exp = [
-        0.8747118444935734, 0.45894970699054716, 0.8128902290652635, 0.6647584509517386, 0.07862000822981241, 0.8922143403426294, 0.7716846716448352,
-        0.03573038091548353, 0.3131705059260478, 0.30127442822811057,
-      ];
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const { sequence, expected } = queryDb(environment, { arrayFrom: true, repl: true });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, exp);
+      assert.deepStrictEqual(jsonResult.predictions, expected);
     });
 
     it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
       // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS IN DENO REPL
-      const seq = [0.4634195562875715, 0.03533371111620309, 0.35943557492793676, 0.13524597491602786];
-      const exp = [
-        0.8646077680356445, 0.7286635959760086, 0.8949938429309372, 0.2245826008328513, 0.8383554271394464, 0.10678410004411598, 0.23996888876487066,
-        0.3301827249786412, 0.06623917497469078, 0.7289090151502068,
-      ];
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: exp.length });
+      const { sequence, expected } = queryDb(environment, { mathRandomStandalone: true, repl: true });
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, exp);
+      assert.deepStrictEqual(jsonResult.predictions, expected);
     });
   });
 });

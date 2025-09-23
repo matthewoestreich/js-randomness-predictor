@@ -1,7 +1,7 @@
 const JsRandomnessPredictor = require("../../../dist/cjs/index.js");
 
 /**
- * This script is used in GitHub Actions.
+ * This script is designed to be used in GitHub Actions.
  *
  * Since `node:test` came out in Node v20 we can't use it in versions 17-19.
  * Therefore, we have to use this script.
