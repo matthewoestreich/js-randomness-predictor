@@ -13,7 +13,9 @@ const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
 
 const hashTags = (n = 1) => "#".repeat(n);
 
-console.log(`${hashTags(100)}\nNode.js Test Versions Without \`node:test\`. Tests using auto-generated sequence`);
+console.log(`${hashTags(100)}\nNode.js : Test Versions Without \`node:test\`.`);
+console.log(`Tests using auto-generated sequence.`);
+console.log(`This script exists because 'node:test' does not exist in v17-v19.`);
 console.log(`Meant for Node.js versions 17-19 | Current version=${NODE_MAJOR_VERSION}\n${hashTags(100)}`);
 
 if (NODE_MAJOR_VERSION > 19) {
