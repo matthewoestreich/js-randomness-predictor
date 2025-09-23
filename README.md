@@ -49,7 +49,7 @@ Deprecated in `v2.0`. Please use the Node Predictor instead - it works just like
 Since we're running in Node, you can dynamically generate the initial sequence by calling the `node()` method without any parameters. This will automatically produce a sequence behind the scenes. **Alternatively, you can manually provide a sequence if you prefer.**
 <br/>
 
-**Node : Provide Your Own Sequence**
+## Provide Your Own Sequence
 
 <!-- prettier-ignore -->
 ```js
@@ -63,7 +63,7 @@ const nextPrediction = await nodePredictor.predictNext();
 const isAccurate = nextPrediction === Math.random();
 ```
 
-**Node : Automatically Generate Sequence**
+## Automatically Generate Sequence
 
 ```js
 // Automatically creates sequence behind the scenes
@@ -73,7 +73,7 @@ const nextPrediction = await nodePredictor.predictNext();
 const isAccurate = nextPrediction === Math.random();
 ```
 
-**Node : Targeting a Different Node.js Version**
+## Targeting a Different Node.js Version
 
 You can target Node.js versions that are either **older or newer** than your current version.
 
@@ -182,7 +182,7 @@ node_modules/.bin/js-randomness-predictor [options]
 
 ## CLI Examples
 
-**Node**
+### Node
 
 When no `--sequence` is provided, a sequence will be generated automatically based on the current runtime.
 
@@ -195,7 +195,7 @@ js-randomness-predictor --environment node --sequence 1 2 3 4
 js-randomness-predictor --environment node --sequence 1 2 3 4 --predictions 15
 ```
 
-**Targeting a Different Node.js Version**
+#### Targeting a Different Node.js Version
 
 You can target Node.js versions that are either **older or newer** than your current version.
 
@@ -224,7 +224,7 @@ js-randomness-predictor -e node -v 22 -s 1 2 3 4
 js-randomness-predictor -e node -v 22 # ERROR!
 ```
 
-**Chrome**
+### Chrome
 
 If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
@@ -237,7 +237,7 @@ js-randomness-predictor --environment chrome --sequence 1 2 3 4 --predictions 5
 js-randomness-predictor -e chrome -v 23 -s 1 2 3 4
 ```
 
-**Firefox**
+### Firefox
 
 If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
@@ -250,7 +250,7 @@ js-randomness-predictor --environment firefox --sequence 1 2 3 4 --predictions 5
 js-randomness-predictor -e firefox -v 23 -s 1 2 3 4
 ```
 
-**Safari**
+### Safari
 
 If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
@@ -263,7 +263,7 @@ js-randomness-predictor --environment safari --sequence 1 2 3 4 --predictions 5
 js-randomness-predictor -e safari -v 23 -s 1 2 3 4
 ```
 
-**Bun**
+### Bun
 
 If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
@@ -276,7 +276,7 @@ js-randomness-predictor --environment bun --sequence 1 2 3 4 --predictions 5
 js-randomness-predictor -e bun -v 23 -s 1 2 3 4
 ```
 
-**Deno**
+### Deno
 
 If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
