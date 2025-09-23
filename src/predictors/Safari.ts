@@ -25,15 +25,12 @@ export default class SafariRandomnessPredictor {
 
   public async predictNext(): Promise<number> {
     if (!this.#isSymbolicStateSolved) {
-      await this.#withRetry(
-        () => this.#solveSymbolicState(),
-        () => {
-          // Retry with logical right shifts
-          this.#symbolicXor = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(ss);
-          this.#concreteXor = (cs: Pair<bigint>): void => XorShift128Plus.concrete(cs);
-          return this.#solveSymbolicState();
-        },
-      );
+      await this.#withRetry(this.#solveSymbolicState.bind(this), () => {
+        // Retry with logical right shifts
+        this.#symbolicXor = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(ss);
+        this.#concreteXor = (cs: Pair<bigint>): void => XorShift128Plus.concrete(cs);
+        return this.#solveSymbolicState();
+      });
     }
     // Modify concrete state before calculating our next prediction.
     this.#concreteXor(this.#concreteState);
