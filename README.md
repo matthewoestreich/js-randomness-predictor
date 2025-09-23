@@ -275,3 +275,16 @@ js-randomness-predictor --environment bun --sequence 1 2 3 4 --predictions 5
 # --env-version (-v) ignored
 js-randomness-predictor -e bun -v 23 -s 1 2 3 4
 ```
+
+**Deno**
+
+If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
+
+```bash
+# Output 10 predictions by default
+js-randomness-predictor --environment deno --sequence 1 2 3 4
+# Output 5 predictions
+js-randomness-predictor --environment deno --sequence 1 2 3 4 --predictions 5
+# --env-version (-v) ignored
+js-randomness-predictor -e deno -v 23 -s 1 2 3 4
+```
