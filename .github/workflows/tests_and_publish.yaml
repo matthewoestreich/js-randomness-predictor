@@ -131,6 +131,7 @@ jobs:
           FORCE_COLOR: "1"
   maybe-publish:
     needs: [test-imports, test-cli, test-legacy-node-versions, test-supported-node-versions, test-bun, test-browsers]
+    if: startsWith(github.event.head_commit.message, '[publish] ')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -143,7 +144,6 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Automated Version Bump
-        if: startsWith(github.event.head_commit.message, '[publish] ')
         uses: phips28/gh-action-bump-version@v11.0.7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -152,7 +152,6 @@ jobs:
           minor-wording: "#minor"
           patch-wording: "#patch"
       - name: Publish to npm
-        if: startsWith(github.event.head_commit.message, '[publish] ')
         shell: bash
         run: npm publish
         env:
