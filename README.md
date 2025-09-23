@@ -100,6 +100,8 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 
 # Bun Predictor
 
+**Cannot use the Bun predictor natively in Bun because Bun does not support Z3**
+
 ```js
 const bunPredictor = JSRandomnessPredictor.bun([...]);
 const nextPrediction = await bunPredictor.predictNext();
@@ -107,6 +109,8 @@ const nextPrediction = await bunPredictor.predictNext();
 ```
 
 # Deno Predictor
+
+**Cannot use the Deno predictor natively in Deno because Deno does not support Z3**
 
 ```js
 const denoPredictor = JSRandomnessPredictor.deno([...]);

@@ -62,7 +62,7 @@ export default class SafariRandomnessPredictor {
         if (this.#hasRetried) {
           return Promise.reject(new UnsatError());
         }
-        // We retry using locical shifts.
+        // We retry using logical shifts.
         return this.#retrySolveSymbolicStateUsingLogicalShifts();
       }
 
