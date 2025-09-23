@@ -23,7 +23,7 @@ export default [
       "cypress/**",
       "node_modules/**",
       "scripts/**",
-      "tests/scripts/**",
+      "tests/node/scripts/**",
       "tests/browser/coi.serviceworker.js",
       "postbuild.cjs",
       "src/browser/coi/**/*",

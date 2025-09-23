@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // safariPredictor.ts
 import * as z3 from "z3-solver";
-import XorShift128Plus from "../../../src/XorShift128Plus.js";
+import XorShift128Plus from "../../src/XorShift128Plus.js";
 
 export default class SafariRandomnessPredictor_worksWithBug {
   sequence: number[];

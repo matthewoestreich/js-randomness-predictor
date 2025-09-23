@@ -6,7 +6,7 @@
  * make predictions with numbers generated in those legacy versions.
  *
  */
-import NodeRandomnessPredictor from "../../src/predictors/Node";
+import NodeRandomnessPredictor from "../../../src/predictors/Node";
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import randomNumberDatabase from "./randomNumbers.json";

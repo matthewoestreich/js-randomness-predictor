@@ -1,4 +1,4 @@
-const JsRandomnessPredictor = require("../../dist/cjs/index.js");
+const JsRandomnessPredictor = require("../../../dist/cjs/index.js");
 
 /**
  * This script is used in GitHub Actions.
@@ -11,9 +11,19 @@ const INITIAL_SEQUENCE_LEN = 4;
 const EXPECTED_PREDICTIONS_LEN = 10;
 const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
 
-console.log(`${"#".repeat(100)}\nTesting Node.js v${NODE_MAJOR_VERSION} with an auto generated sequence & expected\n${"#".repeat(100)}`);
+const hashTags = (n = 1) => "#".repeat(n);
 
-(async () => {
+console.log(`${hashTags(100)}\nNode.js Test Versions Without \`node:test\`. Tests using auto-generated sequence`);
+console.log(`Meant for Node.js versions 17-19 | Current version=${NODE_MAJOR_VERSION}\n${hashTags(100)}`);
+
+if (NODE_MAJOR_VERSION > 19) {
+  console.log(`[SKIPPING] Current Node Version > 19, making this test redundant.\n${hashTags(100)}`);
+  process.exit(0);
+} else {
+  Main();
+}
+
+async function Main() {
   const seq = Array.from({ length: INITIAL_SEQUENCE_LEN }, Math.random);
   const predictor = JsRandomnessPredictor.node(seq);
   const expected = Array.from({ length: EXPECTED_PREDICTIONS_LEN }, Math.random);
@@ -31,4 +41,4 @@ console.log(`${"#".repeat(100)}\nTesting Node.js v${NODE_MAJOR_VERSION} with an 
     console.log({ predictions, expected, result: `[FAILURE] Predictions not accurate.` });
     process.exit(1);
   }
-})();
+}

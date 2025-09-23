@@ -1,6 +1,6 @@
-import SafariRandomnessPredictor from "../../../src/predictors/Safari";
+import SafariRandomnessPredictor from "../../src/predictors/Safari";
 import SafariRandomnessPredictor_worksWithBug from "./Safari_worksWithBug";
-import FirefoxRandomnessPredictor from "../../../src/predictors/Firefox";
+import FirefoxRandomnessPredictor from "../../src/predictors/Firefox";
 
 /*
 function getSeed() {

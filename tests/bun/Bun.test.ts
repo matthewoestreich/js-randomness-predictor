@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { BunRandomnessPredictor } from "../src/predictors";
+import { BunRandomnessPredictor } from "../../src/predictors";
 
 describe("Bun", () => {
   it("should be correct when using Array.fom", async () => {

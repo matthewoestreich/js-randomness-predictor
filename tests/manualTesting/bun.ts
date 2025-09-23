@@ -1,4 +1,4 @@
-import { BunRandomnessPredictor } from "../../../src/predictors";
+import { BunRandomnessPredictor } from "../../src/predictors";
 
 const SEQ_ARRAY_FROM = [0.1584019859484701, 0.5889908981279809, 0.5707594257373063, 0.2013679022755892];
 const EXPECTED_ARRAY_FROM = [
