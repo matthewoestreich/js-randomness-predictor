@@ -150,7 +150,7 @@ const nextPrediction = await safariPredictor.predictNext();
 
 # Command Line Interface
 
-**Important info**
+## Important info
 
 - Each number in the sequence should be separated by a space
 - Each flag has a shorthand equivalent
@@ -163,7 +163,7 @@ js-randomness-predictor --help
 js-randomness-predictor -e <environment> [-v <environment-version>] [-s <sequence...>] [-p <num_predictions>]
 ```
 
-**Global Usage**
+## Global Usage
 
 To make the CLI accessible system-wide, install this package globally using the appropriate global flag for your package manager.
 
@@ -171,7 +171,7 @@ To make the CLI accessible system-wide, install this package globally using the 
 npm i -g js-randomness-predictor
 ```
 
-**Non-Global Usage**
+## Non-Global Usage
 
 You'll need to manually specify the path within a project that has this package installed.
 
