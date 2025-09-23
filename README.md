@@ -106,6 +106,14 @@ const nextPrediction = await bunPredictor.predictNext();
 // You'll need to manually verify accuracy.
 ```
 
+# Deno Predictor
+
+```js
+const denoPredictor = JSRandomnessPredictor.deno([...]);
+const nextPrediction = await denoPredictor.predictNext();
+// You'll need to manually verify accuracy.
+```
+
 # Chrome Predictor
 
 **[See known Chrome issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#chrome)**

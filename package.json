@@ -4,7 +4,7 @@
   "engines": {
     "node": ">=17.0.0 <25.0.0"
   },
-  "description": "Predict Math.random output in Node, Bun, Chrome, Firefox, and Safari",
+  "description": "Predict Math.random output in Node, Deno, Bun, Chrome, Firefox, and Safari",
   "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -35,10 +35,11 @@
     "test:node": "npm run test:node:versions:GE:20 && npm run test:node:versions:17:18:19 && npm run test:node:versions:LE:16",
     "test:cli": "tsx --test tests/cli/*.test.ts",
     "test:bun": "tsx --test tests/bun/*.test.ts",
+    "test:deno": "tsx --test tests/deno/*.test.ts",
     "test:firefox": "tsx --test tests/firefox/*.test.ts",
     "test:chrome": "tsx --test tests/chrome/*.test.ts",
     "test:safari": "tsx --test tests/safari/*.test.ts",
-    "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:firefox && npm run test:chrome && npm run test:safari",
+    "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:deno && npm run test:firefox && npm run test:chrome && npm run test:safari",
     "format": "prettier . \"!cdn/**/*\" --write",
     "lint": "eslint .",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
