@@ -81,7 +81,7 @@ jobs:
       - name: Build
         shell: bash
         run: npm run build
-      - name: Run tests
+      - name: Run tests (>= v20.x)
         if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
         shell: bash
         run: npm run test:node:versions:GE:20
