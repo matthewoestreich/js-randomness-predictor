@@ -4,8 +4,9 @@ import assert from "node:assert";
 import queryDb from "../getRandomNumbersFromDatabase";
 
 describe("Chrome", () => {
+  const runtime = "chrome";
   it(`should predict accurately`, async () => {
-    const { sequence, expected } = queryDb("chrome", {});
+    const { sequence, expected } = queryDb({ runtime, tags: {} });
     const p = new ChromeRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (const n of expected) {

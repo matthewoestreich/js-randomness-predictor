@@ -4,8 +4,10 @@ import assert from "node:assert";
 import queryDb from "../getRandomNumbersFromDatabase";
 
 describe("Firefox", () => {
+  const runtime = "firefox";
+
   it(`should predict accurately`, async () => {
-    const { sequence, expected } = queryDb("firefox", {});
+    const { sequence, expected } = queryDb({ runtime, tags: {} });
     const p = new FirefoxRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {

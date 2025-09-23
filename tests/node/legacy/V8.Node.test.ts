@@ -12,13 +12,15 @@ import assert from "node:assert";
 import queryDatabase from "../../getRandomNumbersFromDatabase";
 
 describe("Node : Legacy Node.js Versions", () => {
+  const runtime = "node";
+
   describe("v10.x : User Provided Sequence", () => {
-    const VERSION = 10;
+    const runtimeVersion = 10;
     // THESE NUMBERS WERE GENERATED IN NODE v10.x
-    const { sequence, expected } = queryDatabase("node", {}, VERSION);
+    const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
-      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -29,12 +31,12 @@ describe("Node : Legacy Node.js Versions", () => {
   });
 
   describe("v11.x : User Provided Sequence", () => {
-    const VERSION = 11;
+    const runtimeVersion = 11;
     // THESE NUMBERS WERE GENERATED IN NODE v11.x
-    const { sequence, expected } = queryDatabase("node", {}, VERSION);
+    const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
-      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -45,12 +47,12 @@ describe("Node : Legacy Node.js Versions", () => {
   });
 
   describe("v12.x : User Provided Sequence", () => {
-    const VERSION = 12;
+    const runtimeVersion = 12;
     // THESE NUMBERS WERE GENERATED IN NODE v12.x
-    const { sequence, expected } = queryDatabase("node", {}, VERSION);
+    const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
-      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -61,12 +63,12 @@ describe("Node : Legacy Node.js Versions", () => {
   });
 
   describe("v13.x : User Provided Sequence", () => {
-    const VERSION = 13;
+    const runtimeVersion = 13;
     // THESE NUMBERS WERE GENERATED IN NODE v13.x
-    const { sequence, expected } = queryDatabase("node", {}, VERSION);
+    const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
-      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -77,12 +79,12 @@ describe("Node : Legacy Node.js Versions", () => {
   });
 
   describe("v14.x : User Provided Sequence", () => {
-    const VERSION = 14;
+    const runtimeVersion = 14;
     // THESE NUMBERS WERE GENERATED IN NODE v14.x
-    const { sequence, expected } = queryDatabase("node", {}, VERSION);
+    const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
-      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -93,12 +95,12 @@ describe("Node : Legacy Node.js Versions", () => {
   });
 
   describe("v15.x : User Provided Sequence", () => {
-    const VERSION = 15;
+    const runtimeVersion = 15;
     // THESE NUMBERS WERE GENERATED IN NODE v15.x
-    const { sequence, expected } = queryDatabase("node", {}, VERSION);
+    const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
-      predictor.setNodeVersion({ major: VERSION, minor: 0, patch: 0 });
+      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -109,8 +111,9 @@ describe("Node : Legacy Node.js Versions", () => {
   });
 
   describe("v16.x : User Provided Sequence", () => {
+    const runtimeVersion = 16;
     // THESE NUMBERS WERE GENERATED IN NODE v16.x
-    const { sequence, expected } = queryDatabase("node", {}, 16);
+    const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = new NodeRandomnessPredictor(sequence);
       predictor.setNodeVersion({ major: 16, minor: 0, patch: 0 });

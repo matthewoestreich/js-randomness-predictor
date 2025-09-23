@@ -4,8 +4,10 @@ import { DenoRandomnessPredictor } from "../../src/predictors";
 import queryDb from "../getRandomNumbersFromDatabase";
 
 describe("Deno", () => {
+  const runtime = "deno";
+
   it("should be correct when using Array.fom generated in REPL", async () => {
-    const { sequence, expected } = queryDb("deno", { arrayFrom: true, repl: true });
+    const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
     const deno = new DenoRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {
@@ -15,7 +17,7 @@ describe("Deno", () => {
   });
 
   it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
-    const { sequence, expected } = queryDb("deno", { mathRandomStandalone: true, repl: true });
+    const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
     const deno = new DenoRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {

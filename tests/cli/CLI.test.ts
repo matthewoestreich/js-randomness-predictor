@@ -70,8 +70,10 @@ describe("CLI", () => {
 
   describe("Firefox", () => {
     const environment = "firefox";
+    const runtime = "firefox";
+
     it("makes correct prediction(s)", () => {
-      const { sequence, expected } = queryDb(environment, {});
+      const { sequence, expected } = queryDb({ runtime, tags: {} });
       const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);
@@ -101,9 +103,11 @@ describe("CLI", () => {
 
   describe("Bun", () => {
     const environment = "bun";
+    const runtime = "bun";
+
     it("should be correct when using Array.fom", async () => {
       // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS.
-      const { sequence, expected } = queryDb(environment, { arrayFrom: true });
+      const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true } });
       const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);
@@ -111,7 +115,7 @@ describe("CLI", () => {
 
     it("should be correct when using Math.random() standalone calls", async () => {
       // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS.
-      const { sequence, expected } = queryDb(environment, { mathRandomStandalone: true });
+      const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true } });
       const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);
@@ -119,7 +123,7 @@ describe("CLI", () => {
 
     it("should be correct when using Array.fom generated in REPL", async () => {
       // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS IN BUN REPL.
-      const { sequence, expected } = queryDb(environment, { arrayFrom: true, repl: true });
+      const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
       const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);
@@ -127,7 +131,7 @@ describe("CLI", () => {
 
     it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
       // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS IN BUN REPL
-      const { sequence, expected } = queryDb(environment, { mathRandomStandalone: true, repl: true });
+      const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
       const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);
@@ -136,10 +140,11 @@ describe("CLI", () => {
 
   describe("Deno", () => {
     const environment = "deno";
+    const runtime = "deno";
 
     it("should be correct when using Array.fom generated in REPL", async () => {
       // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS IN DENO REPL.
-      const { sequence, expected } = queryDb(environment, { arrayFrom: true, repl: true });
+      const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
       const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);
@@ -147,7 +152,7 @@ describe("CLI", () => {
 
     it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
       // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS IN DENO REPL
-      const { sequence, expected } = queryDb(environment, { mathRandomStandalone: true, repl: true });
+      const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
       const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);
