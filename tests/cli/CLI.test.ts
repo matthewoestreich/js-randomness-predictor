@@ -21,8 +21,9 @@ suite("CLI", () => {
     });
   });
 
-  suite("Export Results", (thisSute) => {
-    const relativeExportPath = "./export.json";
+  suite("Export Results", () => {
+    const environment = "node";
+    const relativeExportPath = "./export.json"; // Relative to current working directory
     const absoluteExportPath = path.resolve(process.cwd(), relativeExportPath);
 
     after(() => {
@@ -31,10 +32,22 @@ suite("CLI", () => {
       }
     });
 
-    test("Exports results to file", () => {
-      const result = jsRandomnessPredictor(BIN_PATH, { environment: "node", export: relativeExportPath });
+    test("export results to file", () => {
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath });
       assert.doesNotThrow(() => stderrThrows(result));
       assert.ok(fs.existsSync(absoluteExportPath), "Exported file does not exist");
+    });
+
+    test("file does not get overwritten without --force", () => {
+      const fileContents = JSON.parse(fs.readFileSync(absoluteExportPath, "utf-8"));
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath });
+      assert.notDeepEqual(fileContents, result.stdout);
+    });
+
+    test("file is overwritten when --force is used", () => {
+      const fileContents = fs.readFileSync(absoluteExportPath, "utf-8");
+      const result = jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath, force: true });
+      assert.equal(fileContents + "xxx", result.stdout.toString(), `fileContents=${fileContents}\nresult=${result.stdout.toString()}`);
     });
   });
 
