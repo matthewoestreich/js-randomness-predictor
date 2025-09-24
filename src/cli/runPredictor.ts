@@ -86,40 +86,38 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
 }
 
 function exportResult(argv: PredictorArgs, result: PredictorResult): void {
-  if (argv.export) {
-    const exportPath = nodePath.resolve(process.cwd(), argv.export.toString());
-    const dirPath = nodePath.dirname(exportPath);
-    const fileExists = nodeFs.existsSync(exportPath);
-    const dirExists = nodeFs.existsSync(dirPath);
+  const exportPath = nodePath.resolve(process.cwd(), argv.export!.toString());
+  const dirPath = nodePath.dirname(exportPath);
+  const fileExists = nodeFs.existsSync(exportPath);
+  const dirExists = nodeFs.existsSync(dirPath);
 
-    if (fileExists && !nodeFs.statSync(exportPath).isFile()) {
-      result._warnings?.push(`Export path must be to a file! ${exportPath}`);
-      return;
-    }
-
-    if (nodePath.extname(exportPath) !== ".json") {
-      result._warnings?.push(`Export path must be to a .json file! ${exportPath}`);
-      return;
-    }
-
-    if (fileExists && !argv.force) {
-      result._warnings?.push(`Export path already exists and '--force' was not used! Use '--force' to overwrite existing files.`);
-      return;
-    }
-
-    if (!dirExists && !argv.force) {
-      result._warnings?.push(
-        `One or more directories does not exist in export path and '--force' was not used! Use '--force' to create full path if it does not exist.`,
-      );
-      return;
-    }
-
-    if (!dirExists && argv.force) {
-      nodeFs.mkdirSync(dirPath, { recursive: true });
-    }
-
-    writeResultsToFile(exportPath, result);
+  if (fileExists && !nodeFs.statSync(exportPath).isFile()) {
+    result._warnings?.push(`Export path must be to a file! ${exportPath}`);
+    return;
   }
+
+  if (nodePath.extname(exportPath) !== ".json") {
+    result._warnings?.push(`Export path must be to a .json file! ${exportPath}`);
+    return;
+  }
+
+  if (fileExists && !argv.force) {
+    result._warnings?.push(`Export path already exists and '--force' was not used! Use '--force' to overwrite existing files.`);
+    return;
+  }
+
+  if (!dirExists && !argv.force) {
+    result._warnings?.push(
+      `One or more directories does not exist in export path and '--force' was not used! Use '--force' to create full path if it does not exist.`,
+    );
+    return;
+  }
+
+  if (!dirExists && argv.force) {
+    nodeFs.mkdirSync(dirPath, { recursive: true });
+  }
+
+  writeResultsToFile(exportPath, result);
 }
 
 function writeResultsToFile(path: string, result: PredictorResult): void {
