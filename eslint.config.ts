@@ -7,33 +7,24 @@ const require = createRequire(import.meta.url);
 
 export default [
   {
-    files: ["**/*.{js,mjs,cjs,ts}"],
+    files: ["**/*.{ts}"],
     ignores: [
       "**/*.*config.*",
       "__tests__/**",
       "**/*.test.*",
       "dist/**/*",
+      "./dist/**",
       "coverage/**",
       ".husky/**",
       ".vscode/**",
       ".git/**",
       ".github/**",
-      "www/**",
-      "www-pub/**",
-      "cypress/**",
       "node_modules/**",
-      "scripts/**",
-      "tests/node/scripts/**",
-      "tests/browser/coi.serviceworker.js",
-      "postbuild.cjs",
-      "src/browser/coi/**/*",
-      "cdn/**/*",
-      "tests/browser/z3-built.*",
     ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: "./tsconfig.base.json",
+        project: "./tsconfig/tsconfig.base.json",
       },
     },
     plugins: {

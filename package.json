@@ -23,12 +23,17 @@
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,json,yaml,yml,py,cpp,md}": "prettier --write"
   },
+  "prettier": {
+    "semi": true,
+    "singleQuote": false,
+    "printWidth": 150
+  },
   "scripts": {
     "prepublishOnly": "npm run build && npm run build:umd",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "postbuild": "node postbuild.cjs",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
     "build:umd": "vite build",
     "vite:serve": "vite serve",
     "test:imports": "node --test tests/import/*.test.*",
@@ -43,7 +48,7 @@
     "test:chrome": "tsx --test tests/chrome/*.test.ts",
     "test:safari": "tsx --test tests/safari/*.test.ts",
     "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:deno && npm run test:firefox && npm run test:chrome && npm run test:safari",
-    "format": "prettier . \"!cdn/**/*\" --write",
+    "format": "prettier . --write",
     "lint": "eslint .",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
     "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",

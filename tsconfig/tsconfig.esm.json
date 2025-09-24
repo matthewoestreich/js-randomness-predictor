@@ -4,12 +4,12 @@
     "target": "esnext",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "outDir": "./dist/esm",
-    "rootDir": "./src",
+    "outDir": "../dist/esm",
+    "rootDir": "../src",
     "allowJs": false,
     "declaration": true,
     "isolatedModules": true
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules/", "**/*.test.*", "src/browser/**/*"]
+  "include": ["../src/**/*"],
+  "exclude": ["../node_modules/", "../**/*.test.*", "../src/browser/**/*"]
 }
