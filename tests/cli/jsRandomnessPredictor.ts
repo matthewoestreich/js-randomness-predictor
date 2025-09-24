@@ -6,7 +6,7 @@ import { JSRandomnessPredictorCliArgs } from "../../src/types.ts";
  * @param {string} jsRandomnessPredictorCliPath : path to js-randomness-predictor.js script
  * @param {JSRandomnessPredictorCliArgs} flags
  */
-export function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flags: JSRandomnessPredictorCliArgs): SpawnSyncReturns<string> {
+export default function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flags: JSRandomnessPredictorCliArgs): SpawnSyncReturns<string> {
   const { environment, envVersion, sequence, predictions, force, export: exportPath } = flags;
   const args: string[] = ["-e", environment];
   if (envVersion) {
@@ -25,17 +25,4 @@ export function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flag
     args.push("--force");
   }
   return spawnSync("node", [jsRandomnessPredictorCliPath, ...args], { encoding: "utf8" });
-}
-
-/**
- * Instead of just writing errors to stderr and silently continuing, we throw those errors.
- * @param {SpawnSyncReturns<T>} ssr
- */
-export function stderrThrows<T>(ssr: SpawnSyncReturns<T>): void {
-  if (ssr.stderr !== "") {
-    throw new Error((ssr.stderr as string).toString());
-  }
-  if (ssr.error !== undefined) {
-    throw ssr.error;
-  }
 }

@@ -3,7 +3,8 @@ import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
 import { PREDICTOR_ENVIRONMENTS } from "../../src/constants.ts";
-import { jsRandomnessPredictor, stderrThrows } from "./utils.ts";
+import jsRandomnessPredictor from "./jsRandomnessPredictor.ts";
+import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../getRandomNumbersFromDatabase.ts";
 import { NodeJsMajorVersion, PredictorEnvironment } from "../../src/types.ts";
 
