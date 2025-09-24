@@ -21,14 +21,21 @@ suite("CLI", () => {
     });
   });
 
-  suite("Export Results", () => {
+  suite("Export Predictor Results", () => {
     const environment = "node";
     const relativeExportPath = "./export.json"; // Relative to current working directory
     const absoluteExportPath = path.resolve(process.cwd(), relativeExportPath);
+    // To test for when directory in path doesn't exist
+    const extendedRelativePath = "./export/export.json";
+    const extendedAbsolutePath = path.resolve(process.cwd(), extendedRelativePath);
+    const extendedAbsoluteDirPath = path.dirname(extendedAbsolutePath);
 
     after(() => {
       if (fs.existsSync(absoluteExportPath)) {
         fs.unlinkSync(absoluteExportPath);
+      }
+      if (fs.existsSync(extendedAbsoluteDirPath)) {
+        fs.rmSync(extendedAbsoluteDirPath, { recursive: true, force: true });
       }
     });
 
@@ -39,15 +46,27 @@ suite("CLI", () => {
     });
 
     test("file does not get overwritten without --force", () => {
-      const fileContents = JSON.parse(fs.readFileSync(absoluteExportPath, "utf-8"));
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath });
-      assert.notDeepEqual(fileContents, result.stdout);
+      const before = JSON.parse(fs.readFileSync(absoluteExportPath, "utf-8"));
+      jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath });
+      const after = JSON.parse(fs.readFileSync(absoluteExportPath, "utf-8"));
+      assert.deepEqual(before, after, `${JSON.stringify({ before, after }, null, 2)}`);
     });
 
     test("file is overwritten when --force is used", () => {
-      const fileContents = fs.readFileSync(absoluteExportPath, "utf-8");
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath, force: true });
-      assert.equal(fileContents + "xxx", result.stdout.toString(), `fileContents=${fileContents}\nresult=${result.stdout.toString()}`);
+      const before = fs.readFileSync(absoluteExportPath, "utf-8");
+      jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath, force: true });
+      const after = fs.readFileSync(absoluteExportPath, "utf-8");
+      assert.notDeepStrictEqual(before, after);
+    });
+
+    test("directory does not get created when --force is not used", () => {
+      jsRandomnessPredictor(BIN_PATH, { environment, export: extendedRelativePath });
+      assert.strictEqual(fs.existsSync(extendedAbsolutePath), false);
+    });
+
+    test("directory gets created when --force is used", () => {
+      jsRandomnessPredictor(BIN_PATH, { environment, export: extendedRelativePath, force: true });
+      assert.strictEqual(fs.existsSync(extendedAbsolutePath), true);
     });
   });
 

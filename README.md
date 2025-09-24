@@ -160,7 +160,13 @@ const nextPrediction = await safariPredictor.predictNext();
 js-randomness-predictor --help
 
 # You can use shorthand for flags.
-js-randomness-predictor -e <environment> [-v <environment-version>] [-s <sequence...>] [-p <num_predictions>]
+js-randomness-predictor
+  -e <environment>
+  [-v <environment_version>]
+  [-s <sequence...>]
+  [-p <num_predictions>]
+  [-x <export_path>]
+  [-f <force_overwrite_export_file_or_export_path_creation>]
 ```
 
 ## Global Usage
@@ -179,6 +185,15 @@ You'll need to manually specify the path within a project that has this package 
 # Pretend we are in a project that has this package installed.
 node_modules/.bin/js-randomness-predictor [options]
 ```
+
+## Export Predictor Results
+
+If you want to export results to a file you can use the `--export` (or `-x`) switch. to provide an export path.
+
+- Export path is **relative to the current working directory** (the directory where you are currently running the CLI from)
+- The **provided path** must be to a **.json file**
+- If the **provided file already exists** we do not overwrite it, **unless the `--force` switch is used**
+- If the **full path** you provided **does not exist,** we do not create it, **unless the `--force` switch is used**
 
 ## CLI Examples
 

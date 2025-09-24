@@ -59,7 +59,7 @@ const predictCommand: CommandModule = {
       })
       .option("force", {
         alias: "f",
-        describe: "If exporting, overwrite existing file",
+        describe: "If exporting, overwrite existing file or create needed directories in path",
         type: "boolean",
       })
       .check((argv) => {
