@@ -1,12 +1,12 @@
-import { describe, it } from "node:test";
+import { suite, test } from "node:test";
 import assert from "node:assert";
 import { DenoRandomnessPredictor } from "../../src/predictors";
 import queryDb from "../getRandomNumbersFromDatabase";
 
-describe("Deno", () => {
+suite("Deno", () => {
   const runtime = "deno";
 
-  it("should be correct when using Array.fom generated in REPL", async () => {
+  test("should be correct when using Array.fom generated in REPL", async () => {
     const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
     const deno = new DenoRandomnessPredictor(sequence);
     const predictions: number[] = [];
@@ -16,7 +16,7 @@ describe("Deno", () => {
     assert.deepStrictEqual(predictions, expected);
   });
 
-  it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
+  test("should be correct when using Math.random() standalone calls generated in REPL", async () => {
     const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
     const deno = new DenoRandomnessPredictor(sequence);
     const predictions: number[] = [];

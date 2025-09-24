@@ -1,12 +1,12 @@
 import FirefoxRandomnessPredictor from "../../src/predictors/Firefox";
-import { describe, it } from "node:test";
+import { suite, test } from "node:test";
 import assert from "node:assert";
 import queryDb from "../getRandomNumbersFromDatabase";
 
-describe("Firefox", () => {
+suite("Firefox", () => {
   const runtime = "firefox";
 
-  it(`should predict accurately`, async () => {
+  test(`should predict accurately`, async () => {
     const { sequence, expected } = queryDb({ runtime, tags: {} });
     const p = new FirefoxRandomnessPredictor(sequence);
     const predictions: number[] = [];

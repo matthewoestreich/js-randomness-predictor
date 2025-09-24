@@ -1,12 +1,12 @@
-import { describe, it } from "node:test";
+import { suite, test } from "node:test";
 import assert from "node:assert";
 import { BunRandomnessPredictor } from "../../src/predictors";
 import queryDb from "../getRandomNumbersFromDatabase";
 
-describe("Bun", () => {
+suite("Bun", () => {
   const runtime = "bun";
 
-  it("should be correct when using Array.fom", async () => {
+  test("should be correct when using Array.fom", async () => {
     const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true } });
     const bun = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
@@ -16,7 +16,7 @@ describe("Bun", () => {
     assert.deepStrictEqual(predictions, expected);
   });
 
-  it("should be correct when using Math.random() standalone calls", async () => {
+  test("should be correct when using Math.random() standalone calls", async () => {
     const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true } });
     const bun = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
@@ -26,7 +26,7 @@ describe("Bun", () => {
     assert.deepStrictEqual(predictions, expected);
   });
 
-  it("should be correct when using Array.fom generated in REPL", async () => {
+  test("should be correct when using Array.fom generated in REPL", async () => {
     const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
     const bun = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
@@ -36,7 +36,7 @@ describe("Bun", () => {
     assert.deepStrictEqual(predictions, expected);
   });
 
-  it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
+  test("should be correct when using Math.random() standalone calls generated in REPL", async () => {
     const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
     const bun = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
