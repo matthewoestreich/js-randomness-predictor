@@ -8,7 +8,7 @@ export interface PredictorArgs {
   envVersion?: NodeJsMajorVersion;
   predictions?: number;
   export?: string;
-  force?: boolean; // If exporting, force file overwrite.
+  force?: boolean; // If exporting, force file overwrite or directory structure creation.
   _currentNodeJsMajorVersion: NodeJsMajorVersion;
 }
 

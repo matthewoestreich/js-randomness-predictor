@@ -4,25 +4,31 @@ import { JSRandomnessPredictorCliArgs } from "../../src/types.ts";
 /**
  * Programmatically call js-randomness-predictor CLI
  * @param {string} jsRandomnessPredictorCliPath : path to js-randomness-predictor.js script
- * @param {JSRandomnessPredictorCliArgs} flags
+ * @param {JSRandomnessPredictorCliArgs} args
  */
-export default function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flags: JSRandomnessPredictorCliArgs): SpawnSyncReturns<string> {
-  const { environment, envVersion, sequence, predictions, force, export: exportPath } = flags;
-  const args: string[] = ["-e", environment];
+export default function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, args: JSRandomnessPredictorCliArgs): SpawnSyncReturns<string> {
+  const { environment, envVersion, sequence, predictions, force, export: exportPath } = args;
+  const cmd: string[] = ["-e", environment];
+
   if (envVersion) {
-    args.push("-v", envVersion.toString());
+    cmd.push("-v", envVersion.toString());
   }
+
   if (sequence?.length) {
-    args.push("-s", ...sequence.map(String));
+    cmd.push("-s", ...sequence.map(String));
   }
+
   if (predictions) {
-    args.push("-p", predictions.toString());
+    cmd.push("-p", predictions.toString());
   }
+
   if (exportPath) {
-    args.push("-x", exportPath);
+    cmd.push("-x", exportPath);
   }
+
   if (force) {
-    args.push("--force");
+    cmd.push("--force");
   }
-  return spawnSync("node", [jsRandomnessPredictorCliPath, ...args], { encoding: "utf8" });
+
+  return spawnSync("node", [jsRandomnessPredictorCliPath, ...cmd], { encoding: "utf8" });
 }
