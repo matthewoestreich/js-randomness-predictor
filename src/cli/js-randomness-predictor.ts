@@ -52,6 +52,16 @@ const predictCommand: CommandModule = {
         type: "number",
         choices: ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS,
       })
+      .option("export", {
+        alias: "x",
+        describe: "File path to export results. Must be to a .json file. Path relative to current working directory!",
+        type: "string",
+      })
+      .option("force", {
+        alias: "f",
+        describe: "If exporting, overwrite existing file or create needed directories in path",
+        type: "boolean",
+      })
       .check((argv) => {
         argv._currentNodeJsMajorVersion = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
         const isNode = argv.environment === "node";
@@ -93,6 +103,12 @@ const predictCommand: CommandModule = {
 
       // Show user the final result(s)
       console.log(JSON.stringify(finalResult, null, 2));
+
+      // If any info, show them after results.
+      if (result._info && result._info.length) {
+        console.log();
+        result._info.forEach((info) => Logger.info(info, "\n"));
+      }
 
       // If any warnings, show them after results.
       if (result._warnings && result._warnings.length) {

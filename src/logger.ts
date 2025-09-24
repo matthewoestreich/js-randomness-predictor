@@ -6,9 +6,13 @@ function yellowText(s: string): string {
   return `\x1b[33m${s}\x1b[0m`;
 }
 
+function blueText(s: string): string {
+  return `\x1b[34m${s}\x1b[0m`;
+}
+
 export default class Logger {
   static info(...messages: string[]): void {
-    console.info(`[INFO] ${messages.join(" ")}`);
+    console.info(blueText(`[INFO] ${messages.join(" ")}`));
   }
   static log(...messages: string[]): void {
     console.log(`[LOG] ${messages.join(" ")}`);
