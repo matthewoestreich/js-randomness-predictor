@@ -177,7 +177,6 @@ export default class NodeRandomnessPredictor {
       const sequence = [...this.sequence].reverse();
 
       for (const n of sequence) {
-        //XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state
         XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state
         const mantissa = this.#versionSpecificMethods.recoverMantissa(n);
         this.#versionSpecificMethods.constrainMantissa(mantissa, symbolicStatePair, solver, context);
