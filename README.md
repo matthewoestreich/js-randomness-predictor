@@ -1,3 +1,7 @@
+<h1 align="center">
+  <a href="https://matthewoestreich.github.io/js-randomness-predictor-demos/">Live Demo</a>
+</h1>
+
 <p align="center">
   <a href="https://www.npmjs.com/package/js-randomness-predictor">
     <img src="https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000" alt="npm version" />
@@ -139,6 +143,8 @@ const nextPrediction = await firefoxPredictor.predictNext();
 ```
 
 # Safari Predictor
+
+**IMPORTANT** There is a bug in JavaScriptCore, the JS engine that powers Safari [(which I have created a PR for)](https://github.com/WebKit/WebKit/pull/51077), so please only use **direct calls to `Math.random()`** to generate random numbers until this patch is landed! **Please see "known Safari issues" at the link below for examples.**
 
 **[See known Safari issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)**
 
