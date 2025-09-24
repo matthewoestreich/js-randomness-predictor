@@ -1,4 +1,4 @@
-import { suite, test } from "node:test";
+import { suite, test, after } from "node:test";
 import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
@@ -21,19 +21,20 @@ suite("CLI", () => {
     });
   });
 
-  suite("Export Results", () => {
-    const exportPath = "./export.json";
-    const exportFilePath = path.resolve(process.cwd(), exportPath);
+  suite("Export Results", (thisSute) => {
+    const relativeExportPath = "./export.json";
+    const absoluteExportPath = path.resolve(process.cwd(), relativeExportPath);
 
-    test("Exports results to file", (thisTest) => {
-      thisTest.after(() => {
-        if (fs.existsSync(exportFilePath)) {
-          fs.unlinkSync(exportFilePath);
-        }
-      });
-      const result = jsRandomnessPredictor(BIN_PATH, { environment: "node", export: exportPath });
+    after(() => {
+      if (fs.existsSync(absoluteExportPath)) {
+        fs.unlinkSync(absoluteExportPath);
+      }
+    });
+
+    test("Exports results to file", () => {
+      const result = jsRandomnessPredictor(BIN_PATH, { environment: "node", export: relativeExportPath });
       assert.doesNotThrow(() => stderrThrows(result));
-      assert.ok(fs.existsSync(exportFilePath), "Exported file does not exist");
+      assert.ok(fs.existsSync(absoluteExportPath), "Exported file does not exist");
     });
   });
 
