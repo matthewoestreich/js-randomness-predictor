@@ -7,7 +7,7 @@
  *
  */
 import NodeRandomnessPredictor from "../../../src/predictors/Node";
-import { suite, test } from "node:test";
+import { describe as suite, it as test } from "node:test";
 import assert from "node:assert";
 import queryDatabase from "../../getRandomNumbersFromDatabase";
 

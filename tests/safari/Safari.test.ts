@@ -1,5 +1,5 @@
 import SafariRandomnessPredictor from "../../src/predictors/Safari";
-import { suite, test } from "node:test";
+import { describe as suite, it as test } from "node:test";
 import assert from "node:assert";
 import queryDb from "../getRandomNumbersFromDatabase";
 

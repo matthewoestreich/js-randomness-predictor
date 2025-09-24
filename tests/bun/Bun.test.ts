@@ -1,4 +1,4 @@
-import { suite, test } from "node:test";
+import { describe as suite, it as test } from "node:test";
 import assert from "node:assert";
 import { BunRandomnessPredictor } from "../../src/predictors";
 import queryDb from "../getRandomNumbersFromDatabase";
