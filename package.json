@@ -1,6 +1,6 @@
 {
   "name": "js-randomness-predictor",
-  "version": "2.4.2",
+  "version": "2.4.0",
   "engines": {
     "node": ">=17.0.0 <25.0.0"
   },
@@ -29,7 +29,7 @@
     "printWidth": 150
   },
   "scripts": {
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm run build:umd",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "postbuild": "node postbuild.cjs",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
