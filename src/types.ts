@@ -7,8 +7,13 @@ export interface PredictorArgs {
   sequence?: number[];
   envVersion?: NodeJsMajorVersion;
   predictions?: number;
+  export?: string;
+  force?: boolean; // If exporting, force file overwrite.
   _currentNodeJsMajorVersion: NodeJsMajorVersion;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface JSRandomnessPredictorCliArgs extends Omit<PredictorArgs, "_currentNodeJsMajorVersion"> {}
 
 export type NodeJsVersion = {
   major: number;
@@ -26,6 +31,7 @@ export type PredictorResult = {
   actual: string | number[];
   isCorrect?: boolean;
   _warnings?: string[];
+  _info?: string[];
 };
 
 export type Pair<T> = [T, T];

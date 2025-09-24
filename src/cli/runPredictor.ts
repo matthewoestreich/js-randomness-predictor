@@ -1,3 +1,5 @@
+import nodeFs from "node:fs";
+import nodePath from "node:path";
 import JSRandomnessPredictor from "../index.js";
 import { Predictor, PredictorArgs, PredictorResult } from "../types.js";
 import { DEFAULT_NUM_PREDICTIONS, DEFAULT_SEQUENCE_LENGTH, MAX_NODE_PREDICTIONS } from "../constants.js";
@@ -11,6 +13,7 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       isCorrect: undefined,
       predictions: [],
       _warnings: [],
+      _info: [],
     };
 
     const isNode = argv.environment === "node";
@@ -71,8 +74,42 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       RESULT.isCorrect = RESULT.actual.every((v, i) => v === RESULT.predictions[i]);
     }
 
+    // Export results to file.
+    if (argv.export) {
+      const path = nodePath.resolve(process.cwd(), argv.export.toString());
+      if (nodeFs.existsSync(path) && !nodeFs.statSync(path).isFile()) {
+        // If path is not a file
+        RESULT._warnings?.push(`Export path must be to a file! ${path}`);
+      } else if (nodePath.extname(path) !== ".json") {
+        // If path is not a .json file
+        RESULT._warnings?.push(`Export path must be to a .json file! ${path}`);
+      } else if (nodeFs.existsSync(path) && argv.force !== undefined && !argv.force) {
+        // If file exists but --force was not used
+        RESULT._warnings?.push(`Export path already exists and '--force' was not used! Use '--force' to overwrite existing files.`);
+      } else if (nodeFs.existsSync(path) && argv.force !== undefined && argv.force) {
+        // If file exists and --force was used
+        writeResultsToFile(path, RESULT);
+      } else {
+        // Nothing exists at path, ok to write file.
+        writeResultsToFile(path, RESULT);
+      }
+    }
+
     return Promise.resolve(RESULT);
   } catch (e) {
     return Promise.reject(e);
+  }
+}
+
+function writeResultsToFile(path: string, result: PredictorResult): void {
+  try {
+    const json: PredictorResult = { sequence: result.sequence, predictions: result.predictions, actual: result.actual };
+    if (result.isCorrect !== undefined) {
+      json.isCorrect = result.isCorrect;
+    }
+    nodeFs.writeFileSync(path, JSON.stringify(json, null, 2), { encoding: "utf-8" });
+    result._info?.push(`Exported results to '${path}'`);
+  } catch (e: unknown) {
+    result._warnings?.push(`Unable to export results! ${(e as Error).message}`);
   }
 }

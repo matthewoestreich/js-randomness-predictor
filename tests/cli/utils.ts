@@ -1,20 +1,13 @@
 import { spawnSync, SpawnSyncReturns } from "node:child_process";
-import { PREDICTOR_ENVIRONMENTS } from "../../src/constants.ts";
-
-type Flags = {
-  environment: NonNullable<(typeof PREDICTOR_ENVIRONMENTS)[number]>;
-  envVersion?: number;
-  sequence?: number[];
-  predictions?: number;
-};
+import { JSRandomnessPredictorCliArgs } from "../../src/types.ts";
 
 /**
  * Programmatically call js-randomness-predictor CLI
  * @param {string} jsRandomnessPredictorCliPath : path to js-randomness-predictor.js script
- * @param {Flags} flags
+ * @param {JSRandomnessPredictorCliArgs} flags
  */
-export function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flags: Flags): SpawnSyncReturns<string> {
-  const { environment, envVersion, sequence, predictions } = flags;
+export function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flags: JSRandomnessPredictorCliArgs): SpawnSyncReturns<string> {
+  const { environment, envVersion, sequence, predictions, force, export: exportPath } = flags;
   const args: string[] = ["-e", environment];
   if (envVersion) {
     args.push("-v", envVersion.toString());
@@ -24,6 +17,12 @@ export function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flag
   }
   if (predictions) {
     args.push("-p", predictions.toString());
+  }
+  if (exportPath) {
+    args.push("-x", exportPath);
+  }
+  if (force !== undefined) {
+    args.push("--force");
   }
   return spawnSync("node", [jsRandomnessPredictorCliPath, ...args], { encoding: "utf8" });
 }
