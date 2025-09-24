@@ -21,7 +21,7 @@ export function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, flag
   if (exportPath) {
     args.push("-x", exportPath);
   }
-  if (force !== undefined) {
+  if (force) {
     args.push("--force");
   }
   return spawnSync("node", [jsRandomnessPredictorCliPath, ...args], { encoding: "utf8" });
