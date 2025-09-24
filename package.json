@@ -29,7 +29,7 @@
     "printWidth": 150
   },
   "scripts": {
-    "prepublishOnly": "npm run build && npm run build:umd",
+    "prepublishOnly": "npm run build",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "postbuild": "node postbuild.cjs",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
