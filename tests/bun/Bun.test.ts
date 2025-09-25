@@ -3,6 +3,7 @@ import assert from "node:assert";
 import { BunRandomnessPredictor } from "../../src/predictors";
 import queryDb from "../getRandomNumbersFromDatabase";
 import callBun from "./callBun";
+import stderrThrows from "../cli/stderrThrows";
 
 describe("Bun", () => {
   const runtime = "bun";
@@ -53,7 +54,8 @@ describe("Bun : call from terminal", () => {
   it("[flaky] Array.from() vs Math.random()", async (thisTest) => {
     try {
       const result = callBun(`
-        Bun.setRandomSeed(123);
+        import jsc from "bun:jsc";
+        jsc.setRandomSeed(13371337);
         const sequence = Array.from({ length: 4 }, Math.random);
         const expected = [];
         for (let i = 0; i < 10; i++) {
@@ -62,6 +64,7 @@ describe("Bun : call from terminal", () => {
         console.log(JSON.stringify({ sequence, expected }));
         `);
       const resultJson = JSON.parse(result.stdout);
+      assert.doesNotThrow(() => stderrThrows(result));
       const predictor = new BunRandomnessPredictor(resultJson.sequence);
       const predictions: number[] = [];
       for (let i = 0; i < resultJson.expected.length; i++) {
@@ -76,7 +79,8 @@ describe("Bun : call from terminal", () => {
   it("[flaky] Array.from()", async (thisTest) => {
     try {
       const result = callBun(`
-        Bun.setRandomSeed(123);
+        import jsc from "bun:jsc";
+        jsc.setRandomSeed(13371337);
         const sequence = Array.from({ length: 4 }, Math.random);
         const expected = Array.from({ length: 10 }, Math.random);
         console.log(JSON.stringify({ sequence, expected }));
@@ -96,7 +100,8 @@ describe("Bun : call from terminal", () => {
   it("[flaky] Math.random()", async (thisTest) => {
     try {
       const result = callBun(`
-        Bun.setRandomSeed(123);
+        import jsc from "bun:jsc";
+        jsc.setRandomSeed(13371337);
         const sequence = [Math.random(),Math.random(),Math.random(),Math.random()];
         const expected = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random()];
         console.log(JSON.stringify({ sequence, expected }));

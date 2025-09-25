@@ -1,3 +1,5 @@
+import jsc from "bun:jsc";
+jsc.setRandomSeed(13371337);
 const sequence = Array.from({ length: 4 }, Math.random);
 
 const expected = [
