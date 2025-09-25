@@ -101,6 +101,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: node
+      - name: Install Bun manually
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          echo "${HOME}/.bun/bin" >> $GITHUB_PATH
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Build
