@@ -9,6 +9,10 @@ export default function callBun(evaluate: string, deleteOutputFile = true): Spaw
 
   nodeFs.writeFileSync(filePath, evaluate);
 
+  if (!nodeFs.existsSync(filePath)) {
+    throw new Error(`Unable to run command! Temp file not created!`);
+  }
+
   const output = spawnSync("bun", ["run", filePath], { encoding: "utf8" });
 
   if (deleteOutputFile) {

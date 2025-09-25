@@ -50,9 +50,10 @@ describe("Bun", () => {
 
 describe("Bun : call from terminal", () => {
   // These tests call bun from terminal to get random numbers so we can test them "dynamically".
-  it("[flaky] call bun from terminal : Array.from() vs Math.random()", async (thisTest) => {
+  it("[flaky] Array.from() vs Math.random()", async (thisTest) => {
     try {
       const result = callBun(`
+        Bun.setRandomSeed(123);
         const sequence = Array.from({ length: 4 }, Math.random);
         const expected = [];
         for (let i = 0; i < 10; i++) {
@@ -72,9 +73,10 @@ describe("Bun : call from terminal", () => {
     }
   });
 
-  it("[flaky] call bun from terminal : Array.from()", async (thisTest) => {
+  it("[flaky] Array.from()", async (thisTest) => {
     try {
       const result = callBun(`
+        Bun.setRandomSeed(123);
         const sequence = Array.from({ length: 4 }, Math.random);
         const expected = Array.from({ length: 10 }, Math.random);
         console.log(JSON.stringify({ sequence, expected }));
@@ -91,9 +93,10 @@ describe("Bun : call from terminal", () => {
     }
   });
 
-  it("[flaky] call bun from terminal : Math.random()", async (thisTest) => {
+  it("[flaky] Math.random()", async (thisTest) => {
     try {
       const result = callBun(`
+        Bun.setRandomSeed(123);
         const sequence = [Math.random(),Math.random(),Math.random(),Math.random()];
         const expected = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random()];
         console.log(JSON.stringify({ sequence, expected }));
