@@ -106,6 +106,8 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 
 **Cannot use the Bun predictor natively in Bun because Bun does not support [Z3](https://github.com/Z3Prover/z3)**
 
+**[See known Bun issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)**
+
 ```js
 const bunPredictor = JSRandomnessPredictor.bun([...]);
 const nextPrediction = await bunPredictor.predictNext();

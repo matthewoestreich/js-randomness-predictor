@@ -96,3 +96,32 @@ function gen_n_rands(n = 1) {
 # Chrome
 
 NONE
+
+# Bun
+
+## Bug in JavaScriptCore
+
+Bun has the same issue as Safari, since they both use JavaScriptCore under the hood (equivalent to V8).
+
+There is a bug in JavaScriptCore, the JS engine that powers Bun, [(which I have created a PR for)](https://github.com/WebKit/WebKit/pull/51077) so please only use **direct calls to `Math.random()`** to generate random numbers until this patch is landed! Please see explanation below:
+
+```js
+// Only generate numbers via direct Math.random() calls!
+
+//////////////////////
+// NOT OK ////////////
+//////////////////////
+const rands = Array.from({ length: N }, Math.random);
+
+// Ok
+const sequence = [Math.random(), Math.random(), Math.random(), Math.random()];
+
+// Ok
+function gen_n_rands(n = 1) {
+  const output = [];
+  for (let i = 0; i < n; i++) {
+    output.push(Math.random());
+  }
+  return output;
+}
+```
