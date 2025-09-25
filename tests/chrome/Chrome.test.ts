@@ -1,11 +1,11 @@
 import ChromeRandomnessPredictor from "../../src/predictors/Chrome";
-import { describe as suite, it as test } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert";
 import queryDb from "../getRandomNumbersFromDatabase";
 
-suite("Chrome", () => {
+describe("Chrome", () => {
   const runtime = "chrome";
-  test(`should predict accurately`, async () => {
+  it(`should predict accurately`, async () => {
     const { sequence, expected } = queryDb({ runtime, tags: {} });
     const p = new ChromeRandomnessPredictor(sequence);
     const predictions: number[] = [];
