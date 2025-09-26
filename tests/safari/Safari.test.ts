@@ -1,7 +1,7 @@
 import SafariRandomnessPredictor from "../../src/predictors/Safari";
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import queryDb from "../getRandomNumbersFromDatabase";
+import queryDb from "../queryRandomNumbersDatabase";
 
 describe("Safari", () => {
   const runtime = "safari";
