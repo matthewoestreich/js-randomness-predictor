@@ -16,7 +16,7 @@ describe("Safari", () => {
     assert.deepStrictEqual(expected, predictions);
   });
 
-  it("should predict correctly when numbers were generated using Array.from({ length: 4 }, Math.random)", async () => {
+  it("should predict correctly when numbers were generated using Array.from({ length: N }, Math.random)", async () => {
     const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true } });
     const p = new SafariRandomnessPredictor(sequence);
     const predictions: number[] = [];
