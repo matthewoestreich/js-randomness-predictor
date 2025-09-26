@@ -17,29 +17,18 @@ In practice, this means any Predictor must account for how the engine scales its
 From an implementation perspective, this range is chosen for several practical reasons:
 
 1. **Safe scaling to other ranges:** Random integers in `[0, N)` can be easily derived with `Math.floor(Math.random() * N)` without risking off-by-one errors.
-2. **Full mantissa utilization:** JavaScript numbers are [IEEE-754 double-precision floats](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), which have a 52-bit mantissa. By mapping the raw PRNG output into `[0, 1)`, engines can use all of these 52 bits of precision for randomness.
-   <img width="1920" alt="IEEE754-double-precision-floating-point" src="https://raw.githubusercontent.com/matthewoestreich/js-randomness-predictor/refs/heads/main/.github/Double-Precision-IEEE-754-Floating-Point-Standard-1024x266.jpg" />
+2. **Full mantissa utilization:** JavaScript numbers are IEEE-754 double-precision floats, which have a 52-bit mantissa. By mapping the raw PRNG output into `[0, 1)`, engines can use all of these 52 bits of precision for randomness (more on this in future sections).
 3. **Uniformity and determinism:** PRNGs like xorshift128+ generate integers in a very large range (e.g., 0 to 2⁶⁴-1). Dividing or shifting these integers to fit within `[0, 1)` preserves uniformity without rounding errors that could accumulate if the range included 1.
 
 By using `[0, 1)`, engines can efficiently produce high-precision, deterministic floating-point outputs that are compatible with the ECMAScript spec.
 
 ---
 
-# Symbolic Modeling with Z3
-
-We use [Z3](https://github.com/Z3Prover/z3), an [SMT solver](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), which is published by Microsoft Research. Instead of trying to brute force the state of the PRNG (which would be astronomically slow), we **symbolically model** the algorithm:
-
-- Each part of the [xorshift128+ algorithm](https://en.wikipedia.org/wiki/Xorshift#xorshift+) (shifts, xors, additions) is represented as constraints on unknown 64-bit integers.
-- These constraints describe how the internal state evolves with each call to `Math.random()`.
-- Z3 then attempts to solve for the initial state that satisfies all observed outputs.
-
-This approach turns “guess the hidden state” into “solve a system of equations,” which is vastly more efficient. The symbolic representation of the state is what we call the **symbolic state**, while the resolved, actual integers are the **concrete state** used for prediction.
-
----
-
 # Understanding xorshift128+
 
-Most modern JS engines use **xorshift128+**, a PRNG designed by Sebastiano Vigna.
+Most modern JS engines use **xorshift128+**, a PRNG algorithm designed by Sebastiano Vigna. In fact, _all_ JavaScript engines used by the Predictors in this repository implement **xorshift128+**!
+
+Under the hood:
 
 - The internal state consists of **two 64-bit integers** (`s0` and `s1`).
 - On each iteration:
@@ -52,6 +41,23 @@ You can read [Vigna’s paper on xorshift+ generators here](https://vigna.di.uni
 
 ---
 
+# Symbolic Modeling with Z3
+
+Instead of trying to brute force the state of the PRNG (which would be astronomically slow), we **symbolically model** the algorithm using [Z3](https://github.com/Z3Prover/z3), an [SMT solver](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), which is published by Microsoft Research.
+
+- Each part of the [xorshift128+ algorithm](https://en.wikipedia.org/wiki/Xorshift#xorshift+) (shifts, xors, additions) is represented as constraints on unknown 64-bit integers.
+- These constraints describe how the internal state evolves with each call to `Math.random()`.
+- Z3 then attempts to solve for the initial state that satisfies all observed outputs.
+  - Observed outputs being the numbers provided to a Predictor when it is instantiated. Which we call the **initial sequence**, or simply **sequence**.
+
+This approach turns “guess the hidden state” into “solve a system of equations,” which is vastly more efficient.
+
+### Symbolic State vs Concrete State
+
+The internal Z3 state is what we call the **symbolic state**. The resolved actual integers, we call the **concrete state**, which is used for future prediction. Using **concrete state** for future prediction is much faster than having to compute **symbolic state** for each prediction.
+
+---
+
 # Constraining with IEEE-754 Mantissas
 
 JavaScript does not expose raw 64-bit integers from the PRNG. Instead, each call to `Math.random()` produces a [double-precision floating-point number](https://en.wikipedia.org/wiki/Double-precision_floating-point_format) in the range `[0, 1)`.
@@ -59,6 +65,8 @@ JavaScript does not expose raw 64-bit integers from the PRNG. Instead, each call
 - Doubles are composed of a **sign bit**, an **exponent**, and a **mantissa (significand)**.
 - Engines typically fill the mantissa using bits from the PRNG output.
 - By extracting the mantissa from observed values, we can reconstruct the hidden constraints on the underlying state, which feed into the symbolic state.
+
+<img width="1920" alt="IEEE754-double-precision-floating-point" src="https://raw.githubusercontent.com/matthewoestreich/js-randomness-predictor/refs/heads/main/.github/Double-Precision-IEEE-754-Floating-Point-Standard-1024x266.jpg" />
 
 ---
 
