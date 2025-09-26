@@ -20,7 +20,7 @@ From an implementation perspective, this range is chosen for several practical r
 2. **Full mantissa utilization:** JavaScript numbers are IEEE-754 double-precision floats, which have a 52-bit mantissa. By mapping the raw PRNG output into `[0, 1)`, engines can use all of these 52 bits of precision for randomness (more on this in future sections).
 3. **Uniformity and determinism:** PRNGs like xorshift128+ generate integers in a very large range (e.g., 0 to 2⁶⁴-1). Dividing or shifting these integers to fit within `[0, 1)` preserves uniformity without rounding errors that could accumulate if the range included 1.
 
-By using `[0, 1)`, engines can efficiently produce high-precision, deterministic floating-point outputs that are compatible with the ECMAScript spec.
+By using `[0, 1)`, engines can efficiently produce high-precision floating-point outputs that are compatible with the ECMAScript spec.
 
 ---
 
