@@ -2,8 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { BunRandomnessPredictor } from "../../src/predictors";
 import queryDb from "../getRandomNumbersFromDatabase";
-import callBun from "./callBun";
-import stderrThrows from "../cli/stderrThrows";
+import getSequenceAndExpectedRandomsFromBun from "./getSequenceAndExpectedRandomsFromBun";
 
 describe("Bun", () => {
   const runtime = "bun";
@@ -27,94 +26,48 @@ describe("Bun", () => {
     }
     assert.deepStrictEqual(predictions, expected);
   });
-
-  it("should be correct when using Array.fom generated in REPL", async () => {
-    const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
-    const bun = new BunRandomnessPredictor(sequence);
-    const predictions: number[] = [];
-    for (let i = 0; i < expected.length; i++) {
-      predictions.push(await bun.predictNext());
-    }
-    assert.deepStrictEqual(predictions, expected);
-  });
-
-  it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
-    const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
-    const bun = new BunRandomnessPredictor(sequence);
-    const predictions: number[] = [];
-    for (let i = 0; i < expected.length; i++) {
-      predictions.push(await bun.predictNext());
-    }
-    assert.deepStrictEqual(predictions, expected);
-  });
 });
 
-describe("Bun : call from terminal", () => {
-  // These tests call bun from terminal to get random numbers so we can test them "dynamically".
-  it("[flaky] Array.from() vs Math.random()", async (thisTest) => {
-    try {
-      const result = callBun(`
-        import jsc from "bun:jsc";
-        jsc.setRandomSeed(13371337);
-        const sequence = Array.from({ length: 4 }, Math.random);
-        const expected = [];
-        for (let i = 0; i < 10; i++) {
-          expected.push(Math.random());
-        }
-        console.log(JSON.stringify({ sequence, expected }));
-        `);
-      const resultJson = JSON.parse(result.stdout);
-      assert.doesNotThrow(() => stderrThrows(result));
-      const predictor = new BunRandomnessPredictor(resultJson.sequence);
-      const predictions: number[] = [];
-      for (let i = 0; i < resultJson.expected.length; i++) {
-        predictions.push(await predictor.predictNext());
-      }
-      assert.notDeepStrictEqual(predictions, resultJson.expected);
-    } catch (e) {
-      thisTest.diagnostic(`Allowed failure: ${(e as Error).message}`);
+/**
+ * These tests call bun from terminal to get random numbers dynamically
+ * (not hard coded random numbers)
+ */
+describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
+  it("sequence generated with Array.from(), expected generated with Math.random()", async () => {
+    const { sequence, expected } = getSequenceAndExpectedRandomsFromBun("ArrayFrom", 6, "MathRandom", 10);
+    const predictor = new BunRandomnessPredictor(sequence);
+    const predictions: number[] = [];
+    for (let i = 0; i < expected.length; i++) {
+      predictions.push(await predictor.predictNext());
     }
+    // Array.from and MathRandom should take two diff paths.
+    // Array.from takes the slow path.
+    // MathRandom takes the JIT path.
+    // So they took two diff paths, we should expect them to not be equal.
+    assert.notDeepStrictEqual(predictions, expected);
   });
 
-  it("[flaky] Array.from()", async (thisTest) => {
-    try {
-      const result = callBun(`
-        import jsc from "bun:jsc";
-        jsc.setRandomSeed(13371337);
-        const sequence = Array.from({ length: 4 }, Math.random);
-        const expected = Array.from({ length: 10 }, Math.random);
-        console.log(JSON.stringify({ sequence, expected }));
-        `);
-      const resultJson = JSON.parse(result.stdout.toString());
-      const predictor = new BunRandomnessPredictor(resultJson.sequence);
-      const predictions: number[] = [];
-      for (let i = 0; i < resultJson.expected.length; i++) {
-        predictions.push(await predictor.predictNext());
-      }
-      assert.deepStrictEqual(predictions, resultJson.expected);
-    } catch (e) {
-      thisTest.diagnostic(`Allowed failure: ${(e as Error).message}`);
+  it("both sequence and expected generated with Array.from()", async () => {
+    const { sequence, expected } = getSequenceAndExpectedRandomsFromBun("ArrayFrom", 6, "ArrayFrom", 10);
+    const predictor = new BunRandomnessPredictor(sequence);
+    const predictions: number[] = [];
+    for (let i = 0; i < expected.length; i++) {
+      predictions.push(await predictor.predictNext());
     }
+    // Our sequence and expected both generated via Array.from, so
+    // they should have taken the same path, thus making them equal.
+    assert.deepStrictEqual(predictions, expected);
   });
 
-  it("[flaky] Math.random()", async (thisTest) => {
-    try {
-      const result = callBun(`
-        import jsc from "bun:jsc";
-        jsc.setRandomSeed(13371337);
-        const sequence = [Math.random(),Math.random(),Math.random(),Math.random()];
-        const expected = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random()];
-        console.log(JSON.stringify({ sequence, expected }));
-        `);
-      const resultJson = JSON.parse(result.stdout);
-      const predictor = new BunRandomnessPredictor(resultJson.sequence);
-      const predictions: number[] = [];
-      for (let i = 0; i < resultJson.expected.length; i++) {
-        predictions.push(await predictor.predictNext());
-      }
-      assert.deepStrictEqual(predictions, resultJson.expected);
-    } catch (e) {
-      thisTest.diagnostic(`Allowed failure: ${(e as Error).message}`);
+  it("both sequence and expected generated with Math.random()", async () => {
+    const { sequence, expected } = getSequenceAndExpectedRandomsFromBun("MathRandom", 6, "MathRandom", 10);
+    const predictor = new BunRandomnessPredictor(sequence);
+    const predictions: number[] = [];
+    for (let i = 0; i < expected.length; i++) {
+      predictions.push(await predictor.predictNext());
     }
+    // Our sequence and expected both generated via Math.random calls, so
+    // they should have taken the same path, thus making them equal.
+    assert.deepStrictEqual(predictions, expected);
   });
 });

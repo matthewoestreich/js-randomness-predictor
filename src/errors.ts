@@ -7,6 +7,14 @@ export class UnsatError extends Error {
   }
 }
 
+export class InsufficientSequenceLengthError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = "InsufficientSequenceLengthError";
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
 export class SequenceNotFoundError extends Error {
   constructor(message?: string) {
     super(message);

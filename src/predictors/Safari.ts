@@ -1,6 +1,6 @@
 import * as z3 from "z3-solver";
-import { UnsatError } from "../errors.js";
-import { ConcreteXorShiftImpl, Pair, SymbolicXorShiftImpl } from "../types.js";
+import { InsufficientSequenceLengthError, UnsatError } from "../errors.js";
+import { ConcreteXorShiftFn, Pair, SymbolicXorShiftFn } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import uint64 from "../uint64.js";
 
@@ -11,8 +11,8 @@ export default class SafariRandomnessPredictor {
 
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
-  #symbolicXor: SymbolicXorShiftImpl = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolicArithmeticShiftRight(ss);
-  #concreteXor: ConcreteXorShiftImpl = (cs: Pair<bigint>): void => XorShift128Plus.concreteArithmeticShiftRight(cs);
+  #symbolicXor: SymbolicXorShiftFn = (ss: Pair<z3.BitVec>): void => XorShift128Plus.symbolicArithmeticShiftRight(ss);
+  #concreteXor: ConcreteXorShiftFn = (cs: Pair<bigint>): void => XorShift128Plus.concreteArithmeticShiftRight(cs);
 
   // The mantissa bits (53 effective bits = 52 stored + 1 implicit) for doubles as defined in IEEE-754
   #IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
@@ -20,6 +20,9 @@ export default class SafariRandomnessPredictor {
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
 
   constructor(sequence: number[]) {
+    if (sequence.length < 6) {
+      throw new InsufficientSequenceLengthError(`sequence length must be >= 6 : got ${sequence.length}`);
+    }
     this.sequence = sequence;
   }
 

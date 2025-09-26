@@ -104,12 +104,16 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 
 # Bun Predictor
 
+**IMPORTANT** the initial sequence must contain at least 6 elements!
+
 **Cannot use the Bun predictor natively in Bun because Bun does not support [Z3](https://github.com/Z3Prover/z3)**
 
 **[See known Bun issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)**
 
 ```js
-const bunPredictor = JSRandomnessPredictor.bun([...]);
+// MUST HAVE AT LEAST 6 ELEMENTS IN SEQUENCE!
+const sequence = [...];
+const bunPredictor = JSRandomnessPredictor.bun(sequence);
 const nextPrediction = await bunPredictor.predictNext();
 // You'll need to manually verify accuracy.
 ```
@@ -146,12 +150,14 @@ const nextPrediction = await firefoxPredictor.predictNext();
 
 # Safari Predictor
 
-**IMPORTANT** There is a bug in JavaScriptCore, the JS engine that powers Safari [(which I have created a PR for)](https://github.com/WebKit/WebKit/pull/51077), so please only use **direct calls to `Math.random()`** to generate random numbers until this patch is landed! **Please see "known Safari issues" at the link below for examples.**
+**IMPORTANT** the initial sequence must contain at least 6 elements!
 
 **[See known Safari issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)**
 
 ```js
-const safariPredictor = JSRandomnessPredictor.safari([...]);
+// MUST HAVE AT LEAST 6 ELEMENTS IN SEQUENCE!
+const sequence = [...];
+const safariPredictor = JSRandomnessPredictor.safari(sequence);
 const nextPrediction = await safariPredictor.predictNext();
 // You'll need to manually verify accuracy.
 ```

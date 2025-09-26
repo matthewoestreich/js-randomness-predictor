@@ -36,14 +36,14 @@ export type PredictorResult = {
 
 export type Pair<T> = [T, T];
 
-export type SymbolicXorShiftImpl = (symbolicState: Pair<BitVec>) => void;
-export type ConcreteXorShiftImpl = (concreteState: Pair<bigint>) => void;
-export type NodeJsRecoverMantissaImpl = (n: number) => bigint;
-export type NodeJsConstrainMantissaImpl = (n: bigint, symbolicState: Pair<BitVec>, solver: Solver, context: Context) => void;
-export type NodeJsToDoubleImpl = (concreteState: Pair<bigint>) => number;
+export type SymbolicXorShiftFn = (symbolicState: Pair<BitVec>) => void;
+export type ConcreteXorShiftFn = (concreteState: Pair<bigint>) => void;
+export type RecoverMantissaFn = (n: number) => bigint;
+export type ConstrainMantissaFn = (mantissa: bigint, symbolicState: Pair<BitVec>, solver: Solver, context: Context) => void;
+export type ToDoubleFn = (concreteState: Pair<bigint>) => number;
 
-export type NodeJsVersionSpecificMethods = {
-  recoverMantissa: NodeJsRecoverMantissaImpl;
-  constrainMantissa: NodeJsConstrainMantissaImpl;
-  toDouble: NodeJsToDoubleImpl;
+export type StateConversionMap = {
+  recoverMantissa: RecoverMantissaFn;
+  constrainMantissa: ConstrainMantissaFn;
+  toDouble: ToDoubleFn;
 };

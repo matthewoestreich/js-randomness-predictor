@@ -1,0 +1,56 @@
+import { spawnSync } from "node:child_process";
+
+type RandsType = "ArrayFrom" | "MathRandom";
+type SequenceAndExpectedRandoms = { sequence: number[]; expected: number[] };
+
+/**
+ * Calls Bun from terminal/cmd line with a generated string (that is JS code) used
+ * to get random numbers "dynamically" (so we can test using numbers that are not
+ * hard-coded)..
+ * @param {RandsType} sequenceType : generate numbers via Array.from or Math.random
+ * @param {number} sequenceLength : how many random numbers in sequence
+ * @param {RandsType} expectedType : generate numbers via Array.from or Math.random
+ * @param {number} expectedLength : how many random numbers in expected
+ * @param {number} seed? : seed PRNG with this number
+ * @returns
+ */
+export default function getSequenceAndExpectedRandomsFromBun(
+  sequenceType: RandsType,
+  sequenceLength: number,
+  expectedType: RandsType,
+  expectedLength: number,
+  seed?: number,
+): SequenceAndExpectedRandoms {
+  let script = "";
+
+  if (seed) {
+    script += 'import jsc from "bun:jsc";';
+    script += `jsc.setRandomSeed(${seed});`;
+  }
+
+  switch (sequenceType) {
+    case "ArrayFrom":
+      script += `const sequence = Array.from({ length: ${sequenceLength} }, Math.random);`;
+      break;
+    case "MathRandom":
+      script += `const sequence = [${"Math.random(),".repeat(sequenceLength)}];`;
+      break;
+  }
+
+  switch (expectedType) {
+    case "ArrayFrom":
+      script += `const expected = Array.from({ length: ${expectedLength} }, Math.random);`;
+      break;
+    case "MathRandom":
+      script += `const expected = [${"Math.random(),".repeat(expectedLength)}];`;
+      break;
+  }
+
+  script += "console.log(JSON.stringify({ sequence, expected }));";
+
+  const result = spawnSync("bun", ["-e", script], { encoding: "utf8" });
+  if (result.stderr !== "") {
+    throw new Error(result.stderr.toString());
+  }
+  return JSON.parse(result.stdout) as SequenceAndExpectedRandoms;
+}

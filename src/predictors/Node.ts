@@ -1,5 +1,5 @@
 import * as z3 from "z3-solver";
-import { NodeJsVersion, NodeJsVersionSpecificMethods, Pair } from "../types.js";
+import { NodeJsVersion, StateConversionMap, Pair } from "../types.js";
 import { UnexpectedRuntimeError, UnsatError } from "../errors.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 
@@ -57,7 +57,7 @@ export default class NodeRandomnessPredictor {
   // Map a 53-bit integer into the range [0, 1) as a double
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
   #nodeVersion = this.#getNodeVersion();
-  #versionSpecificMethods: NodeJsVersionSpecificMethods;
+  #versionSpecificMethods: StateConversionMap;
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
 
@@ -103,7 +103,7 @@ export default class NodeRandomnessPredictor {
   }
 
   // Get Node.js version-specific methods.
-  #getVersionSpecificMethods(): NodeJsVersionSpecificMethods {
+  #getVersionSpecificMethods(): StateConversionMap {
     const { major } = this.#nodeVersion;
 
     if (major <= 11) {

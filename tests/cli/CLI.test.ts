@@ -171,22 +171,6 @@ describe("CLI", () => {
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);
     });
-
-    it("should be correct when using Array.fom generated in REPL", async () => {
-      // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS IN BUN REPL.
-      const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
-      const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, expected);
-    });
-
-    it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
-      // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS IN BUN REPL
-      const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
-      const jsonResult = JSON.parse(result.stdout.toString());
-      assert.deepStrictEqual(jsonResult.predictions, expected);
-    });
   });
 
   describe("Deno", () => {
