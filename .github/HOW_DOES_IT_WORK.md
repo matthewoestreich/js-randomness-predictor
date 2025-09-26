@@ -4,7 +4,11 @@ At a high level, a Predictor recovers the **hidden internal state** of the pseud
 
 ---
 
-# ECMAScript Standard
+# Understanding JavaScript Random Number Generation
+
+In order to understand how we can predict future random numbers, you must first understand how random number generation works in JavaScript, or more specifically, ECMAScript.
+
+## ECMAScript Standard
 
 The [ECMAScript standard for `Math.random`](https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-math.random) specifies that:
 
@@ -12,19 +16,7 @@ The [ECMAScript standard for `Math.random`](https://tc39.es/ecma262/multipage/nu
 
 In practice, this means any Predictor must account for how the engine scales its internal PRNG output into the `[0, 1)` range.
 
-### Why [0, 1) range?
-
-From an implementation perspective, this range is chosen for several practical reasons:
-
-- **Safe scaling to other ranges:** Random integers in `[0, N)` can be easily derived with `Math.floor(Math.random() * N)` without risking off-by-one errors.
-- **Full mantissa utilization:** JavaScript numbers are IEEE-754 double-precision floats, which have a 52-bit mantissa. By mapping the raw PRNG output into `[0, 1)`, engines can use all of these 52 bits of precision for randomness (more on this in future sections).
-- **Uniformity and determinism:** PRNGs like xorshift128+ generate integers in a very large range (e.g., 0 to 2⁶⁴-1). Dividing or shifting these integers to fit within `[0, 1)` preserves uniformity without rounding errors that could accumulate if the range included 1.
-
-By using `[0, 1)`, engines can efficiently produce high-precision floating-point outputs that are compatible with the ECMAScript spec.
-
----
-
-# Understanding xorshift128+
+## Meet xorshift128+
 
 Most modern JS engines use **xorshift128+**, a PRNG algorithm designed by Sebastiano Vigna. In fact, _all_ JavaScript engines used by the Predictors in this repository implement **xorshift128+**!
 
@@ -41,7 +33,7 @@ You can read [Vigna’s paper on xorshift+ generators here](https://vigna.di.uni
 
 ---
 
-# Symbolic Modeling with Z3
+# Symbolic Modeling
 
 Instead of trying to brute force the state of the PRNG (which would be astronomically slow), we **symbolically model** the algorithm using [Z3](https://github.com/Z3Prover/z3), an [SMT solver](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), which is published by Microsoft Research.
 
@@ -52,13 +44,13 @@ Instead of trying to brute force the state of the PRNG (which would be astronomi
 
 This approach turns “guess the hidden state” into “solve a system of equations,” which is vastly more efficient.
 
-### Symbolic State vs Concrete State
+**Symbolic State vs Concrete State**
 
 The internal Z3 state is what we call the **symbolic state**. The resolved actual integers, we call the **concrete state**, which is used for future prediction. Using **concrete state** for future prediction is much faster than having to compute **symbolic state** for each prediction.
 
 ---
 
-# Constraining with IEEE-754 Mantissas
+## Constraining with IEEE-754 Mantissas
 
 JavaScript does not expose raw 64-bit integers from the PRNG. Instead, each call to `Math.random()` produces a [double-precision floating-point number](https://en.wikipedia.org/wiki/Double-precision_floating-point_format) in the range `[0, 1)`.
 
