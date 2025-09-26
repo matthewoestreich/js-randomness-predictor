@@ -10,7 +10,6 @@ export default class SafariRandomnessPredictor {
   public sequence: number[];
 
   #minimumSequenceLength = 6;
-  #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
   #symbolicXor: SymbolicXorShiftFn;
   #concreteXor: ConcreteXorShiftFn;
@@ -30,7 +29,7 @@ export default class SafariRandomnessPredictor {
   }
 
   public async predictNext(): Promise<number> {
-    if (!this.#isSymbolicStateSolved) {
+    if (this.#concreteState[0] === 0n && this.#concreteState[1] === 0n) {
       await this.#withRetry(
         () => this.#solveSymbolicState(),
         () => {
@@ -54,7 +53,7 @@ export default class SafariRandomnessPredictor {
     }
   }
 
-  async #solveSymbolicState(): Promise<boolean> {
+  async #solveSymbolicState(): Promise<void> {
     try {
       const { Context } = await z3.init();
       const context = Context("main");
@@ -88,8 +87,6 @@ export default class SafariRandomnessPredictor {
       }
 
       this.#concreteState = concreteStatePair;
-      this.#isSymbolicStateSolved = true;
-      return true;
     } catch (e) {
       return Promise.reject(e);
     }

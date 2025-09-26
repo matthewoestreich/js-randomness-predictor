@@ -8,7 +8,6 @@ export default class ChromeRandomnessPredictor {
 
   // Map a 53-bit integer into the range [0, 1) as a double.
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
-  #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence: number[]) {
@@ -16,7 +15,7 @@ export default class ChromeRandomnessPredictor {
   }
 
   public async predictNext(): Promise<number> {
-    if (!this.#isSymbolicStateSolved) {
+    if (this.#concreteState[0] === 0n && this.#concreteState[1] === 0n) {
       await this.#solveSymbolicState();
     }
     // Calculate next prediction, using first item in concrete state, before modifying concrete state.
@@ -28,7 +27,7 @@ export default class ChromeRandomnessPredictor {
 
   // Solves symbolic state so we can move forward using concrete state, which
   // is much faster than having to compute symbolic state for every prediction.
-  async #solveSymbolicState(): Promise<boolean> {
+  async #solveSymbolicState(): Promise<void> {
     try {
       const { Context } = await z3.init();
       const context = Context("main");
@@ -50,7 +49,7 @@ export default class ChromeRandomnessPredictor {
       }
 
       if ((await solver.check()) !== "sat") {
-        return Promise.reject(new UnsatError());
+        throw new UnsatError();
       }
 
       const model = solver.model();
@@ -59,8 +58,6 @@ export default class ChromeRandomnessPredictor {
         (model.get(symbolicState0) as z3.BitVecNum).value(),
         (model.get(symbolicState1) as z3.BitVecNum).value(),
       ];
-      this.#isSymbolicStateSolved = true;
-      return true;
     } catch (e) {
       return Promise.reject(e);
     }
