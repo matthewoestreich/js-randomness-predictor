@@ -9,10 +9,11 @@ import uint64 from "../uint64.js";
 export default class SafariRandomnessPredictor {
   public sequence: number[];
 
+  #minimumSequenceLength = 6;
   #isSymbolicStateSolved = false;
   #concreteState: Pair<bigint> = [0n, 0n];
-  #symbolicXor = XorShift128Plus.symbolicArithmeticShiftRight.bind(this);
-  #concreteXor = XorShift128Plus.concreteArithmeticShiftRight.bind(this);
+  #symbolicXor: SymbolicXorShiftFn;
+  #concreteXor: ConcreteXorShiftFn;
 
   // The mantissa bits (53 effective bits = 52 stored + 1 implicit) for doubles as defined in IEEE-754
   #IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
@@ -20,9 +21,11 @@ export default class SafariRandomnessPredictor {
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
 
   constructor(sequence: number[]) {
-    if (sequence.length < 6) {
+    if (sequence.length < this.#minimumSequenceLength) {
       throw new InsufficientSequenceLengthError(`sequence length must be >= 6 : got ${sequence.length}`);
     }
+    this.#symbolicXor = (s: Pair<z3.BitVec>) => XorShift128Plus.symbolicArithmeticShiftRight(s);
+    this.#concreteXor = (s: Pair<bigint>) => XorShift128Plus.concreteArithmeticShiftRight(s);
     this.sequence = sequence;
   }
 
@@ -30,8 +33,8 @@ export default class SafariRandomnessPredictor {
     if (!this.#isSymbolicStateSolved) {
       await this.#withRetry(this.#solveSymbolicState.bind(this), () => {
         // Retry with logical right shifts
-        this.#symbolicXor = XorShift128Plus.symbolic.bind(this);
-        this.#concreteXor = XorShift128Plus.concrete.bind(this);
+        this.#symbolicXor = (s: Pair<z3.BitVec>) => XorShift128Plus.symbolic(s);
+        this.#concreteXor = (s: Pair<bigint>) => XorShift128Plus.concrete(s);
         return this.#solveSymbolicState();
       });
     }
