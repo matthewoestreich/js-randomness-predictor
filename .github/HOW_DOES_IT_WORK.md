@@ -1,6 +1,6 @@
 # How a Predictor Works
 
-At a high level, a Predictor recovers the **hidden internal state** of the pseudorandom number generator (PRNG) used by a JavaScript engine. With this state known, future `Math.random()` outputs are fully determined and can be reproduced with 100% accuracy.
+At a high level, a Predictor recovers the **hidden internal state** of the pseudorandom number generator (PRNG) used by a JavaScript engine. With this state known, future `Math.random()` outputs are fully determined and can be reproduced with perfect accuracy.
 
 ---
 
@@ -18,7 +18,7 @@ From an implementation perspective, this range is chosen for several practical r
 
 1. **Safe scaling to other ranges:** Random integers in `[0, N)` can be easily derived with `Math.floor(Math.random() * N)` without risking off-by-one errors.
 2. **Full mantissa utilization:** JavaScript numbers are [IEEE-754 double-precision floats](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), which have a 52-bit mantissa. By mapping the raw PRNG output into `[0, 1)`, engines can use all of these 52 bits of precision for randomness.
-   <img width="1920" alt="IEEE754-double-precision-floating-point" src="https://github.com/matthewoestreich/js-randomness-predictor/.github/Double-Precision-IEEE-754-Floating-Point-Standard-1024x266.jpg" />
+   <img width="1920" alt="IEEE754-double-precision-floating-point" src="https://raw.githubusercontent.com/matthewoestreich/js-randomness-predictor/refs/heads/main/.github/Double-Precision-IEEE-754-Floating-Point-Standard-1024x266.jpg" />
 3. **Uniformity and determinism:** PRNGs like xorshift128+ generate integers in a very large range (e.g., 0 to 2⁶⁴-1). Dividing or shifting these integers to fit within `[0, 1)` preserves uniformity without rounding errors that could accumulate if the range included 1.
 
 By using `[0, 1)`, engines can efficiently produce high-precision, deterministic floating-point outputs that are compatible with the ECMAScript spec.

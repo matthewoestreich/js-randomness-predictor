@@ -10,6 +10,10 @@
 
 ---
 
+# How Does it Work?
+
+[You can read more about how a Predictor works under the hood here.](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/HOW_DOES_IT_WORK.md)
+
 # Important Info
 
 - Use the predictor that matches the environment where the sequence was originally generated. **Meaning, if it came from Chrome, use the Chrome predictor, etc...**.
