@@ -46,7 +46,7 @@ function tagsAreEqual(a: Tags, b: Tags): boolean {
  *  - This query would NOT MATCH!! : { foo: 1 }
  *  - The only query that would match would be the exact same object : { foo: 1, bar: 2 }
  */
-export default function getSequenceAndExpectedFromDatabase(query: DatabaseQuery): SequenceAndExpected {
+export default function queryRandomNumbersDatabase(query: DatabaseQuery): SequenceAndExpected {
   // Filter database by runtime and optional version
   const candidates = randomNumbersDatabase.filter(
     (entry) => entry.runtime === query.runtime && (query.runtimeVersion === undefined || entry.runtimeVersion === query.runtimeVersion),

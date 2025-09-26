@@ -1,7 +1,7 @@
 import ChromeRandomnessPredictor from "../../src/predictors/Chrome";
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import queryDb from "../getRandomNumbersFromDatabase";
+import queryDb from "../queryRandomNumbersDatabase";
 
 describe("Chrome", () => {
   const runtime = "chrome";

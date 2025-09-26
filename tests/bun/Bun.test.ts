@@ -1,8 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { BunRandomnessPredictor } from "../../src/predictors";
-import queryDb from "../getRandomNumbersFromDatabase";
-import getSequenceAndExpectedRandomsFromBun from "./getSequenceAndExpectedRandomsFromBun";
+import queryDb from "../queryRandomNumbersDatabase";
+import getSequenceAndExpectedRandomsFromRuntime from "../getSequenceAndExpectedRandomFromRuntime";
 
 describe("Bun", () => {
   const runtime = "bun";
@@ -38,7 +38,7 @@ describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
     /**
      * If/when this test starts failing, it means the bug in JavaScriptCore has been patched!
      */
-    const { sequence, expected } = getSequenceAndExpectedRandomsFromBun("ArrayFrom", 6, "MathRandom", 10);
+    const { sequence, expected } = getSequenceAndExpectedRandomsFromRuntime("bun", "ArrayFrom", 6, "MathRandom", 10);
     const predictor = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {
@@ -52,7 +52,7 @@ describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
   });
 
   it("both sequence and expected generated with Array.from()", async () => {
-    const { sequence, expected } = getSequenceAndExpectedRandomsFromBun("ArrayFrom", 6, "ArrayFrom", 10);
+    const { sequence, expected } = getSequenceAndExpectedRandomsFromRuntime("bun", "ArrayFrom", 6, "ArrayFrom", 10);
     const predictor = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {
@@ -64,7 +64,7 @@ describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
   });
 
   it("both sequence and expected generated with Math.random()", async () => {
-    const { sequence, expected } = getSequenceAndExpectedRandomsFromBun("MathRandom", 6, "MathRandom", 10);
+    const { sequence, expected } = getSequenceAndExpectedRandomsFromRuntime("bun", "MathRandom", 6, "MathRandom", 10);
     const predictor = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {

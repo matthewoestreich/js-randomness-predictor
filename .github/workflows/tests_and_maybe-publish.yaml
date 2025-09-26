@@ -123,6 +123,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: node
+      - name: Install Deno manually
+        shell: bash
+        run: |
+          curl -fsSL https://deno.land/x/install/install.sh | bash
+          echo "${HOME}/.deno/bin" >> $GITHUB_PATH
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Build

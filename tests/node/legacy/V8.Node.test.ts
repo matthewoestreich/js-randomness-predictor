@@ -9,7 +9,7 @@
 import NodeRandomnessPredictor from "../../../src/predictors/Node";
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import queryDatabase from "../../getRandomNumbersFromDatabase";
+import queryDatabase from "../../queryRandomNumbersDatabase";
 
 describe("Node : Legacy Node.js Versions", () => {
   const runtime = "node";
