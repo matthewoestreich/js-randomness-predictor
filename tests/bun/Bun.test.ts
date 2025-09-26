@@ -30,20 +30,24 @@ describe("Bun", () => {
 
 /**
  * These tests call bun from terminal to get random numbers dynamically
- * (not hard coded random numbers)
+ * (not hard coded random numbers). We have to do this because Bun does
+ * not support Z3, so we cannot run our predictor/tests natively in Bun.
  */
 describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
   it("sequence generated with Array.from(), expected generated with Math.random()", async () => {
+    /**
+     * If/when this test starts failing, it means the bug in JavaScriptCore has been patched!
+     */
     const { sequence, expected } = getSequenceAndExpectedRandomsFromBun("ArrayFrom", 6, "MathRandom", 10);
     const predictor = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {
       predictions.push(await predictor.predictNext());
     }
-    // Array.from and MathRandom should take two diff paths.
-    // Array.from takes the slow path.
-    // MathRandom takes the JIT path.
-    // So they took two diff paths, we should expect them to not be equal.
+    // ~ Due to current JavaScriptCore bug ~
+    // Array.from({length:n},Math.random) takes the slow baseline path.
+    // Math.random() takes the JIT path.
+    // Since they took two diff paths, we should expect their results to not be equal.
     assert.notDeepStrictEqual(predictions, expected);
   });
 

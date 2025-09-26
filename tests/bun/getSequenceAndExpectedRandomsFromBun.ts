@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 
-type RandsType = "ArrayFrom" | "MathRandom";
+type RandomNumberGenerationMethod = "ArrayFrom" | "MathRandom";
 type SequenceAndExpectedRandoms = { sequence: number[]; expected: number[] };
 
 /**
@@ -9,17 +9,17 @@ type SequenceAndExpectedRandoms = { sequence: number[]; expected: number[] };
  * hard-coded)..
  * We have to do this because Bun does not support Z3, so we can't run the predictor
  * natively in Bun.
- * @param {RandsType} sequenceType : generate numbers via Array.from or Math.random
+ * @param {RandomNumberGenerationMethod} sequenceType : generate numbers via Array.from or Math.random
  * @param {number} sequenceLength : how many random numbers in sequence
- * @param {RandsType} expectedType : generate numbers via Array.from or Math.random
+ * @param {RandomNumberGenerationMethod} expectedType : generate numbers via Array.from or Math.random
  * @param {number} expectedLength : how many random numbers in expected
  * @param {number} seed? : seed PRNG with this number
  * @returns
  */
 export default function getSequenceAndExpectedRandomsFromBun(
-  sequenceType: RandsType,
+  sequenceType: RandomNumberGenerationMethod,
   sequenceLength: number,
-  expectedType: RandsType,
+  expectedType: RandomNumberGenerationMethod,
   expectedLength: number,
   seed?: number,
 ): SequenceAndExpectedRandoms {
