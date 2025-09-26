@@ -16,9 +16,9 @@ In practice, this means any Predictor must account for how the engine scales its
 
 From an implementation perspective, this range is chosen for several practical reasons:
 
-1. **Safe scaling to other ranges:** Random integers in `[0, N)` can be easily derived with `Math.floor(Math.random() * N)` without risking off-by-one errors.
-2. **Full mantissa utilization:** JavaScript numbers are IEEE-754 double-precision floats, which have a 52-bit mantissa. By mapping the raw PRNG output into `[0, 1)`, engines can use all of these 52 bits of precision for randomness (more on this in future sections).
-3. **Uniformity and determinism:** PRNGs like xorshift128+ generate integers in a very large range (e.g., 0 to 2⁶⁴-1). Dividing or shifting these integers to fit within `[0, 1)` preserves uniformity without rounding errors that could accumulate if the range included 1.
+- **Safe scaling to other ranges:** Random integers in `[0, N)` can be easily derived with `Math.floor(Math.random() * N)` without risking off-by-one errors.
+- **Full mantissa utilization:** JavaScript numbers are IEEE-754 double-precision floats, which have a 52-bit mantissa. By mapping the raw PRNG output into `[0, 1)`, engines can use all of these 52 bits of precision for randomness (more on this in future sections).
+- **Uniformity and determinism:** PRNGs like xorshift128+ generate integers in a very large range (e.g., 0 to 2⁶⁴-1). Dividing or shifting these integers to fit within `[0, 1)` preserves uniformity without rounding errors that could accumulate if the range included 1.
 
 By using `[0, 1)`, engines can efficiently produce high-precision floating-point outputs that are compatible with the ECMAScript spec.
 
@@ -48,7 +48,7 @@ Instead of trying to brute force the state of the PRNG (which would be astronomi
 - Each part of the [xorshift128+ algorithm](https://en.wikipedia.org/wiki/Xorshift#xorshift+) (shifts, xors, additions) is represented as constraints on unknown 64-bit integers.
 - These constraints describe how the internal state evolves with each call to `Math.random()`.
 - Z3 then attempts to solve for the initial state that satisfies all observed outputs.
-  - Observed outputs being the numbers provided to a Predictor when it is instantiated. Which we call the **initial sequence**, or simply **sequence**.
+  1. Observed outputs being the numbers provided to a Predictor when it is instantiated. Which we call the **initial sequence**, or simply **sequence**.
 
 This approach turns “guess the hidden state” into “solve a system of equations,” which is vastly more efficient.
 
