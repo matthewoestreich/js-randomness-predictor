@@ -1,7 +1,7 @@
 import FirefoxRandomnessPredictor from "../../src/predictors/Firefox";
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import queryDb from "../getRandomNumbersFromDatabase";
+import queryDb from "../queryRandomNumbersDatabase";
 
 describe("Firefox", () => {
   const runtime = "firefox";

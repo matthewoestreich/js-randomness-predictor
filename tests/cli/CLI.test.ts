@@ -5,14 +5,15 @@ import path from "node:path";
 import { PREDICTOR_ENVIRONMENTS } from "../../src/constants.ts";
 import jsRandomnessPredictor from "./jsRandomnessPredictor.ts";
 import stderrThrows from "./stderrThrows.ts";
-import queryDb from "../getRandomNumbersFromDatabase.ts";
+import queryDb from "../queryRandomNumbersDatabase.ts";
 import { NodeJsMajorVersion, PredictorEnvironment } from "../../src/types.ts";
 
 const BIN_PATH = path.resolve(import.meta.dirname, "../../dist/esm/cli/js-randomness-predictor.js");
 
 describe("CLI", () => {
   it("ensures built files exist", () => {
-    assert.strictEqual(fs.existsSync(BIN_PATH), true);
+    // assert.ok will 'succeed' on any truthy value, use `=== true` so I can sleep at night.
+    assert.ok(fs.existsSync(BIN_PATH) === true);
   });
 
   it(`[${PREDICTOR_ENVIRONMENTS.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
@@ -27,7 +28,7 @@ describe("CLI", () => {
     const relativeExportPath = "./export.json"; // Relative to current working directory
     const absoluteExportPath = path.resolve(process.cwd(), relativeExportPath);
     // To test for when directory in path doesn't exist
-    const extendedRelativePath = "./export/export.json";
+    const extendedRelativePath = "./export/export.json"; // Relative to current working directory
     const extendedAbsolutePath = path.resolve(process.cwd(), extendedRelativePath);
     const extendedAbsoluteDirPath = path.dirname(extendedAbsolutePath);
 
