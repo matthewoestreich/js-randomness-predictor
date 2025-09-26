@@ -7,6 +7,8 @@ type SequenceAndExpectedRandoms = { sequence: number[]; expected: number[] };
  * Calls Bun from terminal/cmd line with a generated string (that is JS code) used
  * to get random numbers "dynamically" (so we can test using numbers that are not
  * hard-coded)..
+ * We have to do this because Bun does not support Z3, so we can't run the predictor
+ * natively in Bun.
  * @param {RandsType} sequenceType : generate numbers via Array.from or Math.random
  * @param {number} sequenceLength : how many random numbers in sequence
  * @param {RandsType} expectedType : generate numbers via Array.from or Math.random
