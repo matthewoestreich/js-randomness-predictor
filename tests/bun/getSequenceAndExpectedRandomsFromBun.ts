@@ -24,7 +24,7 @@ export default function getSequenceAndExpectedRandomsFromBun(
   seed?: number,
 ): SequenceAndExpectedRandoms {
   if (sequenceLength <= 0 || expectedLength <= 0) {
-    throw new Error(`Both sequence lenght and expected length must be > 0! sequenceLength=${sequenceLength} expectedLength=${expectedLength}`);
+    throw new Error(`Both sequence length and expected length must be > 0! sequenceLength=${sequenceLength} expectedLength=${expectedLength}`);
   }
 
   let script = "";
