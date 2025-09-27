@@ -1,6 +1,6 @@
 import * as z3 from "z3-solver-jsrp";
 import { InsufficientSequenceLengthError, UnexpectedRuntimeError, UnsatError } from "../errors.js";
-import { ConcreteXorShiftFn, Pair, SymbolicXorShiftFn } from "../types.js";
+import { Pair } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import uint64 from "../uint64.js";
 import callMathRandom from "../callMathRandom.js";
@@ -12,8 +12,8 @@ export default class BunRandomnessPredictor {
 
   #minimumSequenceLength = 6;
   #concreteState: Pair<bigint> = [0n, 0n];
-  #symbolicXor: SymbolicXorShiftFn;
-  #concreteXor: ConcreteXorShiftFn;
+  #symbolicXor = (s: Pair<z3.BitVec>) => XorShift128Plus.symbolic(s);
+  #concreteXor = (s: Pair<bigint>) => XorShift128Plus.concrete(s);
 
   // The mantissa bits (53 effective bits = 52 stored + 1 implicit) for doubles as defined in IEEE-754
   #IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
@@ -28,10 +28,8 @@ export default class BunRandomnessPredictor {
       if (!this.#isBunRuntime()) {
         throw new UnexpectedRuntimeError("Expected Bun runtime! Unable to auto-generate sequence, please provide one.");
       }
-      sequence = callMathRandom(6);
+      sequence = callMathRandom(this.#minimumSequenceLength);
     }
-    this.#symbolicXor = (s: Pair<z3.BitVec>) => XorShift128Plus.symbolicArithmeticShiftRight(s);
-    this.#concreteXor = (s: Pair<bigint>) => XorShift128Plus.concreteArithmeticShiftRight(s);
     this.sequence = sequence;
   }
 
@@ -40,9 +38,8 @@ export default class BunRandomnessPredictor {
       await this.#withRetry(
         () => this.#solveSymbolicState(),
         () => {
-          // Retry with logical right shifts
-          this.#symbolicXor = (s: Pair<z3.BitVec>) => XorShift128Plus.symbolic(s);
-          this.#concreteXor = (s: Pair<bigint>) => XorShift128Plus.concrete(s);
+          this.#symbolicXor = (s: Pair<z3.BitVec>) => XorShift128Plus.symbolicArithmeticShiftRight(s);
+          this.#concreteXor = (s: Pair<bigint>) => XorShift128Plus.concreteArithmeticShiftRight(s);
           return this.#solveSymbolicState();
         },
       );
