@@ -35,7 +35,7 @@ You can read [Vigna’s paper on xorshift+ generators here](https://vigna.di.uni
 
 # Symbolic Modeling
 
-Instead of trying to brute force the state of the PRNG (which would be astronomically slow), we **symbolically model** the algorithm using [Z3](https://github.com/Z3Prover/z3), an [SMT solver](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), which is published by Microsoft Research.
+Instead of trying to brute force the state of the PRNG (which would be astronomically slow), we **symbolically model** the algorithm using a cusotom fork of [Z3](https://github.com/Z3Prover/z3), an [SMT solver](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), which is published by Microsoft Research.
 
 - Each part of the [xorshift128+ algorithm](https://en.wikipedia.org/wiki/Xorshift#xorshift+) (shifts, xors, additions) is represented as constraints on unknown 64-bit integers.
 - These constraints describe how the internal state evolves with each call to `Math.random()`.

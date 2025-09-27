@@ -79,7 +79,7 @@
   },
   "dependencies": {
     "yargs": "^18.0.0",
-    "z3-solver-jsrp": "^1.0.1"
+    "z3-solver-jsrp": "^4.15.3-republish"
   },
   "devDependencies": {
     "@types/eslint": "^9.6.1",
