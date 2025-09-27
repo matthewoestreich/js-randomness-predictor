@@ -123,8 +123,6 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v2.x
-      - name: Install dependencies
-        run: deno task install
       - name: Build
         shell: bash
         run: deno task build
