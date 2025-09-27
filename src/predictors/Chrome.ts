@@ -1,4 +1,4 @@
-import * as z3 from "z3-solver";
+import * as z3 from "z3-solver-jsrp";
 import { UnsatError } from "../errors.js";
 import { Pair } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";

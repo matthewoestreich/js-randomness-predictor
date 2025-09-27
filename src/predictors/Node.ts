@@ -1,4 +1,4 @@
-import * as z3 from "z3-solver";
+import * as z3 from "z3-solver-jsrp";
 import { NodeJsVersion, StateConversionMap, Pair } from "../types.js";
 import { UnexpectedRuntimeError, UnsatError } from "../errors.js";
 import XorShift128Plus from "../XorShift128Plus.js";
@@ -46,6 +46,8 @@ import XorShift128Plus from "../XorShift128Plus.js";
 
 export default class NodeRandomnessPredictor {
   public sequence: number[];
+
+  x: z3.B;
 
   // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
   #MAX_SEQUENCE_LENGTH = 64;
