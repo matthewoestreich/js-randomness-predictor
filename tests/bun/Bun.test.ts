@@ -17,7 +17,7 @@ const testOptions: TestOptions = { timeout: 25000, retry: 3 };
 
 describe("Bun", () => {
   test(
-    "'sequence' generated with Array.from(), 'expected' generated with Math.random()",
+    "[Bun] 'sequence' generated with Array.from(), 'expected' generated with Math.random()",
     async () => {
       /**
        * If/when this test starts failing, it means the bug in JavaScriptCore has been patched!
@@ -35,11 +35,11 @@ describe("Bun", () => {
       // Since they took two diff paths, we should expect their results to not be equal.
       expect(predictions).not.toEqual(expected);
     },
-    testOptions,
+    { ...testOptions },
   );
 
   test(
-    "both 'sequence' and 'expected' generated with Array.from()",
+    "[Bun] both 'sequence' and 'expected' generated with Array.from()",
     async () => {
       const sequence = Array.from({ length: 6 }, Math.random);
       const predictor = new BunRandomnessPredictor(sequence);
@@ -52,11 +52,11 @@ describe("Bun", () => {
       // they should have taken the same path, thus making them equal.
       expect(predictions).toEqual(expected);
     },
-    testOptions,
+    { ...testOptions },
   );
 
   test(
-    "both 'sequence' and 'expected' generated with Math.random()",
+    "[Bun] both 'sequence' and 'expected' generated with Math.random()",
     async () => {
       const sequence = callMathRandom(6);
       const expected = callMathRandom(6);
@@ -69,11 +69,11 @@ describe("Bun", () => {
       // they should have taken the same path, thus making them equal.
       expect(predictions).toEqual(expected);
     },
-    testOptions,
+    { ...testOptions },
   );
 
   test(
-    "tests with a dynamically generated sequence",
+    "[Bun] tests with a dynamically generated sequence",
     async () => {
       const predictor = new BunRandomnessPredictor();
       const expected = callMathRandom(6);
@@ -83,6 +83,6 @@ describe("Bun", () => {
       }
       expect(predictions).toEqual(expected);
     },
-    testOptions,
+    { ...testOptions },
   );
 });
