@@ -17,7 +17,7 @@ const testOptions: TestOptions = { timeout: 25000, retry: 3 };
 
 describe("Bun", () => {
   test(
-    "[Bun] 'sequence' generated with Array.from(), 'expected' generated with Math.random()",
+    "'sequence' generated with Array.from(), 'expected' generated with Math.random()",
     async () => {
       /**
        * If/when this test starts failing, it means the bug in JavaScriptCore has been patched!
@@ -39,7 +39,7 @@ describe("Bun", () => {
   );
 
   test(
-    "[Bun] both 'sequence' and 'expected' generated with Array.from()",
+    "both 'sequence' and 'expected' generated with Array.from()",
     async () => {
       const sequence = Array.from({ length: 6 }, Math.random);
       const predictor = new BunRandomnessPredictor(sequence);
@@ -56,7 +56,7 @@ describe("Bun", () => {
   );
 
   test(
-    "[Bun] both 'sequence' and 'expected' generated with Math.random()",
+    "both 'sequence' and 'expected' generated with Math.random()",
     async () => {
       const sequence = callMathRandom(6);
       const expected = callMathRandom(6);
@@ -73,7 +73,7 @@ describe("Bun", () => {
   );
 
   test(
-    "[Bun] tests with a dynamically generated sequence",
+    "tests with a dynamically generated sequence",
     async () => {
       const predictor = new BunRandomnessPredictor();
       const expected = callMathRandom(6);
