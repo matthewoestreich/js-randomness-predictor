@@ -119,23 +119,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
         with:
-          node-version: node
-      - name: Install Deno manually
-        shell: bash
-        run: |
-          curl -fsSL https://deno.land/x/install/install.sh | bash
-          echo "${HOME}/.deno/bin" >> $GITHUB_PATH
+          deno-version: v2.x
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: deno task install
       - name: Build
         shell: bash
-        run: npm run build
+        run: deno task build
       - name: Run tests
         shell: bash
-        run: npm run test:deno
+        run: deno task test:deno
         env:
           FORCE_COLOR: "1"
   test-browsers:

@@ -15,8 +15,8 @@ const JSRandomnessPredictor = {
   firefox: (sequence: number[]): FirefoxRandomnessPredictor => new FirefoxRandomnessPredictor(sequence),
   chrome: (sequence: number[]): ChromeRandomnessPredictor => new ChromeRandomnessPredictor(sequence),
   safari: (sequence: number[]): SafariRandomnessPredictor => new SafariRandomnessPredictor(sequence),
-  bun: (sequence: number[]): BunRandomnessPredictor => new BunRandomnessPredictor(sequence),
-  deno: (sequence: number[]): DenoRandomnessPredictor => new DenoRandomnessPredictor(sequence),
+  bun: (sequence?: number[]): BunRandomnessPredictor => new BunRandomnessPredictor(sequence),
+  deno: (sequence?: number[]): DenoRandomnessPredictor => new DenoRandomnessPredictor(sequence),
 };
 
 export default JSRandomnessPredictor;

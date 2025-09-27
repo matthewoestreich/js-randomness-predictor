@@ -1,5 +1,5 @@
 import * as z3 from "z3-solver-jsrp";
-import { InsufficientSequenceLengthError, UnsatError } from "../errors.js";
+import { InsufficientSequenceLengthError, UnexpectedRuntimeError, UnsatError } from "../errors.js";
 import { ConcreteXorShiftFn, Pair, SymbolicXorShiftFn } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import uint64 from "../uint64.js";
@@ -25,6 +25,9 @@ export default class BunRandomnessPredictor {
       throw new InsufficientSequenceLengthError(`sequence length must be >= 6 : got ${sequence.length}`);
     }
     if (!sequence) {
+      if (!this.#isBunRuntime()) {
+        throw new UnexpectedRuntimeError("Expected Bun runtime! Unable to auto-generate sequence, please provide one.");
+      }
       sequence = callMathRandom(6);
     }
     this.#symbolicXor = (s: Pair<z3.BitVec>) => XorShift128Plus.symbolicArithmeticShiftRight(s);
