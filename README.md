@@ -130,6 +130,7 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 :construction: **IMPORTANT** :construction: There is a bug in JavaScriptCore, the JS engine that powers Bun [(which I have created a PR for)](https://github.com/WebKit/WebKit/pull/51077), so please only use **direct calls to `Math.random()`** to generate random numbers until this patch is landed! [See here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)
 
 :grey_question: **If you are running natively in Bun**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you.
+
 :grey_question: **If you are using the Bun Predictor outside of Bun**, you must provide a sequence that was generated in Bun and copied over!
 
 ## Provide Your Own Sequence
@@ -166,6 +167,7 @@ const isAccurate = nextPrediction === Math.random();
 :fire: As of `v3.0.0`, you can run the Deno predictor natively in Deno! :fire:
 
 :grey_question: **If you are running natively in Deno**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you.
+
 :grey_question: **If you are using the Deno Predictor outside of Deno**, you must provide a sequence that was generated in Deno and copied over!
 
 ## Provide Your Own Sequence
