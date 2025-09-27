@@ -42,7 +42,7 @@
     "test:node:versions:LE:16": "tsx --test tests/node/legacy/*.test.ts --color",
     "test:node": "npm run test:node:versions:GE:20 && npm run test:node:versions:17:18:19 && npm run test:node:versions:LE:16",
     "test:cli": "tsx --test tests/cli/*.test.ts",
-    "test:bun": "tsx --test tests/bun/*.test.ts",
+    "test:bun": "bun test tests/bun/*.test.ts",
     "test:deno": "deno test --sloppy-imports --allow-read \"./tests/deno/*.test.ts\"",
     "test:firefox": "tsx --test tests/firefox/*.test.ts",
     "test:chrome": "tsx --test tests/chrome/*.test.ts",
@@ -82,12 +82,14 @@
     "z3-solver-jsrp": "^4.15.3-republish"
   },
   "devDependencies": {
+    "@types/bun": "^1.2.22",
     "@types/eslint": "^9.6.1",
     "@types/node": "^24.3.3",
     "@types/yargs": "^17.0.33",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "buffer": "^6.0.3",
+    "bun-types": "^1.2.22",
     "eslint": "^9.35.0",
     "husky": "^9.1.7",
     "jiti": "^2.5.1",

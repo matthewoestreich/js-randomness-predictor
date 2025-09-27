@@ -1,44 +1,21 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
-import { BunRandomnessPredictor } from "../../src/predictors";
-import queryDb from "../queryRandomNumbersDatabase";
-import getSequenceAndExpectedRandomsFromRuntime from "../getSequenceAndExpectedRandomFromRuntime";
+import { describe, it, expect } from "bun:test";
+import BunRandomnessPredictor from "../../src/predictors/Bun.ts";
+
+function callMathRandom(nTimes = 1): number[] {
+  const o: number[] = [];
+  for (let i = 0; i < nTimes; i++) {
+    o.push(Math.random());
+  }
+  return o;
+}
 
 describe("Bun", () => {
-  const runtime = "bun";
-
-  it("should be correct when using Array.fom", async () => {
-    const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true } });
-    const bun = new BunRandomnessPredictor(sequence);
-    const predictions: number[] = [];
-    for (let i = 0; i < expected.length; i++) {
-      predictions.push(await bun.predictNext());
-    }
-    assert.deepStrictEqual(predictions, expected);
-  });
-
-  it("should be correct when using Math.random() standalone calls", async () => {
-    const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true } });
-    const bun = new BunRandomnessPredictor(sequence);
-    const predictions: number[] = [];
-    for (let i = 0; i < expected.length; i++) {
-      predictions.push(await bun.predictNext());
-    }
-    assert.deepStrictEqual(predictions, expected);
-  });
-});
-
-/**
- * These tests call bun from terminal to get random numbers dynamically
- * (not hard coded random numbers). We have to do this because Bun does
- * not support Z3, so we cannot run our predictor/tests natively in Bun.
- */
-describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
-  it("sequence generated with Array.from(), expected generated with Math.random()", async () => {
+  it("'sequence' generated with Array.from(), 'expected' generated with Math.random()", async () => {
     /**
      * If/when this test starts failing, it means the bug in JavaScriptCore has been patched!
      */
-    const { sequence, expected } = getSequenceAndExpectedRandomsFromRuntime("bun", "ArrayFrom", 10, "MathRandom", 10);
+    const sequence = Array.from({ length: 8 }, Math.random);
+    const expected = callMathRandom(10);
     const predictor = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {
@@ -48,11 +25,12 @@ describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
     // Array.from({length:n},Math.random) takes the slow baseline path.
     // Math.random() takes the JIT path.
     // Since they took two diff paths, we should expect their results to not be equal.
-    assert.notDeepStrictEqual(predictions, expected);
+    expect(predictions).not.toStrictEqual(expected);
   });
 
-  it("both sequence and expected generated with Array.from()", async () => {
-    const { sequence, expected } = getSequenceAndExpectedRandomsFromRuntime("bun", "ArrayFrom", 10, "ArrayFrom", 10);
+  it("both 'sequence' and 'expected' generated with Array.from()", async () => {
+    const sequence = Array.from({ length: 10 }, Math.random);
+    const expected = Array.from({ length: 10 }, Math.random);
     const predictor = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {
@@ -60,11 +38,12 @@ describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
     }
     // Our sequence and expected both generated via Array.from, so
     // they should have taken the same path, thus making them equal.
-    assert.deepStrictEqual(predictions, expected);
+    expect(predictions).toStrictEqual(expected);
   });
 
-  it("both sequence and expected generated with Math.random()", async () => {
-    const { sequence, expected } = getSequenceAndExpectedRandomsFromRuntime("bun", "MathRandom", 10, "MathRandom", 10);
+  it("both 'sequence' and 'expected' generated with Math.random()", async () => {
+    const sequence = callMathRandom(8);
+    const expected = callMathRandom(10);
     const predictor = new BunRandomnessPredictor(sequence);
     const predictions: number[] = [];
     for (let i = 0; i < expected.length; i++) {
@@ -72,6 +51,16 @@ describe("Bun : Dynamic Random Numbers (call Bun from terminal)", () => {
     }
     // Our sequence and expected both generated via Math.random calls, so
     // they should have taken the same path, thus making them equal.
-    assert.deepStrictEqual(predictions, expected);
+    expect(predictions).toStrictEqual(expected);
+  });
+
+  it("tests with a dynamically generated sequence", async () => {
+    const predictor = new BunRandomnessPredictor();
+    const expected = callMathRandom(10);
+    const predictions: number[] = [];
+    for (let i = 0; i < expected.length; i++) {
+      predictions.push(await predictor.predictNext());
+    }
+    expect(predictions).toStrictEqual(expected);
   });
 });

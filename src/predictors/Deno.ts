@@ -3,9 +3,6 @@ import { UnexpectedRuntimeError, UnsatError } from "../errors.js";
 import { Pair } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 
-// Cannot use this predictor natively in Deno because Deno does
-// not support Z3.
-
 export default class DenoRandomnessPredictor {
   public sequence: number[];
 
