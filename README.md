@@ -16,20 +16,33 @@
 
 # Important Info
 
+- Having trouble? [See all known issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md)
 - Use the predictor that matches the environment where the sequence was originally generated. **Meaning, if it came from Chrome, use the Chrome predictor, etc...**.
-- We recommend at least 4 numbers in the initial sequence.
-- Breaking changes in `v2.0.0`! The V8 Predictor was deprecated - please use the Node Predictor instead.
-- [See all known issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md)
+- We recommend at least **6 numbers** in the **initial sequence** for **Bun and Safari**, and at least **4 numbers** for **Node, Chrome, Firefox, and Deno**.
+- **Breaking changes in `v2.0.0`!** The V8 Predictor was deprecated! Use the predictor that matches your runtime instead.
+- **In `v3.0.0`, native runtime support for Bun and Deno was added!** You can run the Bun predictor natively in Bun, and the Deno predictor natively in Deno!
 
 # Installation
 
-Use your favorite package manager.
+**Node**
 
 ```bash
 npm i js-randomness-predictor
 yarn add js-randomness-predictor
 pnpm add js-randomness-predictor
 # etc...
+```
+
+**Bun**
+
+```bash
+bun add js-randomness-predictor
+```
+
+**Deno**
+
+```bash
+deno add npm:js-randomness-predictor
 ```
 
 # Usage
@@ -46,9 +59,11 @@ import JSRandomnessPredictor from "js-randomness-predictor";
 const JSRandomnessPredictor = require("js-randomness-predictor");
 ```
 
-# V8 Predictor
+**Deno**
 
-Deprecated in `v2.0`. Please use the Node Predictor instead - it works just like the V8 Predictor.
+```js
+import JSRandomnessPredictor from "npm:js-randomness-predictor";
+```
 
 # Node Predictor
 
@@ -108,28 +123,75 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 
 # Bun Predictor
 
-**IMPORTANT** the initial sequence must contain at least 6 elements!
+[See known Bun issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)
 
-**Cannot use the Bun predictor natively in Bun because Bun does not support [Z3](https://github.com/Z3Prover/z3)**
+:fire: As of `v3.0.0`, you can run the Bun predictor natively in Bun! :fire:
 
-**[See known Bun issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)**
+:construction: **IMPORTANT** :construction: There is a bug in JavaScriptCore, the JS engine that powers Bun [(which I have created a PR for)](https://github.com/WebKit/WebKit/pull/51077), so please only use **direct calls to `Math.random()`** to generate random numbers until this patch is landed! [See here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)
+
+:grey_question: **If you are running natively in Bun**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you.
+:grey_question: **If you are using the Bun Predictor outside of Bun**, you must provide a sequence that was generated in Bun and copied over!
+
+## Provide Your Own Sequence
+
+:exclamation: The initial sequence must contain at least 6 elements! :exclamation:
+
+<!-- prettier-ignore -->
+```js
+// Sequence must contain at least 6 elements!
+const providedSequence = Array.from({ length: 6 }, Math.random);
+// Or...
+const providedSequence = [/* copy & paste from REPL */];
+
+const bunPredictor = JSRandomnessPredictor.bun(providedSequence);
+const nextPrediction = await bunPredictor.predictNext();
+// We can programmatically verify since we are running in Bun.
+const isAccurate = nextPrediction === Math.random();
+```
+
+## Automatically Generate Sequence
+
+**IMPORTANT** : must be running natively in Bun for this to work! Otherwise you will get an error.
 
 ```js
-// MUST HAVE AT LEAST 6 ELEMENTS IN SEQUENCE!
-const sequence = [...];
-const bunPredictor = JSRandomnessPredictor.bun(sequence);
+// Automatically creates sequence behind the scenes
+const bunPredictor = JSRandomnessPredictor.bun();
 const nextPrediction = await bunPredictor.predictNext();
-// You'll need to manually verify accuracy.
+// We can programmatically verify since we are running in Bun.
+const isAccurate = nextPrediction === Math.random();
 ```
 
 # Deno Predictor
 
-**Cannot use the Deno predictor natively in Deno because Deno does not support [Z3](https://github.com/Z3Prover/z3)**
+:fire: As of `v3.0.0`, you can run the Deno predictor natively in Deno! :fire:
+
+:grey_question: **If you are running natively in Deno**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you.
+:grey_question: **If you are using the Deno Predictor outside of Deno**, you must provide a sequence that was generated in Deno and copied over!
+
+## Provide Your Own Sequence
+
+<!-- prettier-ignore -->
+```js
+const providedSequence = Array.from({ length: 4 }, Math.random);
+// Or...
+const providedSequence = [/* copy & paste from REPL */];
+
+const denoPredictor = JSRandomnessPredictor.deno(providedSequence);
+const nextPrediction = await denoPredictor.predictNext();
+// We can programmatically verify since we are running in Deno.
+const isAccurate = nextPrediction === Math.random();
+```
+
+## Automatically Generate Sequence
+
+**IMPORTANT** : must be running natively in Deno for this to work! Otherwise you will get an error.
 
 ```js
-const denoPredictor = JSRandomnessPredictor.deno([...]);
+// Automatically creates sequence behind the scenes
+const denoPredictor = JSRandomnessPredictor.deno();
 const nextPrediction = await denoPredictor.predictNext();
-// You'll need to manually verify accuracy.
+// We can programmatically verify since we are running in Deno.
+const isAccurate = nextPrediction === Math.random();
 ```
 
 # Chrome Predictor
@@ -154,9 +216,11 @@ const nextPrediction = await firefoxPredictor.predictNext();
 
 # Safari Predictor
 
-**IMPORTANT** the initial sequence must contain at least 6 elements!
-
 **[See known Safari issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)**
+
+:exclamation: The initial sequence must contain at least 6 elements! :exclamation:
+
+:construction: **IMPORTANT** :construction: There is a bug in JavaScriptCore, the JS engine that powers Safari [(which I have created a PR for)](https://github.com/WebKit/WebKit/pull/51077), so please only use **direct calls to `Math.random()`** to generate random numbers until this patch is landed! [See here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)
 
 ```js
 // MUST HAVE AT LEAST 6 ELEMENTS IN SEQUENCE!
