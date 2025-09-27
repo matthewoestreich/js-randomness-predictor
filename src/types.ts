@@ -1,6 +1,6 @@
 import JSRandomnessPredictor from "./index.js";
 import { PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS } from "./constants.js";
-import { BitVec, Solver, Context } from "z3-solver";
+import { BitVec, Solver, Context } from "z3-solver-jsrp";
 
 export interface PredictorArgs {
   environment: PredictorEnvironment;

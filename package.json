@@ -79,7 +79,6 @@
   },
   "dependencies": {
     "yargs": "^18.0.0",
-    "z3-solver": "^4.15.3",
     "z3-solver-jsrp": "^1.0.1"
   },
   "devDependencies": {

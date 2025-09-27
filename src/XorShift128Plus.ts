@@ -1,4 +1,4 @@
-import { BitVec } from "z3-solver";
+import { BitVec } from "z3-solver-jsrp";
 import { Pair } from "./types.js";
 import uint64 from "./uint64.js";
 
