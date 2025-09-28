@@ -1,5 +1,6 @@
 import JSRandomnessPredictor from "../index.js";
-import { exportResult, callMathRandom, getCurrentNodeJsMajorVersion } from "./utils.js";
+import { exportResult, getCurrentNodeJsMajorVersion } from "./utils.js";
+import callMathRandom from "../callMathRandom.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import {
   // types/interfaces
