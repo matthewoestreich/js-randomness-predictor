@@ -243,6 +243,23 @@ js-randomness-predictor
   [-f <force_overwrite_export_file_or_export_path_creation>]
 ```
 
+## Global Usage
+
+To make the CLI accessible system-wide, install this package globally using the appropriate global flag for your package manager.
+
+```bash
+npm i -g js-randomness-predictor
+```
+
+## Non-Global Usage
+
+You'll need to manually specify the path within a project that has this package installed.
+
+```bash
+# Pretend we are in a project that has this package installed.
+$ node_modules/.bin/js-randomness-predictor [options]
+```
+
 ## Choosing a Runtime
 
 By default, we execute the CLI in Node. If you would like, you can choose to execcute the CLI in Bun or Deno as well.
@@ -262,23 +279,6 @@ $ JSRP_RUNTIME=deno js-randomness-predictor -e bun # `--sequence` not required
 
 # This will use the Node runtime to run the CLI
 $ js-randomness-predictor [args]
-```
-
-## Global Usage
-
-To make the CLI accessible system-wide, install this package globally using the appropriate global flag for your package manager.
-
-```bash
-npm i -g js-randomness-predictor
-```
-
-## Non-Global Usage
-
-You'll need to manually specify the path within a project that has this package installed.
-
-```bash
-# Pretend we are in a project that has this package installed.
-$ node_modules/.bin/js-randomness-predictor [options]
 ```
 
 ## Export Predictor Results
