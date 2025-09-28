@@ -243,6 +243,27 @@ js-randomness-predictor
   [-f <force_overwrite_export_file_or_export_path_creation>]
 ```
 
+## Choosing a Runtime
+
+By default, we execute the CLI in Node. If you would like, you can choose to execcute the CLI in Bun or Deno as well.
+
+- If you choose to run the CLI in Bun, you are not required to provide a `--sequence` if `--environment bun` as well
+- If you choose to run the CLI in Deno, you are not required to provide a `--sequence` if `--environment deno` as well
+- You'll need to set an env variable called `JSRP_RUNTIME` to be `bun`, `deno`, or `node` (is `node` by default)
+
+```bash
+# This will use the Bun runtime to run the CLI
+$ JSRP_RUNTIME=bun js-randomness-predictor -e bun # `--sequence` not required
+$ JSRP_RUNTIME=bun js-randomness-predictor -e deno # ERROR `--sequence` IS required
+
+# This will use the Deno runtime to run the CLI
+$ JSRP_RUNTIME=deno js-randomness-predictor -e deno # `--sequence` not required
+$ JSRP_RUNTIME=deno js-randomness-predictor -e bun # `--sequence` not required
+
+# This will use the Node runtime to run the CLI
+$ js-randomness-predictor [args]
+```
+
 ## Global Usage
 
 To make the CLI accessible system-wide, install this package globally using the appropriate global flag for your package manager.
@@ -257,7 +278,7 @@ You'll need to manually specify the path within a project that has this package 
 
 ```bash
 # Pretend we are in a project that has this package installed.
-node_modules/.bin/js-randomness-predictor [options]
+$ node_modules/.bin/js-randomness-predictor [options]
 ```
 
 ## Export Predictor Results
@@ -277,11 +298,11 @@ When no `--sequence` is provided, a sequence will be generated automatically bas
 
 ```bash
 # Auto-generate sequence
-js-randomness-predictor --environment node
+$ js-randomness-predictor --environment node
 
 # Provide your own sequence and prediction count
-js-randomness-predictor --environment node --sequence 1 2 3 4
-js-randomness-predictor --environment node --sequence 1 2 3 4 --predictions 15
+$ js-randomness-predictor --environment node --sequence 1 2 3 4
+$ js-randomness-predictor --environment node --sequence 1 2 3 4 --predictions 15
 ```
 
 #### Targeting a Different Node.js Version
@@ -300,17 +321,17 @@ Essentially, this flag tells the predictor: **"The sequence I provided was gener
 
 ```bash
 # Specify environment version explicitly
-js-randomness-predictor --environment node --env-version 22 --sequence 1 2 3 4
+$ js-randomness-predictor --environment node --env-version 22 --sequence 1 2 3 4
 
 # Shorthand version
-js-randomness-predictor -e node -v 22 -s 1 2 3 4
+$ js-randomness-predictor -e node -v 22 -s 1 2 3 4
 ```
 
 ⚠️ If you use `--env-version` with a version different from your current Node.js version, the `--sequence` flag is **required**:
 
 ```bash
 # Current Node.js: v24.2.0
-js-randomness-predictor -e node -v 22 # ERROR!
+$ js-randomness-predictor -e node -v 22 # ERROR!
 ```
 
 ### Chrome
@@ -319,11 +340,11 @@ If the `--env-version` flag is provided and the `--environment` flag is not `nod
 
 ```bash
 # Output 10 predictions by default
-js-randomness-predictor --environment chrome --sequence 1 2 3 4
+$ js-randomness-predictor --environment chrome --sequence 1 2 3 4
 # Output 5 predictions
-js-randomness-predictor --environment chrome --sequence 1 2 3 4 --predictions 5
+$ js-randomness-predictor --environment chrome --sequence 1 2 3 4 --predictions 5
 # --env-version (-v) ignored
-js-randomness-predictor -e chrome -v 23 -s 1 2 3 4
+$ js-randomness-predictor -e chrome -v 23 -s 1 2 3 4
 ```
 
 ### Firefox
@@ -332,11 +353,11 @@ If the `--env-version` flag is provided and the `--environment` flag is not `nod
 
 ```bash
 # Output 10 predictions by default
-js-randomness-predictor --environment firefox --sequence 1 2 3 4
+$ js-randomness-predictor --environment firefox --sequence 1 2 3 4
 # Output 5 predictions
-js-randomness-predictor --environment firefox --sequence 1 2 3 4 --predictions 5
+$ js-randomness-predictor --environment firefox --sequence 1 2 3 4 --predictions 5
 # --env-version (-v) ignored
-js-randomness-predictor -e firefox -v 23 -s 1 2 3 4
+$ js-randomness-predictor -e firefox -v 23 -s 1 2 3 4
 ```
 
 ### Safari
@@ -345,11 +366,11 @@ If the `--env-version` flag is provided and the `--environment` flag is not `nod
 
 ```bash
 # Output 10 predictions by default
-js-randomness-predictor --environment safari --sequence 1 2 3 4
+$ js-randomness-predictor --environment safari --sequence 1 2 3 4
 # Output 5 predictions
-js-randomness-predictor --environment safari --sequence 1 2 3 4 --predictions 5
+$ js-randomness-predictor --environment safari --sequence 1 2 3 4 --predictions 5
 # --env-version (-v) ignored
-js-randomness-predictor -e safari -v 23 -s 1 2 3 4
+$ js-randomness-predictor -e safari -v 23 -s 1 2 3 4
 ```
 
 ### Bun
@@ -358,11 +379,11 @@ If the `--env-version` flag is provided and the `--environment` flag is not `nod
 
 ```bash
 # Output 10 predictions by default
-js-randomness-predictor --environment bun --sequence 1 2 3 4
+$ js-randomness-predictor --environment bun --sequence 1 2 3 4
 # Output 5 predictions
-js-randomness-predictor --environment bun --sequence 1 2 3 4 --predictions 5
+$ js-randomness-predictor --environment bun --sequence 1 2 3 4 --predictions 5
 # --env-version (-v) ignored
-js-randomness-predictor -e bun -v 23 -s 1 2 3 4
+$ js-randomness-predictor -e bun -v 23 -s 1 2 3 4
 ```
 
 ### Deno
@@ -371,9 +392,9 @@ If the `--env-version` flag is provided and the `--environment` flag is not `nod
 
 ```bash
 # Output 10 predictions by default
-js-randomness-predictor --environment deno --sequence 1 2 3 4
+$ js-randomness-predictor --environment deno --sequence 1 2 3 4
 # Output 5 predictions
-js-randomness-predictor --environment deno --sequence 1 2 3 4 --predictions 5
+$ js-randomness-predictor --environment deno --sequence 1 2 3 4 --predictions 5
 # --env-version (-v) ignored
-js-randomness-predictor -e deno -v 23 -s 1 2 3 4
+$ js-randomness-predictor -e deno -v 23 -s 1 2 3 4
 ```
