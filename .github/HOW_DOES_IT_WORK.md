@@ -35,18 +35,13 @@ You can read [Vigna’s paper on xorshift+ generators here](https://vigna.di.uni
 
 # Symbolic Modeling
 
-Instead of trying to brute force the state of the PRNG (which would be astronomically slow), we **symbolically model** the algorithm using a cusotom fork of [Z3](https://github.com/Z3Prover/z3), an [SMT solver](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), which is published by Microsoft Research.
+Instead of trying to brute force the state of the PRNG (which would be astronomically slow), we **symbolically model** the algorithm using a [cusotom fork](https://github.com/matthewoestreich/z3) of [Z3](https://github.com/Z3Prover/z3), an [SMT solver](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), which is published by Microsoft Research.
 
 - Each part of the [xorshift128+ algorithm](https://en.wikipedia.org/wiki/Xorshift#xorshift+) (shifts, xors, additions) is represented as constraints on unknown 64-bit integers.
 - These constraints describe how the internal state evolves with each call to `Math.random()`.
 - Z3 then attempts to solve for the initial state that satisfies all observed outputs.
-  1. Observed outputs being the numbers provided to a Predictor when it is instantiated. Which we call the **initial sequence**, or simply **sequence**.
 
 This approach turns “guess the hidden state” into “solve a system of equations,” which is vastly more efficient.
-
-**Symbolic State vs Concrete State**
-
-The internal Z3 state is what we call the **symbolic state**. The resolved actual integers, we call the **concrete state**, which is used for future prediction. Using **concrete state** for future prediction is much faster than having to compute **symbolic state** for each prediction.
 
 ---
 

@@ -76,11 +76,8 @@ Since we're running in Node, you can dynamically generate the initial sequence b
 
 <!-- prettier-ignore -->
 ```js
-const providedSequence = Array.from({ length: 4 }, Math.random);
-// Or...
-const providedSequence = [/* copy & paste from REPL */];
-
-const nodePredictor = JSRandomnessPredictor.node(providedSequence);
+const sequence = Array.from({ length: 4 }, Math.random);
+const nodePredictor = JSRandomnessPredictor.node(sequence);
 const nextPrediction = await nodePredictor.predictNext();
 // We can programmatically verify since we are running in Node.
 const isAccurate = nextPrediction === Math.random();
@@ -127,11 +124,9 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 
 :fire: As of `v3.0.0`, you can run the Bun predictor natively in Bun! :fire:
 
-:construction: **IMPORTANT** :construction: There is a bug in JavaScriptCore, the JS engine that powers Bun [(which I have created a PR for)](https://github.com/WebKit/WebKit/pull/51077), so please only use **direct calls to `Math.random()`** to generate random numbers until this patch is landed! [See here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)
+:construction: Only use "standalone" `Math.random()` calls in Bun (for now) - [see here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun) :construction:
 
-:grey_question: **If you are running natively in Bun**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you.
-
-:grey_question: **If you are using the Bun Predictor outside of Bun**, you must provide a sequence that was generated in Bun and copied over!
+**If you are running natively in Bun**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you. **If you are using the Bun Predictor outside of Bun**, you must provide a sequence that was generated in Bun and copied over!
 
 ## Provide Your Own Sequence
 
@@ -140,11 +135,11 @@ const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
 <!-- prettier-ignore -->
 ```js
 // Sequence must contain at least 6 elements!
-const providedSequence = Array.from({ length: 6 }, Math.random);
-// Or...
-const providedSequence = [/* copy & paste from REPL */];
-
-const bunPredictor = JSRandomnessPredictor.bun(providedSequence);
+const sequence = [
+  Math.random(), Math.random(), Math.random(),
+  Math.random(), Math.random(), Math.random()
+];
+const bunPredictor = JSRandomnessPredictor.bun(sequence);
 const nextPrediction = await bunPredictor.predictNext();
 // We can programmatically verify since we are running in Bun.
 const isAccurate = nextPrediction === Math.random();
@@ -152,7 +147,7 @@ const isAccurate = nextPrediction === Math.random();
 
 ## Automatically Generate Sequence
 
-**IMPORTANT** : must be running natively in Bun for this to work! Otherwise you will get an error.
+**IMPORTANT** : must be running natively in Bun for this to work!
 
 ```js
 // Automatically creates sequence behind the scenes
@@ -166,19 +161,14 @@ const isAccurate = nextPrediction === Math.random();
 
 :fire: As of `v3.0.0`, you can run the Deno predictor natively in Deno! :fire:
 
-:grey_question: **If you are running natively in Deno**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you.
-
-:grey_question: **If you are using the Deno Predictor outside of Deno**, you must provide a sequence that was generated in Deno and copied over!
+**If you are running natively in Deno**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you. **If you are using the Deno Predictor outside of Deno**, you must provide a sequence that was generated in Deno and copied over!
 
 ## Provide Your Own Sequence
 
 <!-- prettier-ignore -->
 ```js
-const providedSequence = Array.from({ length: 4 }, Math.random);
-// Or...
-const providedSequence = [/* copy & paste from REPL */];
-
-const denoPredictor = JSRandomnessPredictor.deno(providedSequence);
+const sequence = Array.from({ length: 4 }, Math.random);
+const denoPredictor = JSRandomnessPredictor.deno(sequence);
 const nextPrediction = await denoPredictor.predictNext();
 // We can programmatically verify since we are running in Deno.
 const isAccurate = nextPrediction === Math.random();
@@ -186,7 +176,7 @@ const isAccurate = nextPrediction === Math.random();
 
 ## Automatically Generate Sequence
 
-**IMPORTANT** : must be running natively in Deno for this to work! Otherwise you will get an error.
+**IMPORTANT** : must be running natively in Deno for this to work!
 
 ```js
 // Automatically creates sequence behind the scenes
@@ -222,7 +212,7 @@ const nextPrediction = await firefoxPredictor.predictNext();
 
 :exclamation: The initial sequence must contain at least 6 elements! :exclamation:
 
-:construction: **IMPORTANT** :construction: There is a bug in JavaScriptCore, the JS engine that powers Safari [(which I have created a PR for)](https://github.com/WebKit/WebKit/pull/51077), so please only use **direct calls to `Math.random()`** to generate random numbers until this patch is landed! [See here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)
+:construction: Only use "standalone" `Math.random()` calls in Safari (for now) - [see here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari) :construction:
 
 ```js
 // MUST HAVE AT LEAST 6 ELEMENTS IN SEQUENCE!
