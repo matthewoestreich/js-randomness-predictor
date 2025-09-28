@@ -17,7 +17,7 @@ import {
 export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult> {
   try {
     // Default results
-    const finalResult: PredictorResult = {
+    const result: PredictorResult = {
       actual: "You'll need to get this yourself via the same way you generated the sequence",
       sequence: argv.sequence ? argv.sequence : callMathRandom(DEFAULT_SEQUENCE_LENGTH[argv.environment]),
       isCorrect: undefined,
@@ -34,23 +34,23 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
     // If we are running an a runtime that is built with V8, we cannot predict accurately
     // past 64 total calls to Math.random without solving symbolic state again.
     // See here for why https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
-    if (RUNTIME_ENGINE[ExecutionRuntime.type()] === "v8" && numPredictions + finalResult.sequence.length > V8_MAX_PREDICTIONS) {
+    if (RUNTIME_ENGINE[ExecutionRuntime.type()] === "v8" && numPredictions + result.sequence.length > V8_MAX_PREDICTIONS) {
       // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
-      if (finalResult.sequence.length >= V8_MAX_PREDICTIONS) {
-        throw new Error(`Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${finalResult.sequence.length}'`);
+      if (result.sequence.length >= V8_MAX_PREDICTIONS) {
+        throw new Error(`Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${result.sequence.length}'`);
       }
-      const numPredictionsLeft = V8_MAX_PREDICTIONS - finalResult.sequence.length;
+      const numPredictionsLeft = V8_MAX_PREDICTIONS - result.sequence.length;
       numPredictions = numPredictionsLeft; // Truncate predictions to fit bounds.
-      finalResult._warnings!.push(
+      result._warnings!.push(
         `Exceeded max predictions!\n` +
-          ` - For a sequence length of '${finalResult.sequence.length}', max number of predictions allowed is '${numPredictionsLeft}'.\n` +
+          ` - For a sequence length of '${result.sequence.length}', max number of predictions allowed is '${numPredictionsLeft}'.\n` +
           ` - Truncated number of predictions to '${numPredictionsLeft}'.\n` +
           ` - Why? See here : https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion`,
       );
     }
 
     // Make our predictor.
-    const predictor: Predictor = JSRandomnessPredictor[argv.environment](finalResult.sequence);
+    const predictor: Predictor = JSRandomnessPredictor[argv.environment](result.sequence);
 
     // We need to run `setNodeVersion(x)` on the current Predictor if the user provided a command
     // that includes `--environment node --env-version N`, but the Node version of the current
@@ -65,45 +65,45 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
     // Make predictions
     for (let i = 0; i < numPredictions; i++) {
       const p = await predictor.predictNext();
-      finalResult.predictions.push(p);
+      result.predictions.push(p);
     }
 
     // We may be able to auto check if predictions are accurate because we generated the sequence.
     if (!argv.sequence) {
+      // Make sure the environment matches the runtime
       switch (argv.environment) {
         case "node": {
           if (ExecutionRuntime.isNode() && (!argv.envVersion || nodeExecutionVersionMatchesArgvVersion)) {
-            finalResult.actual = callMathRandom(numPredictions);
+            result.actual = callMathRandom(numPredictions);
           }
           break;
         }
         case "deno": {
           if (ExecutionRuntime.isDeno()) {
-            finalResult.actual = callMathRandom(numPredictions);
+            result.actual = callMathRandom(numPredictions);
           }
           break;
         }
         case "bun": {
           if (ExecutionRuntime.isBun()) {
-            finalResult.actual = callMathRandom(numPredictions);
+            result.actual = callMathRandom(numPredictions);
           }
           break;
         }
       }
     }
 
-    // If our results object `.actual` is of type `number[]` it means
-    // we can check for accuracy.
-    if (Array.isArray(finalResult.actual)) {
-      finalResult.isCorrect = finalResult.actual.every((v, i) => v === finalResult.predictions[i]);
+    // If our results object `.actual` is an array, it means we can check for accuracy.
+    if (Array.isArray(result.actual)) {
+      result.isCorrect = result.actual.every((v, i) => v === result.predictions[i]);
     }
 
     // Export results to file.
     if (argv.export) {
-      exportResult(argv, finalResult);
+      exportResult(argv, result);
     }
 
-    return Promise.resolve(finalResult);
+    return result;
   } catch (e) {
     return Promise.reject(e);
   }

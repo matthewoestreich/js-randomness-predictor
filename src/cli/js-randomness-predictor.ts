@@ -3,7 +3,7 @@
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, PredictorResult, RUNTIMES, NODE_MAJOR_VERSIONS, IS_SERVER_RUNTIME } from "../types.js";
+import { PredictorArgs, PredictorResult, RUNTIMES, NODE_MAJOR_VERSIONS, RUNTIME_ENV_VAR_NAME } from "../types.js";
 import { SequenceNotFoundError } from "../errors.js";
 import Logger from "../logger.js";
 import { getCurrentNodeJsMajorVersion } from "./utils.js";
@@ -64,13 +64,15 @@ const predictCommand: CommandModule = {
         type: "boolean",
       })
       .check((argv) => {
-        // If the --environment is not a server runtime the --sequence is required!
-        if (!argv.sequence && !IS_SERVER_RUNTIME[argv.environment]) {
-          throw new SequenceNotFoundError(`'--sequence' is required when '--environment' is '${argv.environment}'`);
+        // If the current execution runtime does not equal '--environment' it means we can't auto generate sequence.
+        if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
+          throw new SequenceNotFoundError(
+            `'--sequence' is required when '--environment' is '${argv.environment}' and '${RUNTIME_ENV_VAR_NAME}' is '${ExecutionRuntime.type()}'`,
+          );
         }
 
-        // If we are running in Node and user provided "-e node" as well as "--env-version N" without "--sequence",
-        // but the current Node execution version doesn't match with "--env-version N", it means we can't generate
+        // If execution runtime is Node and user provided "-e node" as well as "--env-version N" without "--sequence",
+        // but the current Node execution runtime version doesn't match with "--env-version N", it means we can't generate
         // a reliable sequence, so the user HAS to provide a "--sequence" argument. Let them know about this error.
         if (
           ExecutionRuntime.isNode() &&
@@ -96,6 +98,8 @@ const predictCommand: CommandModule = {
         predictions: result.predictions,
         actual: result.actual,
       };
+
+      // Have to check for undefined here, bc well, isCorrect=false is falsey, too.
       if (result?.isCorrect !== undefined) {
         finalResult.isCorrect = result.isCorrect;
       }

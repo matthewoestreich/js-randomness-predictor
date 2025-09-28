@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 import { spawnSync, SpawnSyncOptionsWithBufferEncoding } from "node:child_process";
 import nodepath from "node:path";
-import { ServerRuntimeType } from "../types.js";
+import { ServerRuntimeType, RUNTIME_ENV_VAR_NAME } from "../types.js";
 
-const RUNTIME_ENV_VAR_NAME = "JSRP_RUNTIME";
 const SCRIPT_TO_RUN_RELATIVE_PATH = "./js-randomness-predictor.js";
 
 const runtime = (process.env[RUNTIME_ENV_VAR_NAME] as ServerRuntimeType) || "node"; // default to Node
