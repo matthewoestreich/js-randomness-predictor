@@ -15,10 +15,12 @@ const finalArgs = [script, ...cliArgs];
 const childProcessOptions: SpawnSyncOptionsWithBufferEncoding = { stdio: "inherit" };
 
 if (runtime === "deno") {
+  // Deno needs an import map...smh
+  const importMap = nodepath.resolve(import.meta.dirname, "./deno_import_map.json");
   // So the command ultimately becomes:
   // `deno --allow-env --allow-read js-randomness-predictor.js <rest_of_cli_args>`
   // Deno forces us to put the "--allow-*" commands PRIOR to the script!
-  finalArgs.unshift("--allow-env", "--allow-read");
+  finalArgs.unshift("--allow-env", "--allow-read", `--import-map=${importMap}`);
   // So we can use imports that arent prefixed with "npm:", eg `import x from "npm:x"`
   childProcessOptions.env = {
     ...process.env,

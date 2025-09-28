@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "yargs": "npm:yargs",
+    "yargs/helpers": "npm:yargs/helpers",
+    "z3-solver-jsrp": "npm:z3-solver-jsrp"
+  }
+}
