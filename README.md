@@ -275,7 +275,7 @@ $ JSRP_RUNTIME=bun js-randomness-predictor -e deno # ERROR `--sequence` IS requi
 
 # This will use the Deno runtime to run the CLI
 $ JSRP_RUNTIME=deno js-randomness-predictor -e deno # `--sequence` not required
-$ JSRP_RUNTIME=deno js-randomness-predictor -e bun # ERROR `--sequence` IS not required
+$ JSRP_RUNTIME=deno js-randomness-predictor -e bun # ERROR `--sequence` IS required
 
 # This will use the Node runtime to run the CLI
 $ js-randomness-predictor [args]
