@@ -2,11 +2,10 @@ import { describe, it, after } from "node:test";
 import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
-import { PREDICTOR_ENVIRONMENTS } from "../../src/constants.ts";
 import jsRandomnessPredictor from "./jsRandomnessPredictor.ts";
 import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
-import { NodeJsMajorVersion, PredictorEnvironment } from "../../src/types.ts";
+import { NodeJsMajorVersion, RuntimeType, RUNTIMES } from "../../src/types.ts";
 
 const BIN_PATH = path.resolve(import.meta.dirname, "../../dist/esm/cli/js-randomness-predictor.js");
 
@@ -16,8 +15,8 @@ describe("CLI", () => {
     assert.ok(fs.existsSync(BIN_PATH) === true);
   });
 
-  it(`[${PREDICTOR_ENVIRONMENTS.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
-    PREDICTOR_ENVIRONMENTS.forEach((e: PredictorEnvironment) => {
+  it(`[${RUNTIMES.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
+    RUNTIMES.forEach((e: RuntimeType) => {
       const result = jsRandomnessPredictor(BIN_PATH, { environment: e, predictions: -1, sequence: [1, 2, 3] });
       assert.throws(() => stderrThrows(result));
     });

@@ -2,6 +2,7 @@ import * as z3 from "z3-solver-jsrp";
 import { UnexpectedRuntimeError, UnsatError } from "../errors.js";
 import { Pair } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
+import ExecutionRuntime from "../ExecutionRuntime.js";
 
 export default class DenoRandomnessPredictor {
   public sequence: number[];
@@ -12,7 +13,7 @@ export default class DenoRandomnessPredictor {
 
   constructor(sequence?: number[]) {
     if (!sequence) {
-      if (!this.#isDenoRuntime()) {
+      if (!ExecutionRuntime.isDeno()) {
         throw new UnexpectedRuntimeError("Expected Deno runtime! Unable to auto-generate sequence, please provide one.");
       }
       sequence = Array.from({ length: 4 }, Math.random);
@@ -29,11 +30,6 @@ export default class DenoRandomnessPredictor {
     // Modify concrete state.
     XorShift128Plus.concreteBackwards(this.#concreteState);
     return next;
-  }
-
-  #isDenoRuntime(): boolean {
-    // @ts-ignore
-    return typeof globalThis.Deno !== undefined;
   }
 
   // Solves symbolic state so we can move forward using concrete state, which

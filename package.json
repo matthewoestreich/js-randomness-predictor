@@ -14,7 +14,7 @@
     "require": "./dist/cjs/index.js"
   },
   "bin": {
-    "js-randomness-predictor": "./dist/esm/cli/js-randomness-predictor.js"
+    "js-randomness-predictor": "./dist/esm/cli/cli.js"
   },
   "files": [
     "dist",

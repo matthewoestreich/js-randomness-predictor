@@ -3,10 +3,11 @@
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, NodeJsMajorVersion, PredictorResult } from "../types.js";
-import { PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS } from "../constants.js";
+import { PredictorArgs, PredictorResult, RUNTIMES, NODE_MAJOR_VERSIONS, IS_SERVER_RUNTIME } from "../types.js";
 import { SequenceNotFoundError } from "../errors.js";
 import Logger from "../logger.js";
+import { getCurrentNodeJsMajorVersion } from "./utils.js";
+import ExecutionRuntime from "../ExecutionRuntime.js";
 
 const predictCommand: CommandModule = {
   command: "*",
@@ -16,7 +17,7 @@ const predictCommand: CommandModule = {
       .option("environment", {
         alias: "e",
         describe: "Predictor environment",
-        choices: PREDICTOR_ENVIRONMENTS,
+        choices: RUNTIMES,
         demandOption: true,
         type: "string",
       })
@@ -50,7 +51,7 @@ const predictCommand: CommandModule = {
         alias: "v",
         describe: "Node.js major version",
         type: "number",
-        choices: ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS,
+        choices: NODE_MAJOR_VERSIONS,
       })
       .option("export", {
         alias: "x",
@@ -63,25 +64,23 @@ const predictCommand: CommandModule = {
         type: "boolean",
       })
       .check((argv) => {
-        argv._currentNodeJsMajorVersion = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
-        const isNode = argv.environment === "node";
-        const isNodeVersionMatch = argv.envVersion === argv._currentNodeJsMajorVersion;
-
-        // If the --environment is not node the --sequence is required!
-        if (!argv.sequence && !isNode) {
+        // If the --environment is not a server runtime the --sequence is required!
+        if (!argv.sequence && !IS_SERVER_RUNTIME[argv.environment]) {
           throw new SequenceNotFoundError(`'--sequence' is required when '--environment' is '${argv.environment}'`);
         }
 
-        // * If:
-        //    - The --environment is node
-        //    - The --env-version was provided
-        //    - The --sequence was NOT provided
-        //    - The --env-version does NOT match the users current running node version
-        // * Then:
-        //    Throw an error. Sequence is required when doing `-e node -v X` where `X` is != current nodejs major version.
-        if (isNode && argv.envVersion && !argv.sequence && !isNodeVersionMatch) {
+        // If we are running in Node and user provided "-e node" as well as "--env-version N" without "--sequence",
+        // but the current Node execution version doesn't match with "--env-version N", it means we can't generate
+        // a reliable sequence, so the user HAS to provide a "--sequence" argument. Let them know about this error.
+        if (
+          ExecutionRuntime.isNode() &&
+          argv.environment === "node" &&
+          argv.envVersion &&
+          !argv.sequence &&
+          argv.envVersion !== getCurrentNodeJsMajorVersion()
+        ) {
           throw new SequenceNotFoundError(
-            `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version!`,
+            `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version! Current Node version is '${getCurrentNodeJsMajorVersion()}' but --env-version is '${argv.envVersion}'`,
           );
         }
 

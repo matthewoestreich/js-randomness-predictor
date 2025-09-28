@@ -4,6 +4,7 @@ import { Pair } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import uint64 from "../uint64.js";
 import callMathRandom from "../callMathRandom.js";
+import ExecutionRuntime from "../ExecutionRuntime.js";
 
 // Huge shout out https://blog.drstra.in/posts/jsc-randomness-predictor/
 
@@ -25,7 +26,7 @@ export default class BunRandomnessPredictor {
       throw new InsufficientSequenceLengthError(`sequence length must be >= 6 : got ${sequence.length}`);
     }
     if (!sequence) {
-      if (!this.#isBunRuntime()) {
+      if (!ExecutionRuntime.isBun()) {
         throw new UnexpectedRuntimeError("Expected Bun runtime! Unable to auto-generate sequence, please provide one.");
       }
       sequence = callMathRandom(this.#minimumSequenceLength);
@@ -47,11 +48,6 @@ export default class BunRandomnessPredictor {
     // Modify concrete state before calculating our next prediction.
     this.#concreteXor(this.#concreteState);
     return this.#toDouble(uint64(this.#concreteState[0] + this.#concreteState[1]));
-  }
-
-  #isBunRuntime(): boolean {
-    // @ts-ignore
-    return typeof globalThis.Bun !== undefined;
   }
 
   async #withRetry<BT, RT>(baseFn: () => Promise<BT>, retryFn: () => Promise<RT>): Promise<BT | RT> {
