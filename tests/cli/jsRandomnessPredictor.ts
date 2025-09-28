@@ -1,12 +1,12 @@
 import { spawnSync, SpawnSyncReturns } from "node:child_process";
-import { JSRandomnessPredictorCliArgs } from "../../src/types.ts";
+import { PredictorArgs } from "../../src/types.ts";
 
 /**
  * Programmatically call js-randomness-predictor CLI
  * @param {string} jsRandomnessPredictorCliPath : path to js-randomness-predictor.js script
- * @param {JSRandomnessPredictorCliArgs} args
+ * @param {PredictorArgs} args
  */
-export default function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, args: JSRandomnessPredictorCliArgs): SpawnSyncReturns<string> {
+export default function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, args: PredictorArgs): SpawnSyncReturns<string> {
   const { environment, envVersion, sequence, predictions, force, export: exportPath } = args;
   const cmd: string[] = ["-e", environment];
 
