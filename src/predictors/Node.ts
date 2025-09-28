@@ -1,7 +1,8 @@
 import * as z3 from "z3-solver-jsrp";
-import { NodeJsVersion, StateConversionMap, Pair } from "../types.js";
+import { SemanticVersion, StateConversionMap, Pair } from "../types.js";
 import { UnexpectedRuntimeError, UnsatError } from "../errors.js";
 import XorShift128Plus from "../XorShift128Plus.js";
+import ExecutionRuntime from "../ExecutionRuntime.js";
 
 /**
  *
@@ -65,7 +66,7 @@ export default class NodeRandomnessPredictor {
       throw new Error(`sequence.length must be less than '${this.#MAX_SEQUENCE_LENGTH}', got '${sequence.length}'`);
     }
     if (!sequence) {
-      if (!this.#isNodeRuntime) {
+      if (!ExecutionRuntime.isNode()) {
         throw new UnexpectedRuntimeError("Expected NodeJS runtime! Unable to auto-generate sequence, please provide one.");
       }
       sequence = Array.from({ length: this.#DEFAULT_SEQUENCE_LENGTH }, Math.random);
@@ -85,18 +86,13 @@ export default class NodeRandomnessPredictor {
     return next;
   }
 
-  setNodeVersion(version: NodeJsVersion): void {
+  setNodeVersion(version: SemanticVersion): void {
     this.#nodeVersion = version;
     // If the version is changed, we must set version specific methods!
     this.#versionSpecificMethods = this.#getVersionSpecificMethods();
   }
 
-  #isNodeRuntime(): boolean {
-    // @ts-ignore
-    return typeof globalThis.Bun === undefined && typeof globalThis.Deno === undefined && process.versions.node !== undefined;
-  }
-
-  #getNodeVersion(): NodeJsVersion {
+  #getNodeVersion(): SemanticVersion {
     const [major, minor, patch] = process.versions.node.split(".").map(Number);
     return { major, minor, patch };
   }

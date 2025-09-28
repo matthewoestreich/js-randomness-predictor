@@ -8,7 +8,7 @@ import {
   DenoRandomnessPredictor,
 } from "./predictors/index.js";
 
-export type { NodeJsVersion } from "./types.js";
+export type { SemanticVersion as NodeJsVersion } from "./types.js";
 
 const JSRandomnessPredictor = {
   node: (sequence?: number[]): NodeRandomnessPredictor => new NodeRandomnessPredictor(sequence),

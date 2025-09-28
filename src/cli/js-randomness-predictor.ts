@@ -3,8 +3,7 @@
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, NodeJsMajorVersion, PredictorResult } from "../types.js";
-import { PREDICTOR_ENVIRONMENTS, ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS } from "../constants.js";
+import { PredictorArgs, PredictorResult, RUNTIMES, NODE_MAJOR_VERSIONS, IS_SERVER_RUNTIME } from "../types.js";
 import { SequenceNotFoundError } from "../errors.js";
 import Logger from "../logger.js";
 
@@ -16,7 +15,7 @@ const predictCommand: CommandModule = {
       .option("environment", {
         alias: "e",
         describe: "Predictor environment",
-        choices: PREDICTOR_ENVIRONMENTS,
+        choices: RUNTIMES,
         demandOption: true,
         type: "string",
       })
@@ -50,7 +49,7 @@ const predictCommand: CommandModule = {
         alias: "v",
         describe: "Node.js major version",
         type: "number",
-        choices: ALL_POSSIBLE_NODEJS_MAJOR_VERSIONS,
+        choices: NODE_MAJOR_VERSIONS,
       })
       .option("export", {
         alias: "x",
@@ -63,12 +62,12 @@ const predictCommand: CommandModule = {
         type: "boolean",
       })
       .check((argv) => {
-        argv._currentNodeJsMajorVersion = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
         const isNode = argv.environment === "node";
         const isNodeVersionMatch = argv.envVersion === argv._currentNodeJsMajorVersion;
+        const isSequenceRequired = !IS_SERVER_RUNTIME[argv.environment];
 
-        // If the --environment is not node the --sequence is required!
-        if (!argv.sequence && !isNode) {
+        // If the --environment is not a server runtime the --sequence is required!
+        if (!argv.sequence && isSequenceRequired) {
           throw new SequenceNotFoundError(`'--sequence' is required when '--environment' is '${argv.environment}'`);
         }
 
