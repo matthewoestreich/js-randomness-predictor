@@ -1,13 +1,12 @@
 import JSRandomnessPredictor from "../index.js";
-import { exportResult, getCurrentNodeJsMajorVersion } from "./utils.js";
+import exportResult from "./exportResults.js";
+import getCurrentNodeJsMajorVersion from "./getCurrentNodeJsMajorVersion.js";
 import callMathRandom from "../callMathRandom.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import {
-  // types/interfaces
   Predictor,
   PredictorArgs,
   PredictorResult,
-  // constants
   DEFAULT_NUMBER_OF_PREDICTIONS,
   V8_MAX_PREDICTIONS,
   DEFAULT_SEQUENCE_LENGTH,

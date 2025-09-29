@@ -5,8 +5,8 @@ import { BitVec, Solver, Context } from "z3-solver-jsrp";
  * CONSTANTS
  *********************************************************************************************************/
 
-// The env var that determines which runtime the CLI uses.
-export const RUNTIME_ENV_VAR_NAME = "JSRP_RUNTIME";
+// The env var KEY (not the value) that determines which runtime the CLI uses.
+export const EXECUTION_RUNTIME_ENV_VAR_KEY = "JSRP_RUNTIME";
 export const DEFAULT_NUMBER_OF_PREDICTIONS = 10;
 export const V8_MAX_PREDICTIONS = 64;
 export const NODE_MAJOR_VERSIONS = [0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] as const;

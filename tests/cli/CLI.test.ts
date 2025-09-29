@@ -6,14 +6,9 @@ import jsRandomnessPredictor from "./jsRandomnessPredictorWrapper.ts";
 import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import { NodeJsMajorVersion, RuntimeType, RUNTIMES } from "../../src/types.ts";
-import { BIN_PATH } from "./binPath.ts";
+import BIN_PATH from "./entryPointPath.ts";
 
 describe("Base Tests", () => {
-  it("ensures built files exist", () => {
-    // assert.ok will 'succeed' on any truthy value, use `=== true` so I can sleep at night.
-    assert.ok(fs.existsSync(BIN_PATH) === true);
-  });
-
   it(`[${RUNTIMES.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
     RUNTIMES.forEach((e: RuntimeType) => {
       const result = jsRandomnessPredictor(BIN_PATH, { environment: e, predictions: -1, sequence: [1, 2, 3] });

@@ -1,12 +1,11 @@
 #!/usr/bin/env node
-
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, PredictorResult, RUNTIMES, NODE_MAJOR_VERSIONS, RUNTIME_ENV_VAR_NAME } from "../types.js";
+import { PredictorArgs, PredictorResult, RUNTIMES, NODE_MAJOR_VERSIONS, EXECUTION_RUNTIME_ENV_VAR_KEY } from "../types.js";
 import { SequenceNotFoundError } from "../errors.js";
 import Logger from "../logger.js";
-import { getCurrentNodeJsMajorVersion } from "./utils.js";
+import getCurrentNodeJsMajorVersion from "./getCurrentNodeJsMajorVersion.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 
 const predictCommand: CommandModule = {
@@ -67,7 +66,7 @@ const predictCommand: CommandModule = {
         // If the current execution runtime does not equal '--environment' it means we can't auto generate sequence.
         if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
           throw new SequenceNotFoundError(
-            `'--sequence' is required when '--environment' is '${argv.environment}' and '${RUNTIME_ENV_VAR_NAME}' is '${ExecutionRuntime.type()}'`,
+            `'--sequence' is required when '--environment' is '${argv.environment}' and '${EXECUTION_RUNTIME_ENV_VAR_KEY}' is '${ExecutionRuntime.type()}'`,
           );
         }
 

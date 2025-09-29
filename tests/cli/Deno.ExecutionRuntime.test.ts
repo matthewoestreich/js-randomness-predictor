@@ -2,8 +2,8 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import jsRandomnessPredictor from "./jsRandomnessPredictorWrapper.ts";
 import stderrThrows from "./stderrThrows.ts";
-import { RUNTIME_ENV_VAR_NAME } from "../../src/types.ts";
-import { BIN_PATH } from "./binPath.ts";
+import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/types.ts";
+import BIN_PATH from "./entryPointPath.ts";
 
 describe("Deno as Execution Runtime", () => {
   const executionRuntime = "deno";
@@ -11,7 +11,7 @@ describe("Deno as Execution Runtime", () => {
   const differentEnvironment = "bun";
 
   // Change runtime
-  process.env[RUNTIME_ENV_VAR_NAME] = executionRuntime;
+  process.env[EXECUTION_RUNTIME_ENV_VAR_KEY] = executionRuntime;
 
   it("predicts dynamic sequence", () => {
     const result = jsRandomnessPredictor(BIN_PATH, { environment });
@@ -38,7 +38,7 @@ describe("Deno as Execution Runtime", () => {
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
 
-  it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${RUNTIME_ENV_VAR_NAME}' value (${process.env[RUNTIME_ENV_VAR_NAME]})`, () => {
+  it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, () => {
     const result = jsRandomnessPredictor(BIN_PATH, { environment: differentEnvironment });
     assert.throws(() => stderrThrows(result));
   });

@@ -1,8 +1,8 @@
 import nodefs from "node:fs";
 import nodepath from "node:path";
-import { NodeJsMajorVersion, PredictorArgs, PredictorResult } from "../types.js";
+import { PredictorArgs, PredictorResult } from "../types.js";
 
-export function exportResult(argv: PredictorArgs, result: PredictorResult): void {
+export default function exportResult(argv: PredictorArgs, result: PredictorResult): void {
   const exportPath = nodepath.resolve(process.cwd(), argv.export!.toString());
   const dirPath = nodepath.dirname(exportPath);
   const fileExists = nodefs.existsSync(exportPath);
@@ -35,10 +35,6 @@ export function exportResult(argv: PredictorArgs, result: PredictorResult): void
   }
 
   writeResultsToFile(exportPath, result);
-}
-
-export function getCurrentNodeJsMajorVersion(): NodeJsMajorVersion {
-  return Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
 }
 
 /**

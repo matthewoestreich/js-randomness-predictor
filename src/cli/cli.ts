@@ -1,25 +1,33 @@
 #!/usr/bin/env node
+
+/**
+ * This file is the entry point for the CLI!
+ */
 import { spawnSync, SpawnSyncOptionsWithBufferEncoding } from "node:child_process";
 import nodepath from "node:path";
-import { ServerRuntimeType, RUNTIME_ENV_VAR_NAME } from "../types.js";
+import { ServerRuntimeType, EXECUTION_RUNTIME_ENV_VAR_KEY } from "../types.js";
 
-const SCRIPT_TO_RUN_RELATIVE_PATH = "./js-randomness-predictor.js";
+// Node is our default execution runtime.
+const executionRuntime = (process.env[EXECUTION_RUNTIME_ENV_VAR_KEY] as ServerRuntimeType) || "node";
+const js_randomness_predictor = nodepath.resolve(import.meta.dirname, "./js-randomness-predictor.js");
 
-const runtime = (process.env[RUNTIME_ENV_VAR_NAME] as ServerRuntimeType) || "node"; // default to Node
-const script = nodepath.resolve(import.meta.dirname, SCRIPT_TO_RUN_RELATIVE_PATH);
-
-const cliArgs = process.argv.slice(2);
-const finalArgs = [script, ...cliArgs];
-
+// These are the args that a user provided to js-randomness-predictor CLI.
+const jsrpArgs = process.argv.slice(2);
+// These are the args for the child process we are about to run.
+const finalArgs = [js_randomness_predictor, ...jsrpArgs];
+// Options for child process we are about to run.
 const childProcessOptions: SpawnSyncOptionsWithBufferEncoding = { stdio: "inherit" };
 
-if (runtime === "deno") {
+// Deno is so special!
+if (executionRuntime === "deno") {
   // Deno needs an import map...smh
   const importMap = nodepath.resolve(import.meta.dirname, "./deno_import_map.json");
+
+  // Deno forces us to put the "--allow-*" commands PRIOR to the script!
   // So the command ultimately becomes:
   // `deno --allow-env --allow-read js-randomness-predictor.js <rest_of_cli_args>`
-  // Deno forces us to put the "--allow-*" commands PRIOR to the script!
   finalArgs.unshift("--allow-env", "--allow-read", `--import-map=${importMap}`);
+
   // So we can use imports that arent prefixed with "npm:", eg `import x from "npm:x"`
   childProcessOptions.env = {
     ...process.env,
@@ -27,4 +35,4 @@ if (runtime === "deno") {
   };
 }
 
-spawnSync(runtime.toString(), finalArgs, childProcessOptions);
+spawnSync(executionRuntime.toString(), finalArgs, childProcessOptions);
