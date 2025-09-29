@@ -15,7 +15,9 @@ export default function callJsRandomnessPredictorCli(
   args: PredictorArgs,
   extendedOptions?: CallJsRandomnessPredictorCliExtendedOptions,
 ): SpawnSyncReturns<string> {
-  (extendedOptions ||= {}).jsRandomnessPredictorCliPath = JSRP_CLI_PATH;
+  if (!extendedOptions?.jsRandomnessPredictorCliPath) {
+    (extendedOptions ||= {}).jsRandomnessPredictorCliPath = JSRP_CLI_PATH;
+  }
 
   const { environment, envVersion, sequence, predictions, force, export: exportPath } = args;
   const cmd: string[] = ["-e", environment];
