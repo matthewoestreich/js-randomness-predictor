@@ -51,6 +51,8 @@ describe("Node", () => {
     it("should trigger pool exhaustion", () => {
       const seq = Array.from({ length: 64 }, Math.random);
       const result = callJsRandomnessPredictorCli({ environment, sequence: seq });
+      // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
+      // so we can't even truncate predictions to fit bounds.
       assert.throws(() => stderrThrows(result));
     });
 
