@@ -3,7 +3,7 @@ import { PredictorArgs } from "../../src/types.ts";
 
 /**
  * Programmatically call js-randomness-predictor CLI
- * @param {string} jsRandomnessPredictorCliPath : path to js-randomness-predictor.js script
+ * @param {string} jsRandomnessPredictorCliPath : path to CLI entry point script
  * @param {PredictorArgs} args
  */
 export default function jsRandomnessPredictor(jsRandomnessPredictorCliPath: string, args: PredictorArgs): SpawnSyncReturns<string> {

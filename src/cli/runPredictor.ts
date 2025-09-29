@@ -31,10 +31,10 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
 
     let numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUMBER_OF_PREDICTIONS;
 
-    // If we are running an a runtime that is built with V8, we cannot predict accurately
+    // If the user provided an '--environment' that is built with V8, we cannot predict accurately
     // past 64 total calls to Math.random without solving symbolic state again.
     // See here for why https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
-    if (RUNTIME_ENGINE[ExecutionRuntime.type()] === "v8" && numPredictions + result.sequence.length > V8_MAX_PREDICTIONS) {
+    if (RUNTIME_ENGINE[argv.environment] === "v8" && numPredictions + result.sequence.length > V8_MAX_PREDICTIONS) {
       // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
       if (result.sequence.length >= V8_MAX_PREDICTIONS) {
         throw new Error(`Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${result.sequence.length}'`);
