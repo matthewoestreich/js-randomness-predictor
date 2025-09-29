@@ -1,4 +1,4 @@
-name: tests_and_publish.yaml
+name: tests_and_maybe-publish.yaml
 
 on:
   push:
