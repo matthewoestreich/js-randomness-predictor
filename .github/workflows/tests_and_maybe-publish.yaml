@@ -144,7 +144,8 @@ jobs:
           FORCE_COLOR: "1"
   maybe-publish:
     needs: [test-imports, test-cli, test-legacy-node-versions, test-supported-node-versions, test-bun, test-browsers, test-deno]
-    if: startsWith(github.event.head_commit.message, '[publish] ')
+    # NOTE - the backslash in '[publish] \#' escapes the '#' and isn't part of the literally string comparison.
+    if: github.event_name == 'push' && startsWith(github.event.head_commit.message, '[publish] \#')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
