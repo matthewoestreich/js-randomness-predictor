@@ -22,7 +22,7 @@ describe("Bun", () => {
       /**
        * If/when this test starts failing, it means the bug in JavaScriptCore has been patched!
        */
-      const sequence = Array.from({ length: 6 }, Math.random);
+      const sequence = Array.from({ length: 8 }, Math.random);
       const expected = callMathRandom(6);
       const predictor = new BunRandomnessPredictor(sequence);
       const predictions: number[] = [];
@@ -41,7 +41,7 @@ describe("Bun", () => {
   test(
     "both 'sequence' and 'expected' generated with Array.from()",
     async () => {
-      const sequence = Array.from({ length: 6 }, Math.random);
+      const sequence = Array.from({ length: 8 }, Math.random);
       const predictor = new BunRandomnessPredictor(sequence);
       const expected = Array.from({ length: 6 }, Math.random);
       const predictions: number[] = [];
@@ -58,7 +58,7 @@ describe("Bun", () => {
   test(
     "both 'sequence' and 'expected' generated with Math.random()",
     async () => {
-      const sequence = callMathRandom(6);
+      const sequence = callMathRandom(8);
       const expected = callMathRandom(6);
       const predictor = new BunRandomnessPredictor(sequence);
       const predictions: number[] = [];
@@ -76,7 +76,7 @@ describe("Bun", () => {
     "tests with a dynamically generated sequence",
     async () => {
       const predictor = new BunRandomnessPredictor();
-      const expected = callMathRandom(6);
+      const expected = callMathRandom(8);
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         predictions.push(await predictor.predictNext());
