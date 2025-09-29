@@ -1,23 +1,19 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
+import { NODE_MAJOR_VERSIONS, NodeJsMajorVersion } from "../../src/types.ts";
 import jsRandomnessPredictor from "./jsRandomnessPredictorWrapper.ts";
 import stderrThrows from "./stderrThrows.ts";
-import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/types.ts";
-import BIN_PATH from "./entryPointPath.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
+import BIN_PATH from "./entryPointPath.ts";
 
-describe("Deno as Execution Runtime", () => {
-  const executionRuntime = "deno";
-  const environment = "deno";
-  const differentEnvironment = "bun";
+describe("Node", () => {
+  const CURR_NODE_MAJOR_VER = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
+  const environment = "node";
 
-  // Change runtime
-  process.env[EXECUTION_RUNTIME_ENV_VAR_KEY] = executionRuntime;
-
-  it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", () => {
+  it("[dynamic sequence] should not require a sequence if execution runtime (and version) match '--environment' and '--env-version'", () => {
     const result = jsRandomnessPredictor(BIN_PATH, { environment });
     const jsonResult = JSON.parse(result.stdout.toString());
-    assert.strictEqual(jsonResult.isCorrect, true);
+    assert.ok(jsonResult.isCorrect === true);
   });
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
@@ -32,13 +28,26 @@ describe("Deno as Execution Runtime", () => {
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
 
-  it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment: differentEnvironment });
+  it("enforces proper node version when sequence not provided", () => {
+    // We need to ensure we have a node version than the current execution runtime.
+    let diffNodeMajor: NodeJsMajorVersion | undefined;
+    for (let i = NODE_MAJOR_VERSIONS.length - 1; i >= 0; i--) {
+      diffNodeMajor = NODE_MAJOR_VERSIONS[i];
+      if (diffNodeMajor !== CURR_NODE_MAJOR_VER) {
+        break;
+      }
+    }
+    assert.ok(diffNodeMajor);
+    const result = jsRandomnessPredictor(BIN_PATH, { environment, envVersion: diffNodeMajor });
     assert.throws(() => stderrThrows(result));
   });
 
+  it("should not require a sequence if specified --env-version matches current execution runtime version", () => {
+    const result = jsRandomnessPredictor(BIN_PATH, { environment, envVersion: CURR_NODE_MAJOR_VER });
+    assert.doesNotThrow(() => stderrThrows(result));
+  });
+
   describe("Random Number Pool Exhaustion", () => {
-    // Since Deno uses V8
     // https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
     it("should trigger pool exhaustion", () => {
       const seq = Array.from({ length: 64 }, Math.random);
@@ -48,7 +57,7 @@ describe("Deno as Execution Runtime", () => {
 
     // Normally, if an environment is specified that uses V8 under the hood, we are limited to 64 total
     // (predictions + sequence.length) due to pool exhaustion (see KNOWN_ISSUES.md).
-    // This is to test that even though we are executing in an environment that has this limitation (deno),
+    // This is to test that even though we are executing in an environment that has this limitation (node),
     // but specifying an environment that does NOT have this limitation (bun), we do not trigger the limit.
     it("should NOT trigger pool exhaustion", async (thisTest) => {
       // Idk if this is needed, but I'm going to reset it anyway..

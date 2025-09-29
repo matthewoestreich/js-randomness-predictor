@@ -2,10 +2,10 @@ import { describe, it, after } from "node:test";
 import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
+import { RuntimeType, RUNTIMES } from "../../src/types.ts";
 import jsRandomnessPredictor from "./jsRandomnessPredictorWrapper.ts";
 import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
-import { NodeJsMajorVersion, RuntimeType, RUNTIMES } from "../../src/types.ts";
 import BIN_PATH from "./entryPointPath.ts";
 
 describe("Base Tests", () => {
@@ -63,54 +63,6 @@ describe("Export Predictor Results", () => {
   it("directory gets created when --force is used", () => {
     jsRandomnessPredictor(BIN_PATH, { environment, export: extendedRelativePath, force: true });
     assert.strictEqual(fs.existsSync(extendedAbsolutePath), true);
-  });
-});
-
-describe("Node", () => {
-  const CURR_NODE_MAJOR_VER = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
-  const environment = "node";
-
-  it("predicts dynamic sequence", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment });
-    const jsonResult = JSON.parse(result.stdout.toString());
-    assert.strictEqual(jsonResult.isCorrect, true);
-  });
-
-  it("should automatically provide predictions and accuracy when a sequence is not provided and env-version is not provided", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment });
-    const jsonResult = JSON.parse(result.stdout.toString());
-    assert.strictEqual(jsonResult.isCorrect, true);
-  });
-
-  it("should error when sequence is >= 64", () => {
-    const seq = Array.from({ length: 64 }, Math.random);
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq });
-    assert.throws(() => stderrThrows(result));
-  });
-
-  it("should truncate number of predictions when sequence.length + numPredictions > 64 and predict accurately", () => {
-    const seqLength = 4;
-    const numPreds = 70;
-    const expectedNumPreds = 64 - seqLength;
-    const seq = Array.from({ length: seqLength }, Math.random);
-    const expected = Array.from({ length: expectedNumPreds }, Math.random);
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: numPreds });
-    const jsonResult = JSON.parse(result.stdout.toString());
-    assert.equal(jsonResult.predictions.length, expectedNumPreds);
-    assert.deepStrictEqual(jsonResult.predictions, expected);
-  });
-
-  it("enforces proper node version when sequence not provided", () => {
-    // We need to ensure we have a node version that is different than our current version.
-    // So we get our current version, then subtract 1.
-    const diffNodeMajor = (CURR_NODE_MAJOR_VER - 1) as NodeJsMajorVersion;
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, envVersion: diffNodeMajor });
-    assert.throws(() => stderrThrows(result));
-  });
-
-  it("should not require a sequence if specified --env-version matches our current version", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, envVersion: CURR_NODE_MAJOR_VER });
-    assert.doesNotThrow(() => stderrThrows(result));
   });
 });
 

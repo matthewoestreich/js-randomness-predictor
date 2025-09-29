@@ -3,6 +3,7 @@ import exportResult from "./exportResults.js";
 import getCurrentNodeJsMajorVersion from "./getCurrentNodeJsMajorVersion.js";
 import callMathRandom from "../callMathRandom.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
+import { SequenceNotFoundError } from "../errors.js";
 import {
   Predictor,
   PredictorArgs,
@@ -11,10 +12,44 @@ import {
   V8_MAX_PREDICTIONS,
   DEFAULT_SEQUENCE_LENGTH,
   RUNTIME_ENGINE,
+  EXECUTION_RUNTIME_ENV_VAR_KEY,
 } from "../types.js";
 
+/**
+ * This is the "core" of our CLI.
+ *
+ * DRY RUN:
+ *  - You can use an env var "process.env.JSRP_DRY_RUN = '1'" to only test conditions up to the point where
+ *  we are about to create a predictor, but we don't actually create one.
+ *  - A dry run DOES NOT RUN THE PREDICTOR, so you will not have any predictions in results.
+ *
+ * @param {PredictorArgs} argv : the flags used by the cli.
+ * @returns {Promise<PredictorResult>}
+ */
 export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult> {
   try {
+    // If the current execution runtime does not equal '--environment' it means we can't auto generate sequence.
+    if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
+      throw new SequenceNotFoundError(
+        `'--sequence' is required when '--environment' is '${argv.environment}' and '${EXECUTION_RUNTIME_ENV_VAR_KEY}' is '${ExecutionRuntime.type()}'`,
+      );
+    }
+
+    // If execution runtime is Node and user provided "-e node" as well as "--env-version N" without "--sequence",
+    // but the current Node execution runtime version doesn't match with "--env-version N", it means we can't generate
+    // a reliable sequence, so the user HAS to provide a "--sequence" argument. Let them know about this error.
+    if (
+      ExecutionRuntime.isNode() &&
+      argv.environment === "node" &&
+      argv.envVersion &&
+      !argv.sequence &&
+      argv.envVersion !== getCurrentNodeJsMajorVersion()
+    ) {
+      throw new SequenceNotFoundError(
+        `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version! Current Node version is '${getCurrentNodeJsMajorVersion()}' but --env-version is '${argv.envVersion}'`,
+      );
+    }
+
     // Default results
     const result: PredictorResult = {
       actual: "You'll need to get this yourself via the same way you generated the sequence",
@@ -46,6 +81,11 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
           ` - Truncated number of predictions to '${numPredictionsLeft}'.\n` +
           ` - Why? See here : https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion`,
       );
+    }
+
+    // Return early if we are just testing conditions and don't want to actually run the predictor.
+    if (process.env.JSRP_DRY_RUN === "1") {
+      return result;
     }
 
     // Make our predictor.

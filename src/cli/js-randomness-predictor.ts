@@ -2,11 +2,15 @@
 import yargs, { Arguments, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { runPredictor } from "./runPredictor.js";
-import { PredictorArgs, PredictorResult, RUNTIMES, NODE_MAJOR_VERSIONS, EXECUTION_RUNTIME_ENV_VAR_KEY } from "../types.js";
-import { SequenceNotFoundError } from "../errors.js";
+import { PredictorArgs, PredictorResult, RUNTIMES, NODE_MAJOR_VERSIONS } from "../types.js";
 import Logger from "../logger.js";
-import getCurrentNodeJsMajorVersion from "./getCurrentNodeJsMajorVersion.js";
-import ExecutionRuntime from "../ExecutionRuntime.js";
+
+/**
+ * DRY RUN:
+ *  - You can use an env var "process.env.JSRP_DRY_RUN = '1'" to only test conditions up to the point where
+ *  we are about to create a predictor, but we don't actually create one.
+ *  - A dry run DOES NOT RUN THE PREDICTOR, so you will not have any predictions in results.
+ */
 
 const predictCommand: CommandModule = {
   command: "*",
@@ -61,36 +65,17 @@ const predictCommand: CommandModule = {
         alias: "f",
         describe: "If exporting, overwrite existing file or create needed directories in path",
         type: "boolean",
-      })
-      .check((argv) => {
-        // If the current execution runtime does not equal '--environment' it means we can't auto generate sequence.
-        if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
-          throw new SequenceNotFoundError(
-            `'--sequence' is required when '--environment' is '${argv.environment}' and '${EXECUTION_RUNTIME_ENV_VAR_KEY}' is '${ExecutionRuntime.type()}'`,
-          );
-        }
-
-        // If execution runtime is Node and user provided "-e node" as well as "--env-version N" without "--sequence",
-        // but the current Node execution runtime version doesn't match with "--env-version N", it means we can't generate
-        // a reliable sequence, so the user HAS to provide a "--sequence" argument. Let them know about this error.
-        if (
-          ExecutionRuntime.isNode() &&
-          argv.environment === "node" &&
-          argv.envVersion &&
-          !argv.sequence &&
-          argv.envVersion !== getCurrentNodeJsMajorVersion()
-        ) {
-          throw new SequenceNotFoundError(
-            `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version! Current Node version is '${getCurrentNodeJsMajorVersion()}' but --env-version is '${argv.envVersion}'`,
-          );
-        }
-
-        return true;
       });
   },
   handler: async (argv: Arguments) => {
     try {
       const result = await runPredictor(argv as PredictorArgs & Arguments);
+
+      // If dry run, just log everything, including unformatted warnings/info.
+      if (process.env.JSRP_DRY_RUN === "1") {
+        console.log(JSON.stringify(result, null, 2));
+        process.exit(0);
+      }
 
       const finalResult: PredictorResult = {
         sequence: result.sequence,
@@ -129,7 +114,6 @@ const predictCommand: CommandModule = {
 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
 yargs(hideBin(process.argv))
   .scriptName("js-randomness-predictor")
-  .usage("Usage:\n$0 --environment <env> [--env-version <environment_version>] [--sequence <numbers...>] [--predictions <count>]")
   .command(predictCommand)
   .help()
   .argv;

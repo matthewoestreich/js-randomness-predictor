@@ -14,12 +14,12 @@ export default class ExecutionRuntime {
   }
 
   static isNode(): boolean {
-    // prettier-ignore
-    // @ts-ignore
-    return !this.isDeno() // This is just to be safe, I'm pretty sure `process` isnt a global in Deno.
-      && !this.isBun() // In Bun, `process.versions.node` exists.
-      && typeof process.versions.node !== "undefined"
-      && typeof process.versions.node === "string";
+    return (
+      !this.isDeno() && // This is just to be safe, I'm pretty sure `process` isnt a global in Deno.
+      !this.isBun() && // In Bun, `process.versions.node` exists.
+      typeof process.versions.node !== "undefined" &&
+      typeof process.versions.node === "string"
+    );
   }
 
   static isFirefox(): boolean {

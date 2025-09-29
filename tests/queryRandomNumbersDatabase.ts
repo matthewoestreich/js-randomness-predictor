@@ -1,29 +1,5 @@
 import rawDatabase from "./randomNumbersDatabase.json";
-
-type SequenceAndExpected = {
-  sequence: number[];
-  expected: number[];
-};
-
-type RandomNumbers = {
-  sequence: number[];
-  expected: number[];
-  tags: Tags;
-};
-
-type Tags = { [k: string]: string | number | boolean | null | undefined };
-
-type DatabaseEntry = {
-  runtime: string;
-  runtimeVersion: number;
-  randomNumbers: RandomNumbers[];
-};
-
-type DatabaseQuery = {
-  runtime: string;
-  tags: Tags;
-  runtimeVersion?: number;
-};
+import { DatabaseEntry, Tags, DatabaseQuery, SequenceAndExpected } from "./types";
 
 const randomNumbersDatabase = rawDatabase as DatabaseEntry[];
 
