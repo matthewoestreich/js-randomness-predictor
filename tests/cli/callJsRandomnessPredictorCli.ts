@@ -1,4 +1,5 @@
 import nodepath from "node:path";
+import nodefs from "node:fs";
 import { spawnSync, SpawnSyncReturns, SpawnSyncOptionsWithStringEncoding } from "node:child_process";
 import { PredictorArgs } from "../../src/types.ts";
 import { CallJsRandomnessPredictorCliExtendedOptions } from "../types.ts";
@@ -42,6 +43,9 @@ export default function callJsRandomnessPredictorCli(
   const options: SpawnSyncOptionsWithStringEncoding = { encoding: "utf-8", env: { ...process.env } };
   if (extendedOptions?.isDryRun) {
     options.env!.JSRP_DRY_RUN = "1";
+  }
+  if (extendedOptions?.executionRuntime) {
+    options.env!.JSRP_RUNTIME = extendedOptions.executionRuntime;
   }
 
   return spawnSync("node", [extendedOptions.jsRandomnessPredictorCliPath, ...cmd], options);

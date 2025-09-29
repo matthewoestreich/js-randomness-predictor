@@ -4,7 +4,7 @@
  *
  */
 
-import { RuntimeType } from "../src/types";
+import { RuntimeType, ServerRuntimeType } from "../src/types";
 
 export type RandomNumberGenerationMethod = "ArrayFrom" | "MathRandom";
 export type SequenceAndExpectedRandoms = { sequence: number[]; expected: number[] };
@@ -13,6 +13,7 @@ export type SequenceAndExpectedRandoms = { sequence: number[]; expected: number[
 export type CallJsRandomnessPredictorCliExtendedOptions = {
   isDryRun?: boolean;
   jsRandomnessPredictorCliPath?: string;
+  executionRuntime?: ServerRuntimeType;
 };
 
 export type SequenceAndExpected = {

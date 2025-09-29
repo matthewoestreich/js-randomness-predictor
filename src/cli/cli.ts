@@ -11,7 +11,8 @@
 
 import { spawnSync, SpawnSyncOptionsWithBufferEncoding } from "node:child_process";
 import nodepath from "node:path";
-import { ServerRuntimeType, EXECUTION_RUNTIME_ENV_VAR_KEY } from "../types.js";
+import nodefs from "node:fs";
+import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../types.js";
 
 // Relative paths.
 const denoImportMapRelative = "./deno_import_map.json";
