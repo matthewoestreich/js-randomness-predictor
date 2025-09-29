@@ -1,17 +1,16 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { NODE_MAJOR_VERSIONS, NodeJsMajorVersion } from "../../src/types.ts";
-import jsRandomnessPredictor from "./jsRandomnessPredictorWrapper.ts";
+import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
-import BIN_PATH from "./entryPointPath.ts";
 
 describe("Node", () => {
   const CURR_NODE_MAJOR_VER = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
   const environment = "node";
 
   it("[dynamic sequence] should not require a sequence if execution runtime (and version) match '--environment' and '--env-version'", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment });
+    const result = callJsRandomnessPredictorCli({ environment });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.ok(jsonResult.isCorrect === true);
   });
@@ -22,7 +21,7 @@ describe("Node", () => {
     const expectedNumPreds = 64 - seqLength;
     const seq = Array.from({ length: seqLength }, Math.random);
     const expected = Array.from({ length: expectedNumPreds }, Math.random);
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq, predictions: numPreds });
+    const result = callJsRandomnessPredictorCli({ environment, sequence: seq, predictions: numPreds });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.equal(jsonResult.predictions.length, expectedNumPreds);
     assert.deepStrictEqual(jsonResult.predictions, expected);
@@ -38,12 +37,12 @@ describe("Node", () => {
       }
     }
     assert.ok(diffNodeMajor);
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, envVersion: diffNodeMajor });
+    const result = callJsRandomnessPredictorCli({ environment, envVersion: diffNodeMajor });
     assert.throws(() => stderrThrows(result));
   });
 
   it("should not require a sequence if specified --env-version matches current execution runtime version", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, envVersion: CURR_NODE_MAJOR_VER });
+    const result = callJsRandomnessPredictorCli({ environment, envVersion: CURR_NODE_MAJOR_VER });
     assert.doesNotThrow(() => stderrThrows(result));
   });
 
@@ -51,7 +50,7 @@ describe("Node", () => {
     // https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
     it("should trigger pool exhaustion", () => {
       const seq = Array.from({ length: 64 }, Math.random);
-      const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence: seq });
+      const result = callJsRandomnessPredictorCli({ environment, sequence: seq });
       assert.throws(() => stderrThrows(result));
     });
 
@@ -59,12 +58,9 @@ describe("Node", () => {
     // (predictions + sequence.length) due to pool exhaustion (see KNOWN_ISSUES.md).
     // This is to test that even though we are executing in an environment that has this limitation (node),
     // but specifying an environment that does NOT have this limitation (bun), we do not trigger the limit.
-    it("should NOT trigger pool exhaustion", async (thisTest) => {
-      // Idk if this is needed, but I'm going to reset it anyway..
-      thisTest.after(() => (process.env.JSRP_DRY_RUN = "0"));
-      process.env.JSRP_DRY_RUN = "1";
+    it("should NOT trigger pool exhaustion", async () => {
       const { sequence, expected } = queryDb({ runtime: "bun", tags: { sequence64: true } });
-      const result = jsRandomnessPredictor(BIN_PATH, { environment: "bun", sequence, predictions: expected.length });
+      const result = callJsRandomnessPredictorCli({ environment: "bun", sequence, predictions: expected.length }, { isDryRun: true });
       const json = JSON.parse(result.stdout);
       assert.equal(json._warnings?.length, 0, `\n\nGOT WARNINGS:\n${json._warnings?.reduce((a: string, s: string) => (a += s + ", "), "")}\n`);
     });

@@ -3,15 +3,14 @@ import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
 import { RuntimeType, RUNTIMES } from "../../src/types.ts";
-import jsRandomnessPredictor from "./jsRandomnessPredictorWrapper.ts";
+import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
-import BIN_PATH from "./entryPointPath.ts";
 
 describe("Base Tests", () => {
   it(`[${RUNTIMES.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
     RUNTIMES.forEach((e: RuntimeType) => {
-      const result = jsRandomnessPredictor(BIN_PATH, { environment: e, predictions: -1, sequence: [1, 2, 3] });
+      const result = callJsRandomnessPredictorCli({ environment: e, predictions: -1, sequence: [1, 2, 3] });
       assert.throws(() => stderrThrows(result));
     });
   });
@@ -36,32 +35,32 @@ describe("Export Predictor Results", () => {
   });
 
   it("export results to file", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath });
+    const result = callJsRandomnessPredictorCli({ environment, export: relativeExportPath });
     assert.doesNotThrow(() => stderrThrows(result));
     assert.ok(fs.existsSync(absoluteExportPath), "Exported file does not exist");
   });
 
   it("file does not get overwritten without --force", () => {
     const before = JSON.parse(fs.readFileSync(absoluteExportPath, "utf-8"));
-    jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath });
+    callJsRandomnessPredictorCli({ environment, export: relativeExportPath });
     const after = JSON.parse(fs.readFileSync(absoluteExportPath, "utf-8"));
     assert.deepEqual(before, after, `${JSON.stringify({ before, after }, null, 2)}`);
   });
 
   it("file is overwritten when --force is used", () => {
     const before = fs.readFileSync(absoluteExportPath, "utf-8");
-    jsRandomnessPredictor(BIN_PATH, { environment, export: relativeExportPath, force: true });
+    callJsRandomnessPredictorCli({ environment, export: relativeExportPath, force: true });
     const after = fs.readFileSync(absoluteExportPath, "utf-8");
     assert.notDeepStrictEqual(before, after);
   });
 
   it("directory does not get created when --force is not used", () => {
-    jsRandomnessPredictor(BIN_PATH, { environment, export: extendedRelativePath });
+    callJsRandomnessPredictorCli({ environment, export: extendedRelativePath });
     assert.strictEqual(fs.existsSync(extendedAbsolutePath), false);
   });
 
   it("directory gets created when --force is used", () => {
-    jsRandomnessPredictor(BIN_PATH, { environment, export: extendedRelativePath, force: true });
+    callJsRandomnessPredictorCli({ environment, export: extendedRelativePath, force: true });
     assert.strictEqual(fs.existsSync(extendedAbsolutePath), true);
   });
 });
@@ -72,13 +71,13 @@ describe("Firefox", () => {
 
   it("makes correct prediction(s)", () => {
     const { sequence, expected } = queryDb({ runtime, tags: {} });
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
+    const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
 
   it("enforces sequence", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment });
+    const result = callJsRandomnessPredictorCli({ environment });
     assert.throws(() => stderrThrows(result));
   });
 });
@@ -86,7 +85,7 @@ describe("Firefox", () => {
 describe("Chrome", () => {
   const environment = "chrome";
   it("enforces sequence", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment });
+    const result = callJsRandomnessPredictorCli({ environment });
     assert.throws(() => stderrThrows(result));
   });
 });
@@ -94,7 +93,7 @@ describe("Chrome", () => {
 describe("Safari", () => {
   const environment = "safari";
   it("enforces sequence", () => {
-    const result = jsRandomnessPredictor(BIN_PATH, { environment });
+    const result = callJsRandomnessPredictorCli({ environment });
     assert.throws(() => stderrThrows(result));
   });
 });
@@ -106,7 +105,7 @@ describe("Bun", () => {
   it("should be correct when using Array.fom", async () => {
     // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS.
     const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true } });
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
+    const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
@@ -114,7 +113,7 @@ describe("Bun", () => {
   it("should be correct when using Math.random() standalone calls", async () => {
     // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS.
     const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true } });
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
+    const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
@@ -127,7 +126,7 @@ describe("Deno", () => {
   it("should be correct when using Array.fom generated in REPL", async () => {
     // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS IN DENO REPL.
     const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
+    const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
@@ -135,7 +134,7 @@ describe("Deno", () => {
   it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
     // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS IN DENO REPL
     const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
-    const result = jsRandomnessPredictor(BIN_PATH, { environment, sequence, predictions: expected.length });
+    const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });

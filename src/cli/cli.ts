@@ -15,7 +15,7 @@ import { ServerRuntimeType, EXECUTION_RUNTIME_ENV_VAR_KEY } from "../types.js";
 
 // Relative paths.
 const denoImportMapRelative = "./deno_import_map.json";
-const jsrpRelative = "./js-randomness-predictor.ts";
+const jsrpRelative = "./js-randomness-predictor.js";
 
 // Node is our default execution runtime.
 const executionRuntime = process.env[EXECUTION_RUNTIME_ENV_VAR_KEY] || "node";
