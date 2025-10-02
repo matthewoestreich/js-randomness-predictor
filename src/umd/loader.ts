@@ -64,6 +64,7 @@ export default async function loader(): Promise<void> {
         } else {
           if (window.initZ3) {
             // @ts-ignore
+            // TODO : not sure this is needed, run some tests to make sure.
             window.initZ3 = initZ3;
             return;
           }
