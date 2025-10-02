@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import path from "path";
+import nodepath from "node:path";
 
 export default defineConfig({
   resolve: {
@@ -12,7 +12,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: path.resolve(__dirname, "./src/umd/index.ts"),
+      entry: nodepath.resolve(__dirname, "./src/umd/index.ts"),
       name: "JSRandomnessPredictor",
       formats: ["umd"],
       fileName: () => "js-randomness-predictor.js",
