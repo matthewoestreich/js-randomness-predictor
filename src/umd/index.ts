@@ -1,7 +1,7 @@
-import * as jsrp from "../index.js";
+import JSRandomnessPredictor from "../index.js";
 import loader from "./loader.js";
 
 // Invoke immediately upon page load.
 loader();
 
-export default { ...jsrp };
+export default { ...JSRandomnessPredictor };
