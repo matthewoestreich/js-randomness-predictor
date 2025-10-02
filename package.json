@@ -79,7 +79,7 @@
   },
   "dependencies": {
     "yargs": "^18.0.0",
-    "z3-solver-jsrp": "^4.15.3-republish"
+    "z3-solver-jsrp": "^4.15.3-republish.1"
   },
   "devDependencies": {
     "@types/bun": "^1.2.22",

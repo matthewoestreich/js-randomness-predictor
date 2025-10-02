@@ -1,5 +1,5 @@
 import JSRandomnessPredictor from "./index.js";
-import { BitVec, Solver, Context } from "z3-solver-jsrp";
+import { BitVec, Solver, Context, Z3HighLevel, Z3LowLevel } from "z3-solver-jsrp";
 
 /*********************************************************************************************************
  * CONSTANTS
@@ -70,6 +70,7 @@ export interface PredictorArgs {
  * TYPES
  *********************************************************************************************************/
 
+export type Z3Api = Z3HighLevel & Z3LowLevel;
 export type RuntimeType = (typeof RUNTIMES)[number];
 export type EngineType = (typeof JAVASCRIPT_ENGINES)[number];
 export type ServerRuntimeType = (typeof SERVER_RUNTIMES)[number];

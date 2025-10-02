@@ -1,35 +1,23 @@
 import { defineConfig } from "vite";
 import path from "path";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig({
-  server: {
-    headers: {
-      "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Embedder-Policy": "require-corp",
+  resolve: {
+    alias: {
+      // Alias these so our browser shim works correctly.
+      "z3-solver-jsrp": "./src/umd/shim.ts",
+      "z3-solver-jsrp-low-level": "z3-solver-jsrp/dist/build/browser/low-level",
+      "z3-solver-jsrp-high-level": "z3-solver-jsrp/dist/build/browser/high-level",
     },
   },
-  plugins: [
-    viteStaticCopy({
-      targets: [
-        //{
-        //  src: "node_modules/z3-solver/build/z3-built*",
-        //  dest: "", // Relative to `build.outDir`.
-        //},
-        {
-          src: "src/browser/coi/coi.serviceworker.js",
-          dest: "", // Relative to `build.outDir`.
-        },
-      ],
-    }),
-  ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, "./src/browser/index.ts"),
+      entry: path.resolve(__dirname, "./src/umd/index.ts"),
       name: "JSRandomnessPredictor",
       formats: ["umd"],
       fileName: () => "js-randomness-predictor.js",
     },
+    minify: true,
     outDir: "dist/umd",
     emptyOutDir: true,
   },
