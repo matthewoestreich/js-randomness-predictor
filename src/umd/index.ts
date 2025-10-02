@@ -4,4 +4,4 @@ import loader from "./loader.js";
 // Invoke immediately upon page load.
 loader();
 
-export default { ...JSRandomnessPredictor };
+export default JSRandomnessPredictor;
