@@ -9,16 +9,19 @@
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "browser": "./dist/umd/js-randomness-predictor.js",
-  "types": "dist/esm/index.d.ts",
+  "bin": {
+    "js-randomness-predictor": "./dist/esm/cli/cli.js"
+  },
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
+    },
+    "./umd": {
+      "import": "./dist/umd/js-randomness-predictor.js"
     }
   },
-  "bin": {
-    "js-randomness-predictor": "./dist/esm/cli/cli.js"
-  },
+  "types": "dist/esm/index.d.ts",
   "files": [
     "dist",
     "README.md"
@@ -32,7 +35,7 @@
     "printWidth": 150
   },
   "scripts": {
-    "prepublishOnly": "npm run build && npm run build:umd",
+    "prepublishOnly": "npm run build:all",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs",
     "build:all": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd",
     "postbuild": "node postbuild.cjs",
