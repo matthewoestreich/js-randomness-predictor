@@ -30,7 +30,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build && npm run build:umd",
-    "build": "rimraf dist && npm run build:esm && npm run build:cjs",
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd",
     "postbuild": "node postbuild.cjs",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
