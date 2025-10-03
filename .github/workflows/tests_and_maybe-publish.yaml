@@ -21,7 +21,7 @@ jobs:
         run: npm install --ignore-scripts
       - name: Build
         shell: bash
-        run: npm run build
+        run: npm run build:ci
       - name: Run tests
         shell: bash
         run: npm run test:imports
@@ -47,7 +47,7 @@ jobs:
         run: npm install --ignore-scripts
       - name: Build
         shell: bash
-        run: npm run build
+        run: npm run build:ci
       - name: Run tests
         shell: bash
         run: npm run test:cli
@@ -65,7 +65,7 @@ jobs:
         run: npm install --ignore-scripts
       - name: Build
         shell: bash
-        run: npm run build
+        run: npm run build:ci
       - name: Run tests
         shell: bash
         run: npm run test:node:versions:LE:16
@@ -88,7 +88,7 @@ jobs:
         run: npm install --ignore-scripts
       - name: Build
         shell: bash
-        run: npm run build
+        run: npm run build:ci
       - name: Run tests (>= v20.x)
         if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
         shell: bash
@@ -144,7 +144,7 @@ jobs:
         run: npm install --ignore-scripts
       - name: Build
         shell: bash
-        run: npm run build
+        run: npm run build:ci
       - name: Run tests
         shell: bash
         run: npm run test:chrome && npm run test:firefox && npm run test:safari

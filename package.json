@@ -6,6 +6,7 @@
   },
   "description": "Predict Math.random output in Node, Deno, Bun, Chrome, Firefox, and Safari",
   "type": "module",
+  "types": "dist/types/index.d.ts",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "browser": "./dist/umd/js-randomness-predictor.js",
@@ -18,11 +19,10 @@
       "require": "./dist/cjs/index.js"
     },
     "./umd": {
-      "default": "./dist/umd/js-randomness-predictor.js",
-      "types": "./dist/esm/index.d.ts"
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/umd/js-randomness-predictor.js"
     }
   },
-  "types": "dist/esm/index.d.ts",
   "files": [
     "dist",
     "README.md"
@@ -36,14 +36,14 @@
     "printWidth": 150
   },
   "scripts": {
-    "prepublishOnly": "npm run build:all",
-    "build": "rimraf dist && npm run build:esm && npm run build:cjs",
-    "build:all": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd",
+    "prepublishOnly": "npm run build",
     "postbuild": "node postbuild.cjs",
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run emit:types",
+    "build:ci": "npm run build:esm && npm run build:cjs",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
     "build:umd": "vite build",
-    "vite:serve": "vite serve",
+    "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:deno && npm run test:firefox && npm run test:chrome && npm run test:safari",
     "test:imports": "node --test tests/import/*.test.*",
     "test:node:versions:GE:20": "tsx --test tests/node/*.test.ts",
     "test:node:versions:17:18:19": "node tests/node/scripts/testVersionsWithoutNodeTest.cjs",
@@ -55,13 +55,13 @@
     "test:firefox": "tsx --test tests/firefox/*.test.ts",
     "test:chrome": "tsx --test tests/chrome/*.test.ts",
     "test:safari": "tsx --test tests/safari/*.test.ts",
-    "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:deno && npm run test:firefox && npm run test:chrome && npm run test:safari",
     "format": "prettier . --write",
     "lint": "eslint .",
+    "emit:types": "tsc -p tsconfig/tsconfig.types.json --emitDeclarationOnly",
+    "prepare": "husky",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
     "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
-    "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main",
-    "prepare": "husky"
+    "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
   },
   "keywords": [
     "predict-javascript-math-random",
