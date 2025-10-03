@@ -18,7 +18,8 @@
       "require": "./dist/cjs/index.js"
     },
     "./umd": {
-      "import": "./dist/umd/js-randomness-predictor.js"
+      "default": "./dist/umd/js-randomness-predictor.js",
+      "types": "./dist/esm/index.d.ts"
     }
   },
   "types": "dist/esm/index.d.ts",
