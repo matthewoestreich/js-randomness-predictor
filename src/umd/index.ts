@@ -1,14 +1,12 @@
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import JSRandomnessPredictor from "../index.js";
-import { BrowserRuntimeType, Predictor, SUPPORTED_BROWSER_RUNTIMES } from "../types.js";
+import { BrowserRuntimeType } from "../types.js";
 import loader from "./loader.js";
 
 // Invoke immediately upon page load.
 loader();
 
-export default JSRandomnessPredictor;
-
-export function getCurrentBrowser(): BrowserRuntimeType | undefined {
+function getCurrentBrowser(): BrowserRuntimeType | undefined {
   if (ExecutionRuntime.isChrome()) {
     return "chrome";
   }
@@ -20,3 +18,8 @@ export function getCurrentBrowser(): BrowserRuntimeType | undefined {
   }
   return undefined;
 }
+
+export default {
+  ...JSRandomnessPredictor,
+  getCurrentBrowser,
+};
