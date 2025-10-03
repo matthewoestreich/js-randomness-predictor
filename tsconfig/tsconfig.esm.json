@@ -7,7 +7,6 @@
     "outDir": "../dist/esm",
     "rootDir": "../src",
     "allowJs": false,
-    "declaration": true,
     "isolatedModules": true
   },
   "include": ["../src/**/*"],

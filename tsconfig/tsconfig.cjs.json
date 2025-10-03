@@ -7,7 +7,6 @@
     "lib": ["DOM", "es5"],
     "allowJs": true,
     "outDir": "../dist/cjs",
-    "declaration": true,
     "rootDir": "../src"
   },
   "include": ["../src/**/*"],
