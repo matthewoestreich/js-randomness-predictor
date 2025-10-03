@@ -39,7 +39,7 @@
     "prepublishOnly": "npm run build",
     "postbuild": "node postbuild.cjs",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run emit:types",
-    "build:ci": "npm run build:esm && npm run build:cjs",
+    "build:ci": "npm run build:esm && npm run build:cjs && npm run postbuild",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
     "build:umd": "vite build",
