@@ -1,9 +1,10 @@
-import JSRandomnessPredictor from "../index.js";
+import JSRandomnessPredictor from "../JSRandomnessPredictor.js";
 import exportResult from "./exportResults.js";
 import getCurrentNodeJsMajorVersion from "./getCurrentNodeJsMajorVersion.js";
 import callMathRandom from "../callMathRandom.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import { SequenceNotFoundError } from "../errors.js";
+import NodeRandomnessPredictor from "../predictors/Node.js";
 import {
   Predictor,
   PredictorArgs,
@@ -98,7 +99,7 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
     // Node version than they are currently running.
     if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && !nodeExecutionVersionMatchesArgvVersion) {
       const v = { major: Number(argv.envVersion), minor: 0, patch: 0 };
-      (predictor as ReturnType<typeof JSRandomnessPredictor.node>).setNodeVersion(v);
+      predictor.setNodeVersion?.(v);
     }
 
     // Make predictions

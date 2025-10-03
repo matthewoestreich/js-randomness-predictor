@@ -1,4 +1,3 @@
-import JSRandomnessPredictor from "./index.js";
 import { BitVec, Solver, Context, Z3HighLevel, Z3LowLevel } from "z3-solver-jsrp";
 
 /*********************************************************************************************************
@@ -63,6 +62,13 @@ export const SUPPORTED_BROWSER_RUNTIMES: Record<BrowserRuntimeType, boolean> = {
  * INTERFACES
  *********************************************************************************************************/
 
+// Interface which all predictors satisfy
+export interface Predictor {
+  sequence: number[];
+  predictNext(): Promise<number>;
+  setNodeVersion?(version: SemanticVersion): void;
+}
+
 export interface PredictorArgs {
   environment: RuntimeType;
   sequence?: number[];
@@ -77,11 +83,13 @@ export interface PredictorArgs {
  *********************************************************************************************************/
 
 export type Z3Api = Z3HighLevel & Z3LowLevel;
+export type PredictorCtorSequenceRequired = (sequence: number[]) => Predictor;
+export type PredictorCtorSequenceOptional = (sequence?: number[]) => Predictor;
+export type PredictorCtor = PredictorCtorSequenceRequired | PredictorCtorSequenceOptional;
 export type RuntimeType = (typeof RUNTIMES)[number];
 export type EngineType = (typeof JAVASCRIPT_ENGINES)[number];
 export type ServerRuntimeType = (typeof SERVER_RUNTIMES)[number];
 export type BrowserRuntimeType = (typeof BROWSER_RUNTIMES)[number];
-export type Predictor = ReturnType<(typeof JSRandomnessPredictor)[keyof typeof JSRandomnessPredictor]>;
 export type NodeJsMajorVersion = (typeof NODE_MAJOR_VERSIONS)[number];
 export type Pair<T> = [T, T];
 export type SymbolicXorShiftFn = (symbolicState: Pair<BitVec>) => void;

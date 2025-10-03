@@ -9,18 +9,23 @@
   "types": "./dist/types/index.d.ts",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "browser": "./dist/umd/js-randomness-predictor.js",
+  "browser": "./dist/umd/index.js",
   "bin": {
     "js-randomness-predictor": "./dist/esm/cli/cli.js"
   },
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
     "./umd": {
       "types": "./dist/types/umd/index.d.ts",
-      "default": "./dist/umd/js-randomness-predictor.js"
+      "default": "./dist/umd/index.js"
+    },
+    "./es": {
+      "types": "./dist/types",
+      "default": "./dist/es/index.js"
     }
   },
   "files": [
@@ -38,11 +43,12 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "postbuild": "node postbuild.cjs",
-    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run emit:types",
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:es && npm run emit:types",
     "build:ci": "npm run build:esm && npm run build:cjs && npm run postbuild",
-    "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
-    "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
-    "build:umd": "vite build",
+    "build:esm": "tsc -p configs/tsconfig.esm.json",
+    "build:cjs": "tsc -p configs/tsconfig.cjs.json",
+    "build:umd": "vite -c configs/vite.config.umd.ts build",
+    "build:es": "vite -c configs/vite.config.es.ts build",
     "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:deno && npm run test:firefox && npm run test:chrome && npm run test:safari",
     "test:imports": "node --test tests/import/*.test.*",
     "test:node:versions:GE:20": "tsx --test tests/node/*.test.ts",
@@ -58,7 +64,7 @@
     "format": "prettier . --write",
     "lint": "eslint .",
     "prepare": "husky",
-    "emit:types": "tsc -p tsconfig/tsconfig.types.json --emitDeclarationOnly",
+    "emit:types": "tsc -p configs/tsconfig.types.json --emitDeclarationOnly",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
     "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
     "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
