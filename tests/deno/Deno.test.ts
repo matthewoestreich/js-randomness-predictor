@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert";
-import JSRandomnessPredictor from "../../dist/esm/esm.js";
+import JSRandomnessPredictor from "../../dist/esm/builds/esm.js";
 
 function callMathRandom(nTimes = 1): number[] {
   const o: number[] = [];

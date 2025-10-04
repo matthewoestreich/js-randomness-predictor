@@ -12,7 +12,7 @@ import {
   SafariRandomnessPredictor,
   BunRandomnessPredictor,
   DenoRandomnessPredictor,
-} from "./predictors/index.js";
+} from "../predictors/index.js";
 
 export type {
   SemanticVersion,
@@ -21,7 +21,7 @@ export type {
   PredictorCtorSequenceOptional,
   PredictorCtorSequenceRequired,
   RuntimeType,
-} from "./types.js";
+} from "../types.js";
 
 module.exports = {
   node: (sequence?: number[]): NodeRandomnessPredictor => new NodeRandomnessPredictor(sequence),

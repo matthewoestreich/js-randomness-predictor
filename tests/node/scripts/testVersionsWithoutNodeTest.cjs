@@ -1,4 +1,4 @@
-const JsRandomnessPredictor = require("../../../dist/cjs/cjs.js");
+const JsRandomnessPredictor = require("../../../dist/cjs/builds/cjs.js");
 
 /**
  * This script is designed to be used in GitHub Actions.

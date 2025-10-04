@@ -12,5 +12,5 @@
     "moduleResolution": "node",
     "skipLibCheck": true
   },
-  "files": ["../src/cjs.ts"]
+  "files": ["../src/builds/cjs.ts"]
 }

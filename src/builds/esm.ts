@@ -5,7 +5,7 @@
  *
  *
  */
-import JSRandomnessPredictor from "./JSRandomnessPredictor.js";
+import JSRandomnessPredictor from "../JSRandomnessPredictor.js";
 
 export type {
   SemanticVersion,
@@ -14,7 +14,7 @@ export type {
   PredictorCtorSequenceOptional,
   PredictorCtorSequenceRequired,
   RuntimeType,
-} from "./types.js";
+} from "../types.js";
 
 export default JSRandomnessPredictor;
-export * from "./predictors/index.js";
+export * from "../predictors/index.js";

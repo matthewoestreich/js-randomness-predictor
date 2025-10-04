@@ -12,7 +12,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: nodepath.resolve(__dirname, "../src/es.ts"),
+      entry: nodepath.resolve(__dirname, "../src/builds/es.ts"),
       name: "JSRandomnessPredictor",
       formats: ["es"],
       fileName: () => "index.js",

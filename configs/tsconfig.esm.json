@@ -10,6 +10,6 @@
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true
   },
-  "files": ["../src/esm.ts"],
+  "files": ["../src/builds/esm.ts"],
   "include": ["../src/cli/**/*"]
 }

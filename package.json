@@ -7,8 +7,8 @@
   "description": "Predict Math.random output in Node, Deno, Bun, Chrome, Firefox, and Safari",
   "type": "module",
   "types": "./dist/types/index.d.ts",
-  "main": "./dist/cjs/cjs.js",
-  "module": "./dist/esm/esm.js",
+  "main": "./dist/cjs/builds/cjs.js",
+  "module": "./dist/esm/builds/esm.js",
   "browser": "./dist/umd/index.js",
   "bin": {
     "js-randomness-predictor": "./dist/esm/cli/cli.js"
@@ -16,8 +16,8 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/esm.js",
-      "require": "./dist/cjs/cjs.js"
+      "import": "./dist/esm/builds/esm.js",
+      "require": "./dist/cjs/builds/cjs.js"
     },
     "./umd": {
       "types": "./dist/types/index.d.ts",

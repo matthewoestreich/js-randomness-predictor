@@ -8,5 +8,5 @@
     "emitDeclarationOnly": true,
     "outFile": "../dist/types/index.d.ts"
   },
-  "files": ["../src/esm.ts"]
+  "files": ["../src/builds/esm.ts"]
 }

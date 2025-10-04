@@ -12,7 +12,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: nodepath.resolve(__dirname, "../src/umd.ts"),
+      entry: nodepath.resolve(__dirname, "../src/builds/umd.ts"),
       name: "JSRandomnessPredictor",
       formats: ["umd"],
       fileName: () => "index.js",
