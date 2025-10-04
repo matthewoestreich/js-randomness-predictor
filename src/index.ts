@@ -1,3 +1,4 @@
+import type { Predictor, SemanticVersion } from "./public_types.js";
 import {
   FirefoxRandomnessPredictor,
   ChromeRandomnessPredictor,
@@ -7,7 +8,7 @@ import {
   DenoRandomnessPredictor,
 } from "./public_types.js";
 
-export type * from "./public_types.js";
+export type { Predictor, SemanticVersion };
 
 const JSRandomnessPredictor = {
   node: (sequence?: number[]): NodeRandomnessPredictor => new NodeRandomnessPredictor(sequence),
@@ -19,6 +20,8 @@ const JSRandomnessPredictor = {
 };
 
 export default JSRandomnessPredictor;
+
+// To satisfy legacy users.
 export const node = JSRandomnessPredictor.node;
 export const firefox = JSRandomnessPredictor.firefox;
 export const chrome = JSRandomnessPredictor.chrome;

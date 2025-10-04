@@ -10,6 +10,7 @@ import {
 } from "../public_types.js";
 
 import type { BrowserRuntimeType } from "../types.js";
+import type { Predictor, SemanticVersion } from "../public_types.js";
 
 // Invoke immediately upon page load.
 loader();
@@ -37,17 +38,12 @@ const JSRandomnessPredictor = {
   getCurrentBrowser,
 };
 
-export type * from "../public_types.js";
-export type { BrowserRuntimeType };
+export type { BrowserRuntimeType, Predictor, SemanticVersion };
 
-export {
-  FirefoxRandomnessPredictor,
-  ChromeRandomnessPredictor,
-  NodeRandomnessPredictor,
-  SafariRandomnessPredictor,
-  BunRandomnessPredictor,
-  DenoRandomnessPredictor,
-};
-
-// @ts-ignore
-export = JSRandomnessPredictor;
+module.exports = JSRandomnessPredictor;
+module.exports.FirefoxRandomnessPredictor = FirefoxRandomnessPredictor;
+module.exports.ChromeRandomnessPredictor = ChromeRandomnessPredictor;
+module.exports.NodeRandomnessPredictor = NodeRandomnessPredictor;
+module.exports.SafariRandomnessPredictor = SafariRandomnessPredictor;
+module.exports.BunRandomnessPredictor = BunRandomnessPredictor;
+module.exports.DenoRandomnessPredictor = DenoRandomnessPredictor;
