@@ -19,6 +19,12 @@ const JSRandomnessPredictor = {
 };
 
 export default JSRandomnessPredictor;
+export const node = JSRandomnessPredictor.node;
+export const firefox = JSRandomnessPredictor.firefox;
+export const chrome = JSRandomnessPredictor.chrome;
+export const safari = JSRandomnessPredictor.safari;
+export const bun = JSRandomnessPredictor.bun;
+export const deno = JSRandomnessPredictor.deno;
 
 export {
   FirefoxRandomnessPredictor,
