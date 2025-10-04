@@ -9,7 +9,7 @@
   "types": "./dist/types/index.d.ts",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "browser": "./dist/umd/js-randomness-predictor.js",
+  "browser": "./dist/browser/js-randomness-predictor.js",
   "bin": {
     "js-randomness-predictor": "./dist/esm/cli/cli.js"
   },
@@ -19,9 +19,9 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
-    "./umd": {
-      "types": "./dist/types/umd/index.d.ts",
-      "default": "./dist/umd/js-randomness-predictor.js"
+    "./browser": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/browser/index.js"
     }
   },
   "files": [
@@ -39,11 +39,12 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "postbuild": "node postbuild.cjs",
-    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run emit:types",
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:browser:cjs && npm run emit:types",
     "build:ci": "npm run build:esm && npm run build:cjs && npm run postbuild",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
-    "build:umd": "vite build",
+    "build:umd": "BUILD_TARGET='umd' vite build",
+    "build:browser:cjs": "BUILD_TARGET='cjs' vite build",
     "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:deno && npm run test:firefox && npm run test:chrome && npm run test:safari",
     "test:imports": "node --test tests/import/*.test.*",
     "test:node:versions:GE:20": "tsx --test tests/node/*.test.ts",

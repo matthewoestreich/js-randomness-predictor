@@ -1,6 +1,8 @@
 .DS_Store
 build/
 .vscode
+deno.lock
+bun.lock
 
 # Logs
 logs
