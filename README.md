@@ -67,7 +67,7 @@ import JSRandomnessPredictor from "npm:js-randomness-predictor";
 
 ## Frontend/Browser
 
-Browser usage is a little painful. :grimacing: [Please see here for more info]() **THIS GUIDE INCUDES dev servers, eg. the dev servers that `vite`, `webpack`, etc.. offer.**
+Browser usage is a little painful. :grimacing: [Please see here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md) **THIS GUIDE INCUDES dev servers, eg. the dev servers that `vite`, `webpack`, etc.. offer.**
 
 # Node Predictor
 
