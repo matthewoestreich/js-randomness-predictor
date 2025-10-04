@@ -1,14 +1,13 @@
-// prettier-ignore
 import {
-  FirefoxRandomnessPredictor, 
-  ChromeRandomnessPredictor, 
+  FirefoxRandomnessPredictor,
+  ChromeRandomnessPredictor,
   NodeRandomnessPredictor,
   SafariRandomnessPredictor,
   BunRandomnessPredictor,
   DenoRandomnessPredictor,
-} from "./predictors/index.js";
+} from "./public_types.js";
 
-export type { SemanticVersion as NodeJsVersion } from "./types.js";
+export type * from "./public_types.js";
 
 const JSRandomnessPredictor = {
   node: (sequence?: number[]): NodeRandomnessPredictor => new NodeRandomnessPredictor(sequence),
@@ -20,9 +19,12 @@ const JSRandomnessPredictor = {
 };
 
 export default JSRandomnessPredictor;
-export const node = JSRandomnessPredictor.node;
-export const firefox = JSRandomnessPredictor.firefox;
-export const chrome = JSRandomnessPredictor.chrome;
-export const safari = JSRandomnessPredictor.safari;
-export const bun = JSRandomnessPredictor.bun;
-export const deno = JSRandomnessPredictor.deno;
+
+export {
+  FirefoxRandomnessPredictor,
+  ChromeRandomnessPredictor,
+  NodeRandomnessPredictor,
+  SafariRandomnessPredictor,
+  BunRandomnessPredictor,
+  DenoRandomnessPredictor,
+};

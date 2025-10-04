@@ -98,7 +98,7 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
     // Node version than they are currently running.
     if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && !nodeExecutionVersionMatchesArgvVersion) {
       const v = { major: Number(argv.envVersion), minor: 0, patch: 0 };
-      (predictor as ReturnType<typeof JSRandomnessPredictor.node>).setNodeVersion(v);
+      predictor.setNodeVersion?.(v);
     }
 
     // Make predictions

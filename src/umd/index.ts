@@ -1,18 +1,31 @@
 import loader from "./loader.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
-import { BrowserRuntimeType } from "../types.js";
-// prettier-ignore
 import {
-  FirefoxRandomnessPredictor, 
-  ChromeRandomnessPredictor, 
+  FirefoxRandomnessPredictor,
+  ChromeRandomnessPredictor,
   NodeRandomnessPredictor,
   SafariRandomnessPredictor,
   BunRandomnessPredictor,
   DenoRandomnessPredictor,
-} from "../predictors/index.js";
+} from "../public_types.js";
+
+import type { BrowserRuntimeType } from "../types.js";
 
 // Invoke immediately upon page load.
 loader();
+
+function getCurrentBrowser(): BrowserRuntimeType | undefined {
+  if (ExecutionRuntime.isChrome()) {
+    return "chrome";
+  }
+  if (ExecutionRuntime.isSafari()) {
+    return "safari";
+  }
+  if (ExecutionRuntime.isFirefox()) {
+    return "firefox";
+  }
+  return undefined;
+}
 
 const JSRandomnessPredictor = {
   node: (sequence?: number[]): NodeRandomnessPredictor => new NodeRandomnessPredictor(sequence),
@@ -21,28 +34,20 @@ const JSRandomnessPredictor = {
   safari: (sequence: number[]): SafariRandomnessPredictor => new SafariRandomnessPredictor(sequence),
   bun: (sequence?: number[]): BunRandomnessPredictor => new BunRandomnessPredictor(sequence),
   deno: (sequence?: number[]): DenoRandomnessPredictor => new DenoRandomnessPredictor(sequence),
-  getCurrentBrowser: (): BrowserRuntimeType | undefined => {
-    if (ExecutionRuntime.isChrome()) {
-      return "chrome";
-    }
-    if (ExecutionRuntime.isSafari()) {
-      return "safari";
-    }
-    if (ExecutionRuntime.isFirefox()) {
-      return "firefox";
-    }
-    return undefined;
-  },
+  getCurrentBrowser,
 };
 
-export type { SemanticVersion as NodeJsVersion } from "../types.js";
+export type * from "../public_types.js";
+export type { BrowserRuntimeType };
 
-export declare const node: (sequence?: number[]) => NodeRandomnessPredictor;
-export declare const firefox: (sequence: number[]) => FirefoxRandomnessPredictor;
-export declare const chrome: (sequence: number[]) => ChromeRandomnessPredictor;
-export declare const safari: (sequence: number[]) => SafariRandomnessPredictor;
-export declare const bun: (sequence?: number[]) => BunRandomnessPredictor;
-export declare const deno: (sequence?: number[]) => DenoRandomnessPredictor;
-export declare const getCurrentBrowser: () => BrowserRuntimeType | undefined;
+export {
+  FirefoxRandomnessPredictor,
+  ChromeRandomnessPredictor,
+  NodeRandomnessPredictor,
+  SafariRandomnessPredictor,
+  BunRandomnessPredictor,
+  DenoRandomnessPredictor,
+};
 
-export default JSRandomnessPredictor;
+// @ts-ignore
+export = JSRandomnessPredictor;
