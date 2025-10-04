@@ -24,11 +24,6 @@ const safari = (sequence: number[]): SafariRandomnessPredictor => new SafariRand
 const bun = (sequence?: number[]): BunRandomnessPredictor => new BunRandomnessPredictor(sequence);
 const deno = (sequence?: number[]): DenoRandomnessPredictor => new DenoRandomnessPredictor(sequence);
 
-/********** For CJS browser builds *************/
-const JSRandomnessPredictor = { node, firefox, chrome, safari, bun, deno };
-exports = JSRandomnessPredictor;
-/***********************************************/
-
 export {
   FirefoxRandomnessPredictor,
   ChromeRandomnessPredictor,

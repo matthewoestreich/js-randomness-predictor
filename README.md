@@ -65,6 +65,10 @@ const JSRandomnessPredictor = require("js-randomness-predictor");
 import JSRandomnessPredictor from "npm:js-randomness-predictor";
 ```
 
+## Frontend/Browser
+
+Browser usage is a little painful. :grimacing: [Please see here for more info]() **THIS GUIDE INCUDES dev servers, eg. the dev servers that `vite`, `webpack`, etc.. offer.**
+
 # Node Predictor
 
 **[See known Node issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#node)**
@@ -279,6 +283,18 @@ $ JSRP_RUNTIME=deno js-randomness-predictor -e bun # ERROR `--sequence` IS requi
 
 # This will use the Node runtime to run the CLI
 $ js-randomness-predictor [args]
+```
+
+**Windows is a little different**
+
+```shell
+# Via 'cmd'
+C:\>set JSRP_RUNTIME=bun && js-randomness-predictor [...]
+```
+
+```powershell
+# Via 'PowerShell'
+PS C:\> $env:JSRP_RUNTIME = "bun" ; js-randomness-predictor [...]
 ```
 
 ## Export Predictor Results
