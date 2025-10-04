@@ -46,6 +46,6 @@ export default defineConfig({
   },
   build: {
     ...BUILD,
-    minify: true,
+    minify: false,
   },
 });
