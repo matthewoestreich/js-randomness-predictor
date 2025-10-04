@@ -7,8 +7,8 @@
   "description": "Predict Math.random output in Node, Deno, Bun, Chrome, Firefox, and Safari",
   "type": "module",
   "types": "./dist/types/index.d.ts",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "main": "./dist/cjs/cjs.js",
+  "module": "./dist/esm/esm.js",
   "browser": "./dist/umd/index.js",
   "bin": {
     "js-randomness-predictor": "./dist/esm/cli/cli.js"
@@ -16,15 +16,15 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": "./dist/esm/esm.js",
+      "require": "./dist/cjs/cjs.js"
     },
     "./umd": {
-      "types": "./dist/types/umd/index.d.ts",
+      "types": "./dist/types/index.d.ts",
       "default": "./dist/umd/index.js"
     },
     "./es": {
-      "types": "./dist/types",
+      "types": "./dist/types/index.d.ts",
       "default": "./dist/es/index.js"
     }
   },
@@ -64,7 +64,7 @@
     "format": "prettier . --write",
     "lint": "eslint .",
     "prepare": "husky",
-    "emit:types": "tsc -p configs/tsconfig.types.json --emitDeclarationOnly",
+    "emit:types": "tsc -p configs/tsconfig.types.json",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
     "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
     "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
