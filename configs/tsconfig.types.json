@@ -6,7 +6,7 @@
     "module": "nodenext",
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outFile": "../dist/types/index.d.ts"
+    "outDir": "../dist/types"
   },
-  "files": ["../src/builds/esm.ts"]
+  "include": ["../src/**/*"]
 }

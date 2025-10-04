@@ -6,7 +6,7 @@
   },
   "description": "Predict Math.random output in Node, Deno, Bun, Chrome, Firefox, and Safari",
   "type": "module",
-  "types": "./dist/types/index.d.ts",
+  "types": "./dist/types/builds//esm.d.ts",
   "main": "./dist/cjs/builds/cjs.js",
   "module": "./dist/esm/builds/esm.js",
   "browser": "./dist/umd/index.js",
@@ -15,16 +15,16 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/types/builds/esm.d.ts",
       "import": "./dist/esm/builds/esm.js",
       "require": "./dist/cjs/builds/cjs.js"
     },
     "./umd": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/types/builds/esm.d.ts",
       "default": "./dist/umd/index.js"
     },
     "./es": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/types/builds/es.d.ts",
       "default": "./dist/es/index.js"
     }
   },
