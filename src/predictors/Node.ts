@@ -76,7 +76,7 @@ export default class NodeRandomnessPredictor {
   }
 
   async predictNext(): Promise<number> {
-    if (this.#concreteState[0] === 0n || this.#concreteState[1] === 0n) {
+    if (this.#concreteState[0] === 0n && this.#concreteState[1] === 0n) {
       await this.#solveSymbolicState();
     }
     // Calculate next random number before we modify concrete state.
