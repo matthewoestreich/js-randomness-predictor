@@ -1,10 +1,9 @@
 import nodepath from "node:path";
-import nodefs from "node:fs";
 import { spawnSync, SpawnSyncReturns, SpawnSyncOptionsWithStringEncoding } from "node:child_process";
 import { PredictorArgs } from "../../src/types.ts";
 import { CallJsRandomnessPredictorCliExtendedOptions } from "../types.ts";
 
-const JSRP_CLI_PATH = nodepath.resolve(import.meta.dirname, "../../dist/esm/cli/cli.js");
+const JSRP_CLI_PATH = nodepath.resolve(import.meta.dirname, "../../dist/cli/cli.js");
 
 /**
  * Programmatically call js-randomness-predictor CLI

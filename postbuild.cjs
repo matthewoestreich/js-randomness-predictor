@@ -56,7 +56,7 @@ function createPackageJsonIn_Dist_Esm(distPath = "") {
   }
   try {
     mkdirSync(distPath, { recursive: true });
-    const pkgJson = { type: "module" };
+    const pkgJson = { type: "module", types: "../types/index.d.ts" };
     const pkgJsonString = JSON.stringify(pkgJson, null, 2);
     const outFile = resolve(__dirname, distPath, "package.json");
     writeFileSync(outFile, pkgJsonString);
@@ -90,12 +90,12 @@ function createPackageJsonIn_Dist_Browser_Cjs(distPath = "") {
  */
 function copyImportMapToBuild(importMapPath = "") {
   if (importMapPath === "") {
-    throw new Error("[postbuild.js][copy import map for CLI build (/dist/esm/cli/)] need import map for deno");
+    throw new Error("[postbuild.js][copy import map for CLI build (/dist/cli/)] need import map for deno");
   }
   try {
-    const copyToPath = resolve(__dirname, "./dist/esm/cli/deno_import_map.json");
+    const copyToPath = resolve(__dirname, "./dist/cli/deno_import_map.json");
     copyFileSync(importMapPath, copyToPath);
   } catch (e) {
-    throw new Error(`[postbuild.js][copy import map for CLI build (/dist/esm/cli/)] GOT ERROR : ${e.message}`);
+    throw new Error(`[postbuild.js][copy import map for CLI build (/dist/cli/)] GOT ERROR : ${e.message}`);
   }
 }

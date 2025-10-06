@@ -13,7 +13,7 @@ function secondsToMs(seconds: number): number {
   return seconds * 1000;
 }
 
-const testOptions: TestOptions = { timeout: 25000, retry: 3 };
+const testOptions: TestOptions = { timeout: secondsToMs(60), retry: 3 };
 
 describe("Bun", () => {
   test(

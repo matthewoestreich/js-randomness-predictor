@@ -4,12 +4,14 @@
     "target": "esnext",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "outDir": "../dist-staging/esm",
+    "outDir": "../dist-staging",
     "rootDir": "../src",
     "allowJs": false,
     "isolatedModules": true,
     "removeComments": true
   },
-  "include": ["../src/**/*"],
-  "exclude": ["../node_modules/", "../**/*.test.*", "../src/browser/**/*", "../src/cli/**/*"]
+  "files": ["../src/cli/cli.ts"],
+  "include": ["../src/**/*"]
+  //"include": ["../src/**/*"],
+  //"exclude": ["../node_modules/", "../**/*.test.*", "../src/browser/**/*"]
 }
