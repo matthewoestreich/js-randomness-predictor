@@ -4,7 +4,7 @@ import { spawnSync, SpawnSyncReturns, SpawnSyncOptionsWithStringEncoding } from 
 import { PredictorArgs } from "../../src/types.ts";
 import { CallJsRandomnessPredictorCliExtendedOptions } from "../types.ts";
 
-const JSRP_CLI_PATH = nodepath.resolve(import.meta.dirname, "../../dist/esm/cli/cli.js");
+const JSRP_CLI_PATH = nodepath.resolve(import.meta.dirname, "../../dist/cli/cli.js");
 
 /**
  * Programmatically call js-randomness-predictor CLI

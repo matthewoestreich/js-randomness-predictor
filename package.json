@@ -11,7 +11,7 @@
   "module": "./dist/esm/index.js",
   "browser": "./dist/browser/js-randomness-predictor.js",
   "bin": {
-    "js-randomness-predictor": "./dist/esm/cli/cli.js"
+    "js-randomness-predictor": "./dist/cli/cli.js"
   },
   "exports": {
     ".": {
@@ -39,10 +39,12 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "postbuild": "node postbuild.cjs",
-    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:browser:cjs && npm run emit:types",
+    "clean:build": "rimraf dist && rimraf dist-staging",
+    "build": "npm run clean:build && npm run build:esm && npm run build:cli && npm run build:cjs && npm run build:umd && npm run build:browser:cjs && npm run emit:types && npm run minify",
     "build:ci": "npm run build:esm && npm run build:cjs && npm run postbuild",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
+    "build:cli": "tsc -p tsconfig/tsconfig.esm.cli.json",
     "build:umd": "BUILD_TARGET='umd' vite build",
     "build:browser:cjs": "BUILD_TARGET='cjs' vite build",
     "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:deno && npm run test:firefox && npm run test:chrome && npm run test:safari",
@@ -60,6 +62,7 @@
     "format": "prettier . --write",
     "lint": "eslint .",
     "prepare": "husky",
+    "minify": "rollup -c",
     "emit:types": "tsc -p tsconfig/tsconfig.types.json --emitDeclarationOnly",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
     "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
@@ -92,6 +95,8 @@
     "z3-solver-jsrp": "^4.15.3-republish.1"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.2",
     "@types/bun": "^1.2.22",
     "@types/eslint": "^9.6.1",
     "@types/node": "^24.3.3",
@@ -106,6 +111,8 @@
     "lint-staged": "^16.2.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
+    "rollup": "^4.52.4",
+    "rollup-plugin-esbuild-minify": "^1.3.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vite": "^7.1.5",

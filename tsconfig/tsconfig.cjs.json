@@ -6,7 +6,7 @@
     "moduleResolution": "node",
     "lib": ["DOM", "es5"],
     "allowJs": true,
-    "outDir": "../dist/cjs",
+    "outDir": "../dist-staging/cjs",
     "rootDir": "../src",
     "removeComments": true
   },
