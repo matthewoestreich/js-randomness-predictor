@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync, copyFileSync } from "node:fs";
-import { resolve } from "node:path";
+const { mkdirSync, writeFileSync, copyFileSync } = require("node:fs");
+const { resolve } = require("node:path");
 
-createPackageJsonIn_Dist_Cjs(resolve(import.meta.dirname, "./dist/cjs"));
-//createPackageJsonIn_Dist_Umd(resolve(import.meta.dirname, "./dist/umd"));
-createPackageJsonIn_Dist_Browser_Cjs(resolve(import.meta.dirname, "./dist/browser"));
-createPackageJsonIn_Dist_Esm(resolve(import.meta.dirname, "./dist/esm"));
-copyImportMapToBuild(resolve(import.meta.dirname, "./src/cli/deno_import_map.json"));
+createPackageJsonIn_Dist_Cjs(resolve(__dirname, "./dist/cjs"));
+//createPackageJsonIn_Dist_Umd(resolve(__dirname, "./dist/umd"));
+createPackageJsonIn_Dist_Browser_Cjs(resolve(__dirname, "./dist/browser"));
+createPackageJsonIn_Dist_Esm(resolve(__dirname, "./dist/esm"));
+copyImportMapToBuild(resolve(__dirname, "./src/cli/deno_import_map.json"));
 
 /**
  * For the cjs build
@@ -20,7 +20,7 @@ function createPackageJsonIn_Dist_Cjs(distPath = "") {
     mkdirSync(distPath, { recursive: true });
     const pkgJson = { type: "commonjs" };
     const pkgJsonString = JSON.stringify(pkgJson, null, 2);
-    const outFile = resolve(import.meta.dirname, distPath, "package.json");
+    const outFile = resolve(__dirname, distPath, "package.json");
     writeFileSync(outFile, pkgJsonString);
   } catch (e) {
     throw new Error(`[postbuild.js][create package.json in /dist/cjs/] GOT ERROR : ${e.message}`);
@@ -39,7 +39,7 @@ function createPackageJsonIn_Dist_Umd(distPath = "") {
     mkdirSync(distPath, { recursive: true });
     const pkgJson = { types: "../types/umd/index.d.ts" };
     const pkgJsonString = JSON.stringify(pkgJson, null, 2);
-    const outFile = resolve(import.meta.dirname, distPath, "package.json");
+    const outFile = resolve(__dirname, distPath, "package.json");
     writeFileSync(outFile, pkgJsonString);
   } catch (e) {
     throw new Error(`[postbuild.js][create package.json in /dist/umd/] GOT ERROR : ${e.message}`);
@@ -58,7 +58,7 @@ function createPackageJsonIn_Dist_Esm(distPath = "") {
     mkdirSync(distPath, { recursive: true });
     const pkgJson = { type: "module" };
     const pkgJsonString = JSON.stringify(pkgJson, null, 2);
-    const outFile = resolve(import.meta.dirname, distPath, "package.json");
+    const outFile = resolve(__dirname, distPath, "package.json");
     writeFileSync(outFile, pkgJsonString);
   } catch (e) {
     throw new Error(`[postbuild.js][create package.json in /dist/esm/] GOT ERROR : ${e.message}`);
@@ -77,7 +77,7 @@ function createPackageJsonIn_Dist_Browser_Cjs(distPath = "") {
     mkdirSync(distPath, { recursive: true });
     const pkgJson = { type: "commonjs" };
     const pkgJsonString = JSON.stringify(pkgJson, null, 2);
-    const outFile = resolve(import.meta.dirname, distPath, "package.json");
+    const outFile = resolve(__dirname, distPath, "package.json");
     writeFileSync(outFile, pkgJsonString);
   } catch (e) {
     throw new Error(`[postbuild.js][create package.json in /dist/browser/cjs/] GOT ERROR : ${e.message}`);
@@ -93,7 +93,7 @@ function copyImportMapToBuild(importMapPath = "") {
     throw new Error("[postbuild.js][copy import map for CLI build (/dist/esm/cli/)] need import map for deno");
   }
   try {
-    const copyToPath = resolve(import.meta.dirname, "./dist/esm/cli/deno_import_map.json");
+    const copyToPath = resolve(__dirname, "./dist/esm/cli/deno_import_map.json");
     copyFileSync(importMapPath, copyToPath);
   } catch (e) {
     throw new Error(`[postbuild.js][copy import map for CLI build (/dist/esm/cli/)] GOT ERROR : ${e.message}`);
