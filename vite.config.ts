@@ -33,6 +33,9 @@ if (BUILD_TARGET === "cjs") {
     fileName: () => "index.js",
   };
   BUILD.outDir = "dist/browser";
+  BUILD.rollupOptions = {
+    external: ["z3-solver-jsrp"],
+  };
 }
 
 export default defineConfig({
@@ -46,9 +49,6 @@ export default defineConfig({
   },
   build: {
     minify: true,
-    rollupOptions: {
-      external: ["z3-solver-jsrp"],
-    },
     ...BUILD,
   },
 });
