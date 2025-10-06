@@ -3,6 +3,7 @@ build/
 .vscode
 deno.lock
 bun.lock
+dist-staging
 
 # Logs
 logs
