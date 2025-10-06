@@ -7,8 +7,9 @@
     "lib": ["DOM", "es5"],
     "allowJs": true,
     "outDir": "../dist/cjs",
-    "rootDir": "../src"
+    "rootDir": "../src",
+    "removeComments": true
   },
   "include": ["../src/**/*"],
-  "exclude": ["../node_modules", "../**/*.test.*", "../src/cli/**/*", "../src/umd/**/*"]
+  "exclude": ["../node_modules", "../**/*.test.*", "../src/cli/**/*", "../src/browser/**/*"]
 }
