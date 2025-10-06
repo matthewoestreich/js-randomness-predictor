@@ -41,7 +41,7 @@
     "postbuild": "node postbuild.cjs",
     "clean:build": "rimraf dist && rimraf dist-staging",
     "build": "npm run clean:build && npm run build:esm && npm run build:cli && npm run build:cjs && npm run build:umd && npm run build:browser:cjs && npm run emit:types && npm run minify",
-    "build:ci": "npm run build:esm && npm run build:cjs && npm run build:cli && npm run minify && npm run postbuild",
+    "build:ci": "npm run build:esm && npm run build:cjs && npm run build:cli && npm i -D @esbuild/linux-x64 && npm run minify && npm run postbuild",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
     "build:cli": "tsc -p tsconfig/tsconfig.esm.cli.json",
