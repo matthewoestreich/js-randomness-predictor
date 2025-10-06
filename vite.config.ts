@@ -45,7 +45,10 @@ export default defineConfig({
     },
   },
   build: {
-    ...BUILD,
     minify: true,
+    rollupOptions: {
+      external: ["z3-solver-jsrp"],
+    },
+    ...BUILD,
   },
 });

@@ -38,7 +38,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "postbuild": "node postbuild.cjs",
+    "postbuild": "node postbuild.js",
     "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:browser:cjs && npm run emit:types",
     "build:ci": "npm run build:esm && npm run build:cjs && npm run postbuild",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
