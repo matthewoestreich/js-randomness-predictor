@@ -1,5 +1,4 @@
 import nodepath from "node:path";
-import nodefs from "node:fs";
 import { spawnSync, SpawnSyncReturns, SpawnSyncOptionsWithStringEncoding } from "node:child_process";
 import { PredictorArgs } from "../../src/types.ts";
 import { CallJsRandomnessPredictorCliExtendedOptions } from "../types.ts";
