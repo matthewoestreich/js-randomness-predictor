@@ -45,8 +45,4 @@ if (executionRuntime === "deno") {
   childProcessOptions.env!.DENO_COMPAT = "1";
 }
 
-const finalCmd = `${executionRuntime.toString()} ${childProcessArgs.join(" ")}`;
-
-console.log(finalCmd);
-
-spawnSync(finalCmd, childProcessOptions);
+spawnSync(`${executionRuntime.toString()} ${childProcessArgs.join(" ")}`, childProcessOptions);
