@@ -6,12 +6,19 @@ import { globSync } from "glob";
 
 // For minifying built ts files
 
+let __dirname__ = "";
+if (typeof __dirname === "undefined") {
+  __dirname__ = import.meta.dirname;
+} else {
+  __dirname__ = __dirname;
+}
+
 export default [
   /***************** Server-side CJS Build ******************/
   {
-    input: nodepath.resolve(import.meta.dirname, "../dist/staging/cjs/index.js"),
+    input: nodepath.resolve(__dirname__, "../dist/staging/cjs/index.js"),
     output: {
-      file: nodepath.resolve(import.meta.dirname, "../dist/cjs/index.js"),
+      file: nodepath.resolve(__dirname__, "../dist/cjs/index.js"),
       format: "cjs",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), commonjs(), minify()],
@@ -19,9 +26,9 @@ export default [
   },
   /***************** Server-side ESM Build ******************/
   {
-    input: nodepath.resolve(import.meta.dirname, "../dist/staging/esm/index.js"),
+    input: nodepath.resolve(__dirname__, "../dist/staging/esm/index.js"),
     output: {
-      file: nodepath.resolve(import.meta.dirname, "../dist/esm/index.js"),
+      file: nodepath.resolve(__dirname__, "../dist/esm/index.js"),
       format: "esm",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), minify()],
@@ -29,9 +36,9 @@ export default [
   },
   /*********************** CLI Build ************************/
   {
-    input: globSync(nodepath.resolve(import.meta.dirname, "../dist/staging/cli/cli/**/*.js")),
+    input: globSync(nodepath.resolve(__dirname__, "../dist/staging/cli/cli/**/*.js")),
     output: {
-      dir: nodepath.resolve(import.meta.dirname, "../dist/cli"),
+      dir: nodepath.resolve(__dirname__, "../dist/cli"),
       format: "esm",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), minify()],
