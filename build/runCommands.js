@@ -61,16 +61,17 @@ function logFullCommand(fullCommand) {
 function parseArgIntoJson() {
   const argv = process.argv.slice(2);
   const argc = argv.length;
+  const program = nodepath.basename(import.meta.filename);
   if (argc !== 1) {
-    throw new Error(`Expected one arg! Got ${argc}\n Usage:\n${__filename} /some/json/file.json`);
+    throw new Error(`Expected one arg! ${red(`Got ${argc}\n Usage:\n${program} /some/json/file.json\n`)}`);
   }
   const relativePath = argv[0];
   if (!relativePath.endsWith(".json")) {
-    throw new Error(`Expected json file path! Got ${relativePath}\n Usage:\n${__filename} /some/json/file.json`);
+    throw new Error(`Expected json file path! ${red(`Got ${relativePath}\n Usage:\n${program} /some/json/file.json\n`)}`);
   }
   const absolutePath = nodepath.resolve(import.meta.dirname, relativePath);
   if (!nodefs.existsSync(absolutePath)) {
-    throw new Error(`JSON file does not exist at path! Got ${absolutePath}\n Usage:\n${__filename} /some/json/file.json`);
+    throw new Error(`JSON file does not exist at path! ${red(`Got ${absolutePath}\n Usage:\n${program} /some/json/file.json\n`)}`);
   }
   return JSON.parse(nodefs.readFileSync(absolutePath, "utf-8"));
 }
