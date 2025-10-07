@@ -26,7 +26,11 @@ const jsrpArgs = process.argv.slice(2);
 // These are the args for the child process we are about to run.
 const childProcessArgs = [js_randomness_predictor, ...jsrpArgs];
 // Options for child process we are about to run.
-const childProcessOptions: SpawnSyncOptionsWithBufferEncoding = { stdio: "inherit", env: { ...process.env } };
+const childProcessOptions: SpawnSyncOptionsWithBufferEncoding = {
+  stdio: "inherit",
+  env: { ...process.env },
+  shell: true, // Must be true for Windows...
+};
 
 // Deno is so special!
 if (executionRuntime === "deno") {
@@ -41,15 +45,4 @@ if (executionRuntime === "deno") {
   childProcessOptions.env!.DENO_COMPAT = "1";
 }
 
-// Freakin Windows, man...
-// With 'shell: true' Windows will show DEP warnings about passing args.
-// > (node:2164) [DEP0190] DeprecationWarning: Passing args to a child process with shell
-// > option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
-// > (Use `node --trace-deprecation ...` to show where the warning was created)
-if (process.platform === "win32") {
-  process.env.NODE_OPTIONS = "--no-deprecation";
-  childProcessOptions.env!.NODE_OPTIONS = "--no-deprecation";
-  childProcessOptions.shell = true;
-}
-
-spawnSync(executionRuntime.toString(), childProcessArgs, childProcessOptions);
+spawnSync(`${executionRuntime.toString()} ${childProcessArgs.join(" ")}`, childProcessOptions);
