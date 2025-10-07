@@ -42,7 +42,12 @@ if (executionRuntime === "deno") {
 }
 
 // Freakin Windows, man...
+// With 'shell: true' Windows will show DEP warnings about passing args.
+// > (node:2164) [DEP0190] DeprecationWarning: Passing args to a child process with shell
+// > option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+// > (Use `node --trace-deprecation ...` to show where the warning was created)
 if (process.platform === "win32") {
+  process.env.NODE_NO_WARNINGS = "1";
   childProcessOptions.env!.NODE_NO_WARNINGS = "1";
   childProcessOptions.shell = true;
 }
