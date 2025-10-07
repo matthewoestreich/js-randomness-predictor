@@ -63,7 +63,7 @@
     "format": "prettier . --write",
     "lint": "eslint .",
     "prepare": "husky",
-    "minify": "rollup -c build/rollup.config.js",
+    "minify": "rollup -c ./build/rollup.config.js",
     "emit:types": "tsc -p build/tsconfig/tsconfig.types.json --emitDeclarationOnly",
     "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
     "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
