@@ -17,22 +17,22 @@ if (!BUILD_TARGETS[BUILD_TARGET]) {
 // Default to umd.
 const BUILD: BuildEnvironmentOptions = {
   lib: {
-    entry: nodepath.resolve(__dirname, "./src/browser/index.ts"),
+    entry: nodepath.resolve(__dirname, "../src/browser/index.ts"),
     name: "JSRandomnessPredictor",
     formats: ["umd"],
     fileName: () => "js-randomness-predictor.js",
   },
-  outDir: "dist/umd",
+  outDir: nodepath.resolve(__dirname, "../dist/umd"),
 };
 
 if (BUILD_TARGET === "cjs") {
   BUILD.lib = {
     ...BUILD.lib,
-    entry: nodepath.resolve(__dirname, "./src/browser/index.ts"),
+    entry: nodepath.resolve(__dirname, "../src/browser/index.ts"),
     formats: ["cjs"],
     fileName: () => "index.js",
   };
-  BUILD.outDir = "dist/browser";
+  BUILD.outDir = nodepath.resolve(__dirname, "../dist/browser");
 }
 
 export default defineConfig({

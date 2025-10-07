@@ -3,10 +3,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
-    "baseUrl": "../",
+    "baseUrl": "../..",
     "allowSyntheticDefaultImports": true,
     "types": ["node", "bun-types"]
   },
-  "include": ["../**/*"],
-  "exclude": ["../dist/**/*", "../node_modules/**/*", "../tests/**/*"]
+  "include": ["../../**/*"],
+  "exclude": ["../../dist/**/*", "../../node_modules/**/*", "../../tests/**/*"]
 }

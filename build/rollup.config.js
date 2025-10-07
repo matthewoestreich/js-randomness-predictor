@@ -9,9 +9,9 @@ import { globSync } from "glob";
 export default [
   /***************** Server-side CJS Build ******************/
   {
-    input: "./dist/staging/cjs/index.js",
+    input: nodepath.resolve(import.meta.dirname, "../dist/staging/cjs/index.js"),
     output: {
-      file: "./dist/cjs/index.js",
+      file: nodepath.resolve(import.meta.dirname, "../dist/cjs/index.js"),
       format: "cjs",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), commonjs(), minify()],
@@ -19,9 +19,9 @@ export default [
   },
   /***************** Server-side ESM Build ******************/
   {
-    input: "./dist/staging/esm/index.js",
+    input: nodepath.resolve(import.meta.dirname, "../dist/staging/esm/index.js"),
     output: {
-      file: "./dist/esm/index.js",
+      file: nodepath.resolve(import.meta.dirname, "../dist/esm/index.js"),
       format: "esm",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), minify()],
@@ -29,9 +29,9 @@ export default [
   },
   /*********************** CLI Build ************************/
   {
-    input: globSync("./dist/staging/cli/cli/**/*.js"),
+    input: globSync(nodepath.resolve(import.meta.dirname, "../dist/staging/cli/cli/**/*.js")),
     output: {
-      dir: "./dist/cli",
+      dir: nodepath.resolve(import.meta.dirname, "../dist/cli"),
       format: "esm",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), minify()],
