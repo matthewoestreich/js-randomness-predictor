@@ -47,7 +47,7 @@ if (executionRuntime === "deno") {
 // > option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
 // > (Use `node --trace-deprecation ...` to show where the warning was created)
 if (process.platform === "win32") {
-  process.env.NODE_NO_WARNINGS = "--no-deprecation";
+  process.env.NODE_OPTIONS = "--no-deprecation";
   childProcessOptions.env!.NODE_OPTIONS = "--no-deprecation";
   childProcessOptions.shell = true;
 }
