@@ -18,7 +18,7 @@ const denoImportMapRelative = "./deno_import_map.json";
 const jsrpRelative = "./js-randomness-predictor.js";
 
 // Node is our default execution runtime.
-const executionRuntime = process.env[EXECUTION_RUNTIME_ENV_VAR_KEY] || "node";
+const executionRuntime = process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]?.trim() || "node";
 const js_randomness_predictor = nodepath.resolve(import.meta.dirname, jsrpRelative);
 
 // These are the args that a user provided to js-randomness-predictor CLI.
