@@ -4,7 +4,7 @@
     "target": "esnext",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "outDir": "../dist-staging",
+    "outDir": "../dist/staging/cli",
     "rootDir": "../src",
     "allowJs": false,
     "isolatedModules": true,

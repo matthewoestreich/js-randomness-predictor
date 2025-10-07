@@ -39,8 +39,9 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "postbuild": "node postbuild.cjs",
-    "clean:build": "rimraf dist && rimraf dist-staging",
-    "build": "npm run clean:build && npm run build:esm && npm run build:cli && npm run build:cjs && npm run build:umd && npm run build:browser:cjs && npm run emit:types && npm run minify",
+    "clean:build": "rimraf dist",
+    "clean:build:staging": "rimraf dist/staging",
+    "build": "node npm.build.js",
     "build:ci": "npm run build:esm && npm run build:cjs && npm run build:cli && npm i -D @esbuild/linux-x64 && npm run minify && npm run postbuild",
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
@@ -91,7 +92,6 @@
     "url": "https://github.com/matthewoestreich/js-randomness-predictor/issues"
   },
   "dependencies": {
-    "cross-env": "^10.1.0",
     "yargs": "^18.0.0",
     "z3-solver-jsrp": "^4.15.3-republish.1"
   },
@@ -105,6 +105,7 @@
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "bun-types": "^1.2.22",
+    "cross-env": "^10.1.0",
     "eslint": "^9.35.0",
     "glob": "^11.0.3",
     "husky": "^9.1.7",
