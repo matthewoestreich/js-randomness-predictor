@@ -26,11 +26,7 @@ const jsrpArgs = process.argv.slice(2);
 // These are the args for the child process we are about to run.
 const childProcessArgs = [js_randomness_predictor, ...jsrpArgs];
 // Options for child process we are about to run.
-const childProcessOptions: SpawnSyncOptionsWithBufferEncoding = {
-  stdio: "inherit",
-  env: { ...process.env },
-  shell: process.platform === "win32",
-};
+const childProcessOptions: SpawnSyncOptionsWithBufferEncoding = { stdio: "inherit", env: { ...process.env } };
 
 // Deno is so special!
 if (executionRuntime === "deno") {
@@ -45,4 +41,10 @@ if (executionRuntime === "deno") {
   childProcessOptions.env!.DENO_COMPAT = "1";
 }
 
-spawnSync(`${executionRuntime.toString()} ${childProcessArgs.join(" ")}`, childProcessOptions);
+// Freakin Windows, man...
+if (process.platform === "win32") {
+  childProcessOptions.env!.NODE_NO_WARNINGS = "1";
+  childProcessOptions.shell = true;
+}
+
+spawnSync(executionRuntime.toString(), childProcessArgs, childProcessOptions);
