@@ -45,8 +45,8 @@
     "build:esm": "tsc -p tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig/tsconfig.cjs.json",
     "build:cli": "tsc -p tsconfig/tsconfig.esm.cli.json",
-    "build:umd": "BUILD_TARGET='umd' vite build",
-    "build:browser:cjs": "BUILD_TARGET='cjs' vite build",
+    "build:umd": "cross-env BUILD_TARGET='umd' vite build",
+    "build:browser:cjs": "cross-env BUILD_TARGET='cjs' vite build",
     "test": "npm run test:cli && npm run test:node && npm run test:bun && npm run test:deno && npm run test:firefox && npm run test:chrome && npm run test:safari",
     "test:imports": "node --test tests/import/*.test.*",
     "test:node:versions:GE:20": "tsx --test tests/node/*.test.ts",
@@ -91,6 +91,7 @@
     "url": "https://github.com/matthewoestreich/js-randomness-predictor/issues"
   },
   "dependencies": {
+    "cross-env": "^10.1.0",
     "yargs": "^18.0.0",
     "z3-solver-jsrp": "^4.15.3-republish.1"
   },
