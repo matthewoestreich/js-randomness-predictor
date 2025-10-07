@@ -45,4 +45,4 @@ if (executionRuntime === "deno") {
   childProcessOptions.env!.DENO_COMPAT = "1";
 }
 
-spawnSync(executionRuntime.toString(), childProcessArgs, childProcessOptions);
+spawnSync(`${executionRuntime.toString()} ${childProcessArgs.join(" ")}`, childProcessOptions);
