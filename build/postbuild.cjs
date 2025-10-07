@@ -2,11 +2,11 @@
 const { mkdirSync, writeFileSync, copyFileSync } = require("node:fs");
 const { resolve } = require("node:path");
 
-createPackageJsonIn_Dist_Cjs(resolve(__dirname, "./dist/cjs"));
+createPackageJsonIn_Dist_Cjs(resolve(__dirname, "../dist/cjs"));
+createPackageJsonIn_Dist_Browser_Cjs(resolve(__dirname, "../dist/browser"));
+createPackageJsonIn_Dist_Esm(resolve(__dirname, "../dist/esm"));
+copyImportMapToBuild(resolve(__dirname, "../src/cli/deno_import_map.json"));
 //createPackageJsonIn_Dist_Umd(resolve(__dirname, "./dist/umd"));
-createPackageJsonIn_Dist_Browser_Cjs(resolve(__dirname, "./dist/browser"));
-createPackageJsonIn_Dist_Esm(resolve(__dirname, "./dist/esm"));
-copyImportMapToBuild(resolve(__dirname, "./src/cli/deno_import_map.json"));
 
 /**
  * For the cjs build
@@ -93,7 +93,7 @@ function copyImportMapToBuild(importMapPath = "") {
     throw new Error("[postbuild.js][copy import map for CLI build (/dist/cli/)] need import map for deno");
   }
   try {
-    const copyToPath = resolve(__dirname, "./dist/cli/deno_import_map.json");
+    const copyToPath = resolve(__dirname, "../dist/cli/deno_import_map.json");
     copyFileSync(importMapPath, copyToPath);
   } catch (e) {
     throw new Error(`[postbuild.js][copy import map for CLI build (/dist/cli/)] GOT ERROR : ${e.message}`);

@@ -1,0 +1,30 @@
+[
+  {
+    "command": "npm run test:cli",
+    "description": "Tests our CLI built files"
+  },
+  {
+    "command": "npm run test:node",
+    "description": "Tests our Node built files"
+  },
+  {
+    "command": "npm run test:bun",
+    "description": "Tests our Bun built files"
+  },
+  {
+    "command": "npm run test:deno",
+    "description": "Tests our Deno built files"
+  },
+  {
+    "command": "npm run test:firefox",
+    "description": "Tests Firefox with existing numbers"
+  },
+  {
+    "command": "npm run test:chrome",
+    "description": "Tests Chrome with existing numbers"
+  },
+  {
+    "command": "npm run test:safari",
+    "description": "Tests Safari with existing numbers"
+  }
+]

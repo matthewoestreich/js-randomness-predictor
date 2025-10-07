@@ -6,10 +6,10 @@
     "moduleResolution": "node",
     "lib": ["DOM", "es5"],
     "allowJs": true,
-    "outDir": "../dist/staging/cjs",
-    "rootDir": "../src",
+    "outDir": "../../dist/staging/cjs",
+    "rootDir": "../../src",
     "removeComments": true
   },
-  "include": ["../src/**/*"],
-  "exclude": ["../node_modules", "../**/*.test.*", "../src/cli/**/*", "../src/browser/**/*"]
+  "include": ["../../src/**/*"],
+  "exclude": ["../../node_modules", "../../**/*.test.*", "../../src/cli/**/*", "../../src/browser/**/*"]
 }

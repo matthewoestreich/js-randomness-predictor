@@ -4,14 +4,14 @@
     "target": "esnext",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "outDir": "../dist/staging/cli",
-    "rootDir": "../src",
+    "outDir": "../../dist/staging/cli",
+    "rootDir": "../../src",
     "allowJs": false,
     "isolatedModules": true,
     "removeComments": true
   },
-  "files": ["../src/cli/cli.ts"],
-  "include": ["../src/**/*"]
+  "files": ["../../src/cli/cli.ts"],
+  "include": ["../../src/**/*"]
   //"include": ["../src/**/*"],
   //"exclude": ["../node_modules/", "../**/*.test.*", "../src/browser/**/*"]
 }

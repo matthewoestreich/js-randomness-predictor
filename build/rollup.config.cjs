@@ -1,17 +1,17 @@
-import nodepath from "node:path";
-import commonjs from "@rollup/plugin-commonjs";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
-import { minify } from "rollup-plugin-esbuild-minify";
-import { globSync } from "glob";
+const nodepath = require("node:path");
+const commonjs = require("@rollup/plugin-commonjs");
+const { nodeResolve } = require("@rollup/plugin-node-resolve");
+const { minify } = require("rollup-plugin-esbuild-minify");
+const { globSync } = require("glob");
 
 // For minifying built ts files
 
-export default [
+module.exports = [
   /***************** Server-side CJS Build ******************/
   {
-    input: "./dist/staging/cjs/index.js",
+    input: nodepath.resolve(__dirname, "../dist/staging/cjs/index.js"),
     output: {
-      file: "./dist/cjs/index.js",
+      file: nodepath.resolve(__dirname, "../dist/cjs/index.js"),
       format: "cjs",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), commonjs(), minify()],
@@ -19,9 +19,9 @@ export default [
   },
   /***************** Server-side ESM Build ******************/
   {
-    input: "./dist/staging/esm/index.js",
+    input: nodepath.resolve(__dirname, "../dist/staging/esm/index.js"),
     output: {
-      file: "./dist/esm/index.js",
+      file: nodepath.resolve(__dirname, "../dist/esm/index.js"),
       format: "esm",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), minify()],
@@ -29,9 +29,9 @@ export default [
   },
   /*********************** CLI Build ************************/
   {
-    input: globSync("./dist/staging/cli/cli/**/*.js"),
+    input: globSync(nodepath.resolve(__dirname, "../dist/staging/cli/cli/**/*.js")),
     output: {
-      dir: "./dist/cli",
+      dir: nodepath.resolve(__dirname, "../dist/cli"),
       format: "esm",
     },
     plugins: [nodeResolve({ preferBuiltins: true }), minify()],

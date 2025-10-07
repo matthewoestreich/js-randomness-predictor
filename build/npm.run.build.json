@@ -1,0 +1,38 @@
+[
+  {
+    "command": "npm run clean:build",
+    "description": "Cleans existing build dir"
+  },
+  {
+    "command": "npm run build:esm",
+    "description": "Builds server side ESM module"
+  },
+  {
+    "command": "npm run build:cli",
+    "description": "Builds CLI"
+  },
+  {
+    "command": "npm run build:cjs",
+    "description": "Builds server side CJS module"
+  },
+  {
+    "command": "npm run build:umd",
+    "description": "Builds browser UMD (for use in <script> tags)"
+  },
+  {
+    "command": "npm run build:browser:cjs",
+    "description": "Buids CJS for for browser frameworks (React, Vue, Svelte, etc..)"
+  },
+  {
+    "command": "npm run emit:types",
+    "description": "Emits types (.d.ts files)"
+  },
+  {
+    "command": "npm run minify",
+    "description": "Minifies built server-side modules (essentially minifies tsc output)"
+  },
+  {
+    "command": "npm run clean:build:staging",
+    "description": "Cleans our staging folder, which is where tsc outputs files so we can then minify them into their final destination."
+  }
+]
