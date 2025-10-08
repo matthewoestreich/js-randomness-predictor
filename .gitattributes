@@ -2,6 +2,7 @@
 * text=auto
 # Ignore 'cdn' folder from counting towards "languages"
 cdn/** linguist-vendored
+tests/manualTesting/** linguist-vendored
 *.js linguist-language=TypeScript
 *.cjs linguist-language=TypeScript
 *.mjs linguist-language=TypeScript
