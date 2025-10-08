@@ -11,7 +11,7 @@ import { Z3Api } from "../types.js";
 let CACHED_Z3API: Z3Api | undefined = undefined;
 export async function init(): Promise<Z3Api> {
   if (CACHED_Z3API) {
-    return CACHED_Z3API;
+    return { ...CACHED_Z3API };
   }
 
   if (!window.initZ3 || !window.Module) {
@@ -29,7 +29,7 @@ export async function init(): Promise<Z3Api> {
   const { createApi } = await import("z3-solver-jsrp-high-level");
 
   const output = { ...lowLevel, ...createApi(lowLevel.Z3) };
-  CACHED_Z3API = output;
+  CACHED_Z3API = { ...output };
 
   return output;
 }

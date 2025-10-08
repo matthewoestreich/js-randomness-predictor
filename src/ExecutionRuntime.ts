@@ -3,6 +3,9 @@ import { RuntimeType } from "./types.js";
 
 // Detect the runtime that has been used to invoke us.
 export default class ExecutionRuntime {
+  // Mimic static class
+  private constructor() {}
+
   static isDeno(): boolean {
     // @ts-ignore
     return typeof globalThis.Deno !== "undefined" && typeof Deno.version !== "undefined" && typeof Deno.version.deno === "string";

@@ -1,5 +1,9 @@
 [
   {
+    "command": "npm run test:imports",
+    "description": "Tests imports work"
+  },
+  {
     "command": "npm run test:cli",
     "description": "Tests our CLI built files"
   },
