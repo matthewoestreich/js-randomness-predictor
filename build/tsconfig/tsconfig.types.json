@@ -1,6 +1,6 @@
 {
   // Used solely to emit types into dist/types
-  "extends": "./tsconfig.base.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "esnext",
     "module": "nodenext",
