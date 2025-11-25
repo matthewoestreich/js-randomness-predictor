@@ -42,7 +42,7 @@
     "clean:build": "rimraf dist",
     "clean:build:staging": "rimraf dist/staging",
     "build": "node build/runCommands.js ./npm.run.build.json",
-    "build:ci": "npm run build:esm && npm run build:cjs && npm run build:cli && npm i -D @esbuild/linux-x64 && npm i -D esbuild@0.25.10 && npm run minify && npm run postbuild",
+    "build:ci": "npm run build:esm && npm run build:cjs && npm run build:cli && npm i -D @esbuild/linux-x64@0.25.10 && npm run minify && npm run postbuild",
     "build:esm": "tsc -p build/tsconfig/tsconfig.esm.json",
     "build:cjs": "tsc -p build/tsconfig/tsconfig.cjs.json",
     "build:cli": "tsc -p build/tsconfig/tsconfig.esm.cli.json",
