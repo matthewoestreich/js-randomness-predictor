@@ -2,7 +2,7 @@
   "name": "js-randomness-predictor",
   "version": "3.2.32",
   "engines": {
-    "node": ">=17.0.0 <25.0.0"
+    "node": ">=17.0.0 <26.0.0"
   },
   "description": "Predict Math.random output in Node, Deno, Bun, Chrome, Firefox, and Safari",
   "type": "module",
