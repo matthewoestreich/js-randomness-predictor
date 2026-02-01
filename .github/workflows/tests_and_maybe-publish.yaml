@@ -156,7 +156,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.event.head_commit.message, '[publish] ')
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write # needed for auto version bump
       id-token: write # required for OIDC
     steps:
       - name: Checkout repository
