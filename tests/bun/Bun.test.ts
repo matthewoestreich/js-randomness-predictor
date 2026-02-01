@@ -15,13 +15,25 @@ function secondsToMs(seconds: number): number {
 
 const testOptions: TestOptions = { timeout: secondsToMs(60), retry: 3 };
 
+const MIN_BUN_VERSION_REQUIRED = {
+  string: "1.3.8",
+  major: 1,
+  minor: 3,
+  patch: 8,
+};
+
 describe("Bun", () => {
+  test(`enforce minimum bun version to be ${MIN_BUN_VERSION_REQUIRED.string}`, () => {
+    const bunVersion = Bun.version;
+    const [major, minor, patch] = bunVersion.split(".").map(Number);
+    expect(major).toBeGreaterThanOrEqual(MIN_BUN_VERSION_REQUIRED.major);
+    expect(minor).toBeGreaterThanOrEqual(MIN_BUN_VERSION_REQUIRED.minor);
+    expect(patch).toBeGreaterThanOrEqual(MIN_BUN_VERSION_REQUIRED.patch);
+  });
+
   test(
     "'sequence' generated with Array.from(), 'expected' generated with Math.random()",
     async () => {
-      /**
-       * If/when this test starts failing, it means the bug in JavaScriptCore has been patched!
-       */
       const sequence = Array.from({ length: 6 }, Math.random);
       const expected = callMathRandom(6);
       const predictor = new BunRandomnessPredictor(sequence);
@@ -29,11 +41,7 @@ describe("Bun", () => {
       for (let i = 0; i < expected.length; i++) {
         predictions.push(await predictor.predictNext());
       }
-      // ~ Due to current JavaScriptCore bug ~
-      // Array.from({length:n},Math.random) takes the slow baseline path.
-      // Math.random() takes the JIT path.
-      // Since they took two diff paths, we should expect their results to not be equal.
-      expect(predictions).not.toEqual(expected);
+      expect(predictions).toEqual(expected);
     },
     { ...testOptions },
   );
