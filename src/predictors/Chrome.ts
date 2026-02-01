@@ -1,7 +1,21 @@
 import * as z3 from "z3-solver-jsrp";
 import { UnsatError } from "../errors.js";
-import { Pair } from "../types.js";
+import { Pair, StateConversionMap } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
+import uint64 from "../uint64.js";
+
+/**
+ * ========================================================================================
+ * ~ Documenting changes to the Chrome Math.random algorithm ~
+ * ========================================================================================
+ *
+ * JANUARY 2026 UPDATE (comment written on Feb 1, 2026)
+ *    - See this issue : https://github.com/matthewoestreich/js-randomness-predictor/issues/25
+ *    - V8 updated their Math.random implementation in the following commit:
+ *        - https://source.chromium.org/chromium/_/chromium/v8/v8/+/0596ead5b04f5988d7742c2a4559637a4f81b849
+ *    - AT THE TIME OF WRITING THIS COMMENT, we now first try to old algo - if we get UNSAT, we
+ *      try again with the updated algo. If the updated algo produces an error, we return it.
+ */
 
 export default class ChromeRandomnessPredictor {
   public sequence: number[];
@@ -9,6 +23,8 @@ export default class ChromeRandomnessPredictor {
   // Map a 53-bit integer into the range [0, 1) as a double.
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
   #concreteState: Pair<bigint> = [0n, 0n];
+  #rotateVersionSpecificMethods = this.#createVersionSpecificMethodsFactory();
+  #versionSpecificMethods = this.#rotateVersionSpecificMethods();
 
   constructor(sequence: number[]) {
     this.sequence = sequence;
@@ -16,13 +32,16 @@ export default class ChromeRandomnessPredictor {
 
   public async predictNext(): Promise<number> {
     if (this.#concreteState[0] === 0n && this.#concreteState[1] === 0n) {
-      await this.#solveSymbolicState();
+      await this.#withRetry(
+        () => this.#solveSymbolicState(),
+        () => {
+          // Retry with updated version specific methods.
+          this.#versionSpecificMethods = this.#rotateVersionSpecificMethods();
+          return this.#solveSymbolicState();
+        },
+      );
     }
-    // Calculate next prediction, using first item in concrete state, before modifying concrete state.
-    const next = this.#toDouble(this.#concreteState[0]);
-    // Modify concrete state.
-    XorShift128Plus.concreteBackwards(this.#concreteState);
-    return next;
+    return this.#versionSpecificMethods.toDouble(this.#concreteState);
   }
 
   // Solves symbolic state so we can move forward using concrete state, which
@@ -44,8 +63,8 @@ export default class ChromeRandomnessPredictor {
 
       for (const n of sequence) {
         XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state pair.
-        const mantissa = this.#recoverMantissa(n);
-        solver.add(symbolicStatePair[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
+        const mantissa = this.#versionSpecificMethods.recoverMantissa(n);
+        this.#versionSpecificMethods.constrainMantissa(mantissa, symbolicStatePair, solver, context);
       }
 
       if ((await solver.check()) !== "sat") {
@@ -63,12 +82,63 @@ export default class ChromeRandomnessPredictor {
     }
   }
 
-  #recoverMantissa(n: number): bigint {
-    const mantissa = Math.floor(n * this.#SCALING_FACTOR_53_BIT_INT);
-    return BigInt(mantissa);
+  async #withRetry<BT, RT>(baseFn: () => Promise<BT>, retryFn: () => Promise<RT>): Promise<BT | RT> {
+    try {
+      return await baseFn();
+    } catch (_e: unknown) {
+      return await retryFn();
+    }
   }
 
-  #toDouble(n: bigint): number {
-    return Number(n >> 11n) / this.#SCALING_FACTOR_53_BIT_INT;
+  #createVersionSpecificMethodsFactory(): () => StateConversionMap {
+    // If calls is an odd number, we return logic prior to the January 2026 update.
+    // If calls is an even number, we return logic after the January 2026 update.
+    let calls = 0;
+
+    return (): StateConversionMap => {
+      calls += 1;
+
+      if (calls % 2 > 0) {
+        // See comment at top of file.
+        // This object of functions contains logic prior to the January 2026 update.
+        return {
+          recoverMantissa: (n: number): bigint => {
+            const mantissa = Math.floor(n * this.#SCALING_FACTOR_53_BIT_INT);
+            return BigInt(mantissa);
+          },
+          toDouble: (concreteState: Pair<bigint>): number => {
+            // Calculate next prediction, using first item in concrete state, before modifying concrete state.
+            const next = Number(concreteState[0] >> 11n) / this.#SCALING_FACTOR_53_BIT_INT;
+            // Modify concrete state.
+            XorShift128Plus.concreteBackwards(concreteState);
+            return next;
+          },
+          constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+            solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
+          },
+        };
+      }
+
+      // See comment at top of file.
+      // This object of functions contains logic for the Math.random impl AFTER the January 2026 update.
+      return {
+        recoverMantissa: (n: number): bigint => {
+          const mantissa = Math.floor(n * this.#SCALING_FACTOR_53_BIT_INT);
+          return BigInt(mantissa);
+        },
+        toDouble: (concreteState: Pair<bigint>): number => {
+          const random = uint64(concreteState[0] + concreteState[1]);
+          // Calculate next prediction, using first item in concrete state, before modifying concrete state.
+          const next = Number(random >> 11n) / this.#SCALING_FACTOR_53_BIT_INT;
+          // Modify concrete state.
+          XorShift128Plus.concreteBackwards(concreteState);
+          return next;
+        },
+        constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+          const sum = symbolicState[0].add(symbolicState[1]);
+          solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
+        },
+      };
+    };
   }
 }
