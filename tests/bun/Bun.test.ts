@@ -16,21 +16,37 @@ function secondsToMs(seconds: number): number {
 const testOptions: TestOptions = { timeout: secondsToMs(60), retry: 3 };
 
 const MIN_BUN_VERSION_REQUIRED = {
-  string: "1.3.8",
   major: 1,
   minor: 3,
   patch: 8,
 };
 
+const { major: minMajor, minor: minMinor, patch: minPatch } = MIN_BUN_VERSION_REQUIRED;
+
 describe("Bun", () => {
-  test(`enforce minimum bun version to be ${MIN_BUN_VERSION_REQUIRED.string}`, () => {
-    const bunVersion = Bun.version;
-    const [major, minor, patch] = bunVersion.split(".").map(Number);
-    expect(major).toBeGreaterThanOrEqual(MIN_BUN_VERSION_REQUIRED.major);
-    expect(minor).toBeGreaterThanOrEqual(MIN_BUN_VERSION_REQUIRED.minor);
-    expect(patch).toBeGreaterThanOrEqual(MIN_BUN_VERSION_REQUIRED.patch);
+  test(`enforce minimum Bun version to be at least v${minMajor}.${minMinor}.${minPatch}`, () => {
+    const [major, minor, patch] = Bun.version.split(".").map(Number);
+
+    // If the major is greater, no need to compare anything else.
+    if (major > minMajor) {
+      return expect(major).toBeGreaterThan(minMajor);
+    }
+
+    // If major isn't greater than min, it should at least equal min.
+    expect(major).toBe(minMajor);
+
+    // If minor is greater than min, no need to check patch.
+    if (minor > minMinor) {
+      return expect(minor).toBeGreaterThan(minMinor);
+    }
+
+    // If minor isn't greater, it should at least equal min.
+    expect(minor).toBe(minMinor);
+    // Patch has to be greater than or equal to min.
+    expect(patch).toBeGreaterThanOrEqual(minPatch);
   });
 
+  // Requiring a minimum Bun version is needed due to this test and a bug in WebKit prior to v1.3.x
   test(
     "'sequence' generated with Array.from(), 'expected' generated with Math.random()",
     async () => {
