@@ -114,4 +114,11 @@ export type SolvingStrategy = {
   recoverMantissa: RecoverMantissaFn;
   constrainMantissa: ConstrainMantissaFn;
   toDouble: ToDoubleFn;
+  symbolicXorShift: SymbolicXorShiftFn;
+  //xorShiftStrategy: XorShiftStrategy;
+};
+
+export type XorShiftStrategy = {
+  symbolic: SymbolicXorShiftFn;
+  concrete: ConcreteXorShiftFn;
 };
