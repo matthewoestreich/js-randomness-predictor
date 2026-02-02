@@ -49,8 +49,7 @@ export default class V8Predictor {
       const sequence = [...this.sequence].reverse();
 
       for (const n of sequence) {
-        //XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state
-        this.#strategy.symbolicXorShift(symbolicStatePair);
+        this.#strategy.symbolicXorShift(symbolicStatePair); // Modifies symbolic state
         const mantissa = this.#strategy.recoverMantissa(n);
         this.#strategy.constrainMantissa(mantissa, symbolicStatePair, solver, context);
       }
