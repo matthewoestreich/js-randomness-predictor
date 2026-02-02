@@ -414,3 +414,15 @@ $ js-randomness-predictor --environment deno --sequence 1 2 3 4 --predictions 5
 # --env-version (-v) ignored
 $ js-randomness-predictor -e deno -v 23 -s 1 2 3 4
 ```
+
+# Contributing
+
+- [V8 Source Code](https://source.chromium.org/chromium/chromium/src/+/main:v8)
+  - V8 source code is part of the Chromium repo
+  - Used by `Node`, `Chrome`, `Deno`
+- [SpiderMonkey Source Code](https://github.com/mozilla-firefox/firefox/tree/main/js)
+  - SpiderMonkey source code is part of the Firefox repo
+  - Used by `Firefox`
+- [JavaScriptCore Source Code](https://github.com/WebKit/WebKit/tree/main/Source/JavaScriptCore)
+  - JavaScriptCore source code is part of the WebKit repo
+  - Used by `Safari`, `Bun`
