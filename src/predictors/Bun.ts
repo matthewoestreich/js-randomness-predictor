@@ -19,36 +19,32 @@ const IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
 // Map a 53-bit integer into the range [0, 1) as a double.
 const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
 
+// Since the only difference in our Bun strategies are the symbolic & concrete XOR shifts,
+// we can provide a "base" object as to not repeat ourselves.
+const STRATEGY_BASE = {
+  recoverMantissa: (n: number): bigint => {
+    return BigInt(Math.floor(n * SCALING_FACTOR_53_BIT_INT));
+  },
+  toDouble: (concreteState: Pair<bigint>): number => {
+    const n = uint64(concreteState[0] + concreteState[1]);
+    return Number(n & IEEE754_MANTISSA_BITS_MASK) / SCALING_FACTOR_53_BIT_INT;
+  },
+  constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(IEEE754_MANTISSA_BITS_MASK, 64));
+    solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
+  },
+};
+
 const BUN_STRATEGIES: SolvingStrategy[] = [
   // Try with arithmetic shifts first.
   {
-    recoverMantissa: (n: number): bigint => {
-      return BigInt(Math.floor(n * SCALING_FACTOR_53_BIT_INT));
-    },
-    toDouble: (concreteState: Pair<bigint>): number => {
-      const n = uint64(concreteState[0] + concreteState[1]);
-      return Number(n & IEEE754_MANTISSA_BITS_MASK) / SCALING_FACTOR_53_BIT_INT;
-    },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-      const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(IEEE754_MANTISSA_BITS_MASK, 64));
-      solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
-    },
+    ...STRATEGY_BASE,
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolicArithmeticShiftRight(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteArithmeticShiftRight(c),
   },
   // Try with logical shifts next.
   {
-    recoverMantissa: (n: number): bigint => {
-      return BigInt(Math.floor(n * SCALING_FACTOR_53_BIT_INT));
-    },
-    toDouble: (concreteState: Pair<bigint>): number => {
-      const n = uint64(concreteState[0] + concreteState[1]);
-      return Number(n & IEEE754_MANTISSA_BITS_MASK) / SCALING_FACTOR_53_BIT_INT;
-    },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-      const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(IEEE754_MANTISSA_BITS_MASK, 64));
-      solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
-    },
+    ...STRATEGY_BASE,
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concrete(c),
   },
