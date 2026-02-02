@@ -19,7 +19,8 @@ import V8Predictor from "./engines/V8.js";
 
 // Map a 53-bit integer into the range [0, 1) as a double.
 const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
-const chromeStrategies: SolvingStrategy[] = [
+
+const CHROME_STRATEGIES: SolvingStrategy[] = [
   // Pre Jan 2026 changes
   {
     recoverMantissa: (n: number): bigint => {
@@ -27,16 +28,13 @@ const chromeStrategies: SolvingStrategy[] = [
       return BigInt(mantissa);
     },
     toDouble: (concreteState: Pair<bigint>): number => {
-      // Calculate next prediction, using first item in concrete state, before modifying concrete state.
-      const next = Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
-      // Modify concrete state.
-      XorShift128Plus.concreteBackwards(concreteState);
-      return next;
+      return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
     constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
       solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+    concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
   },
   // Post Jan 2026 changes
   {
@@ -46,22 +44,19 @@ const chromeStrategies: SolvingStrategy[] = [
     },
     toDouble: (concreteState: Pair<bigint>): number => {
       const random = uint64(concreteState[0] + concreteState[1]);
-      // Calculate next prediction, using first item in concrete state, before modifying concrete state.
-      const next = Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
-      // Modify concrete state.
-      XorShift128Plus.concreteBackwards(concreteState);
-      return next;
+      return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
     constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
       const sum = symbolicState[0].add(symbolicState[1]);
       solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+    concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
   },
 ];
 
 export default class ChromeRandomnessPredictor extends V8Predictor {
   constructor(sequence: number[]) {
-    super(sequence, chromeStrategies);
+    super(sequence, CHROME_STRATEGIES);
   }
 }

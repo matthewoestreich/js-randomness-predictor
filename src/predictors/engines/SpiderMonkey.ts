@@ -1,8 +1,8 @@
 import * as z3 from "z3-solver-jsrp";
-import { SolvingStrategy, Pair } from "../../types.js";
 import { UnsatError } from "../../errors.js";
+import { Pair, SolvingStrategy } from "../../types.js";
 
-export default class V8Predictor {
+export default class SpiderMonkeyPredictor {
   public sequence: number[];
   #concreteState: Pair<bigint> = [0n, 0n];
   #solvingStrategies: SolvingStrategy[];
@@ -10,7 +10,7 @@ export default class V8Predictor {
 
   constructor(sequence: number[], solvingStrategies: SolvingStrategy[]) {
     if (solvingStrategies.length <= 0) {
-      throw new Error("V8EnginePredictor requires at least one solvingStrategy in solvingStrategies");
+      throw new Error("SpiderMonkeyPredictor requires at least one solvingStrategy in solvingStrategies");
     }
     this.sequence = sequence;
     this.#solvingStrategies = solvingStrategies;
@@ -21,14 +21,9 @@ export default class V8Predictor {
     if (this.#concreteState[0] === 0n && this.#concreteState[1] === 0n) {
       await this.#solveWithStrategies();
     }
-    const next = this.#strategy.toDouble(this.#concreteState);
-    // In V8, we advance concrete state AFTER producing next random number.
+    // In SpiderMonkey we advance concrete state BEFORE grabbing next random.
     this.#strategy.concreteXorShift(this.#concreteState);
-    return next;
-  }
-
-  protected setSolvingStrategies(strategies: SolvingStrategy[]): void {
-    this.#solvingStrategies = strategies;
+    return this.#strategy.toDouble(this.#concreteState);
   }
 
   // Solves symbolic state so we can move forward using concrete state, which
@@ -43,14 +38,9 @@ export default class V8Predictor {
       // We do not directly initialize symbolic states inside of our symbolic state Pair because
       // we need references to the original state/BitVecs in order to be able to pull them out of our model.
       const symbolicStatePair: Pair<z3.BitVec> = [symbolicState0, symbolicState1];
-      // V8’s Math.random() returns a number derived from the state *after* advancing the PRNG.
-      // To reconstruct the original hidden state for the solver, we must process the observed
-      // sequence in reverse order: last observed number first, first observed number last.
-      const sequence = [...this.sequence].reverse();
 
-      for (const n of sequence) {
-        //XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state
-        this.#strategy.symbolicXorShift(symbolicStatePair);
+      for (const n of this.sequence) {
+        this.#strategy.symbolicXorShift(symbolicStatePair); // Modifies symbolic state.
         const mantissa = this.#strategy.recoverMantissa(n);
         this.#strategy.constrainMantissa(mantissa, symbolicStatePair, solver, context);
       }
@@ -60,11 +50,19 @@ export default class V8Predictor {
       }
 
       const model = solver.model();
-      this.#concreteState = [
+      const concreteStatePair: Pair<bigint> = [
         // Order matters here!
         (model.get(symbolicState0) as z3.BitVecNum).value(),
         (model.get(symbolicState1) as z3.BitVecNum).value(),
       ];
+
+      // Advance concrete state to the next unseen number. Z3 returns state at sequence start,
+      // so we have to advance concrete state up to the same point as our initial sequence length.
+      for (const _ of this.sequence) {
+        this.#strategy.concreteXorShift(concreteStatePair);
+      }
+
+      this.#concreteState = concreteStatePair;
     } catch (e) {
       return Promise.reject(e);
     }
@@ -88,6 +86,6 @@ export default class V8Predictor {
       }
     }
 
-    throw lastUnsatError ?? new Error("V8EnginePredictor : no strategies attempted");
+    throw lastUnsatError ?? new Error("SpiderMonkeyPredictor : no strategies attempted");
   }
 }

@@ -49,10 +49,13 @@ import V8Predictor from "./engines/V8.js";
 // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
 const MAX_SEQUENCE_LENGTH = 64;
 const DEFAULT_SEQUENCE_LENGTH = 4;
+
 // The mantissa bits (lower 52 bits) for doubles as defined in IEEE-754
 const IEEE754_MANTISSA_BITS_MASK = 0x000fffffffffffffn;
+
 // The exponent bits (bits 52–62) for 1.0 as defined in IEEE-754 for double precision
 const IEEE754_EXPONENT_BITS_MASK = 0x3ff0000000000000n;
+
 // Map a 53-bit integer into the range [0, 1) as a double
 const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
 
@@ -76,16 +79,14 @@ function getNodeSolvingStrategy(nodeVersion: SemanticVersion): SolvingStrategy {
         const buffer = Buffer.alloc(8);
         buffer.writeBigUInt64LE((n & IEEE754_MANTISSA_BITS_MASK) | IEEE754_EXPONENT_BITS_MASK, 0);
         // Calculate next random number before we modify concrete state.
-        const next = buffer.readDoubleLE(0) - 1;
-        // Modify concrete state.
-        XorShift128Plus.concreteBackwards(concreteState);
-        return next;
+        return buffer.readDoubleLE(0) - 1;
       },
       constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
         const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(IEEE754_MANTISSA_BITS_MASK, 64));
         solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
       },
       symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+      concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
     };
   }
 
@@ -100,15 +101,13 @@ function getNodeSolvingStrategy(nodeVersion: SemanticVersion): SolvingStrategy {
         const buffer = Buffer.alloc(8);
         buffer.writeBigUInt64LE((concreteState[0] >> 12n) | IEEE754_EXPONENT_BITS_MASK, 0);
         // Calculate next random number before we modify concrete state.
-        const next = buffer.readDoubleLE(0) - 1;
-        // Modify concrete state.
-        XorShift128Plus.concreteBackwards(concreteState);
-        return next;
+        return buffer.readDoubleLE(0) - 1;
       },
       constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
         solver.add(symbolicState[0].lshr(12).eq(context.BitVec.val(mantissa, 64)));
       },
       symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+      concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
     };
   }
 
@@ -120,15 +119,13 @@ function getNodeSolvingStrategy(nodeVersion: SemanticVersion): SolvingStrategy {
     },
     toDouble: (concreteState: Pair<bigint>): number => {
       // Calculate next random number before we modify concrete state.
-      const next = Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
-      // Modify concrete state.
-      XorShift128Plus.concreteBackwards(concreteState);
-      return next;
+      return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
     constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
       solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+    concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
   };
 }
 
