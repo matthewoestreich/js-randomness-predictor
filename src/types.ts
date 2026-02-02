@@ -110,7 +110,7 @@ export type PredictorResult = {
   _info?: string[];
 };
 
-export type StateConversionMap = {
+export type SolvingStrategy = {
   recoverMantissa: RecoverMantissaFn;
   constrainMantissa: ConstrainMantissaFn;
   toDouble: ToDoubleFn;

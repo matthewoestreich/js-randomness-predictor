@@ -1,5 +1,5 @@
 import * as z3 from "z3-solver-jsrp";
-import { SemanticVersion, StateConversionMap, Pair } from "../types.js";
+import { SemanticVersion, SolvingStrategy, Pair } from "../types.js";
 import { UnexpectedRuntimeError, UnsatError } from "../errors.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
@@ -58,7 +58,7 @@ export default class NodeRandomnessPredictor {
   // Map a 53-bit integer into the range [0, 1) as a double
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
   #nodeVersion = this.#getNodeVersion();
-  #versionSpecificMethods: StateConversionMap;
+  #solvingStrategy: SolvingStrategy;
   #concreteState: Pair<bigint> = [0n, 0n];
 
   constructor(sequence?: number[]) {
@@ -72,7 +72,7 @@ export default class NodeRandomnessPredictor {
       sequence = Array.from({ length: this.#DEFAULT_SEQUENCE_LENGTH }, Math.random);
     }
     this.sequence = sequence;
-    this.#versionSpecificMethods = this.#getVersionSpecificMethods();
+    this.#solvingStrategy = this.#getSolvingStrategy();
   }
 
   async predictNext(): Promise<number> {
@@ -80,7 +80,7 @@ export default class NodeRandomnessPredictor {
       await this.#solveSymbolicState();
     }
     // Calculate next random number before we modify concrete state.
-    const next = this.#versionSpecificMethods.toDouble(this.#concreteState);
+    const next = this.#solvingStrategy.toDouble(this.#concreteState);
     // Modify concrete state.
     XorShift128Plus.concreteBackwards(this.#concreteState);
     return next;
@@ -89,7 +89,7 @@ export default class NodeRandomnessPredictor {
   setNodeVersion(version: SemanticVersion): void {
     this.#nodeVersion = version;
     // If the version is changed, we must set version specific methods!
-    this.#versionSpecificMethods = this.#getVersionSpecificMethods();
+    this.#solvingStrategy = this.#getSolvingStrategy();
   }
 
   #getNodeVersion(): SemanticVersion {
@@ -98,7 +98,7 @@ export default class NodeRandomnessPredictor {
   }
 
   // Get Node.js version-specific methods.
-  #getVersionSpecificMethods(): StateConversionMap {
+  #getSolvingStrategy(): SolvingStrategy {
     const { major } = this.#nodeVersion;
 
     if (major <= 11) {
@@ -173,8 +173,8 @@ export default class NodeRandomnessPredictor {
 
       for (const n of sequence) {
         XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state
-        const mantissa = this.#versionSpecificMethods.recoverMantissa(n);
-        this.#versionSpecificMethods.constrainMantissa(mantissa, symbolicStatePair, solver, context);
+        const mantissa = this.#solvingStrategy.recoverMantissa(n);
+        this.#solvingStrategy.constrainMantissa(mantissa, symbolicStatePair, solver, context);
       }
 
       if ((await solver.check()) !== "sat") {

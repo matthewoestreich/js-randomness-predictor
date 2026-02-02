@@ -1,6 +1,6 @@
 import * as z3 from "z3-solver-jsrp";
 import { UnexpectedRuntimeError, UnsatError } from "../errors.js";
-import { Pair, StateConversionMap } from "../types.js";
+import { Pair, SolvingStrategy } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import uint64 from "../uint64.js";
@@ -24,8 +24,46 @@ export default class DenoRandomnessPredictor {
   // Map a 53-bit integer into the range [0, 1) as a double.
   #SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
   #concreteState: Pair<bigint> = [0n, 0n];
-  #rotateVersionSpecificMethods = this.#createVersionSpecificMethodsFactory();
-  #versionSpecificMethods = this.#rotateVersionSpecificMethods();
+  #strategy: SolvingStrategy;
+
+  #solvingStrategies: SolvingStrategy[] = [
+    // Pre Jan 2026 changes
+    {
+      recoverMantissa: (n: number): bigint => {
+        const mantissa = Math.floor(n * this.#SCALING_FACTOR_53_BIT_INT);
+        return BigInt(mantissa);
+      },
+      toDouble: (concreteState: Pair<bigint>): number => {
+        // Calculate next prediction, using first item in concrete state, before modifying concrete state.
+        const next = Number(concreteState[0] >> 11n) / this.#SCALING_FACTOR_53_BIT_INT;
+        // Modify concrete state.
+        XorShift128Plus.concreteBackwards(concreteState);
+        return next;
+      },
+      constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+        solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
+      },
+    },
+    // Post Jan 2026 changes
+    {
+      recoverMantissa: (n: number): bigint => {
+        const mantissa = Math.floor(n * this.#SCALING_FACTOR_53_BIT_INT);
+        return BigInt(mantissa);
+      },
+      toDouble: (concreteState: Pair<bigint>): number => {
+        const random = uint64(concreteState[0] + concreteState[1]);
+        // Calculate next prediction, using first item in concrete state, before modifying concrete state.
+        const next = Number(random >> 11n) / this.#SCALING_FACTOR_53_BIT_INT;
+        // Modify concrete state.
+        XorShift128Plus.concreteBackwards(concreteState);
+        return next;
+      },
+      constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+        const sum = symbolicState[0].add(symbolicState[1]);
+        solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
+      },
+    },
+  ];
 
   constructor(sequence?: number[]) {
     if (!sequence) {
@@ -35,20 +73,14 @@ export default class DenoRandomnessPredictor {
       sequence = Array.from({ length: 4 }, Math.random);
     }
     this.sequence = sequence;
+    this.#strategy = this.#solvingStrategies[0];
   }
 
   public async predictNext(): Promise<number> {
     if (this.#concreteState[0] === 0n && this.#concreteState[1] === 0n) {
-      await this.#withRetry(
-        () => this.#solveSymbolicState(),
-        () => {
-          // Retry with updated version specific methods.
-          this.#versionSpecificMethods = this.#rotateVersionSpecificMethods();
-          return this.#solveSymbolicState();
-        },
-      );
+      await this.#solveWithStrategies();
     }
-    return this.#versionSpecificMethods.toDouble(this.#concreteState);
+    return this.#strategy.toDouble(this.#concreteState);
   }
 
   // Solves symbolic state so we can move forward using concrete state, which
@@ -70,8 +102,8 @@ export default class DenoRandomnessPredictor {
 
       for (const n of sequence) {
         XorShift128Plus.symbolic(symbolicStatePair); // Modifies symbolic state pair.
-        const mantissa = this.#versionSpecificMethods.recoverMantissa(n);
-        this.#versionSpecificMethods.constrainMantissa(mantissa, symbolicStatePair, solver, context);
+        const mantissa = this.#strategy.recoverMantissa(n);
+        this.#strategy.constrainMantissa(mantissa, symbolicStatePair, solver, context);
       }
 
       if ((await solver.check()) !== "sat") {
@@ -89,63 +121,23 @@ export default class DenoRandomnessPredictor {
     }
   }
 
-  async #withRetry<BT, RT>(baseFn: () => Promise<BT>, retryFn: () => Promise<RT>): Promise<BT | RT> {
-    try {
-      return await baseFn();
-    } catch (_e: unknown) {
-      return await retryFn();
-    }
-  }
+  async #solveWithStrategies(): Promise<void> {
+    let lastUnsatError: undefined | UnsatError;
 
-  #createVersionSpecificMethodsFactory(): () => StateConversionMap {
-    // If calls is an odd number, we return logic prior to the January 2026 update.
-    // If calls is an even number, we return logic after the January 2026 update.
-    let calls = 0;
-
-    return (): StateConversionMap => {
-      calls += 1;
-
-      if (calls % 2 > 0) {
-        // See comment at top of file.
-        // This object of functions contains logic prior to the January 2026 update.
-        return {
-          recoverMantissa: (n: number): bigint => {
-            const mantissa = Math.floor(n * this.#SCALING_FACTOR_53_BIT_INT);
-            return BigInt(mantissa);
-          },
-          toDouble: (concreteState: Pair<bigint>): number => {
-            // Calculate next prediction, using first item in concrete state, before modifying concrete state.
-            const next = Number(concreteState[0] >> 11n) / this.#SCALING_FACTOR_53_BIT_INT;
-            // Modify concrete state.
-            XorShift128Plus.concreteBackwards(concreteState);
-            return next;
-          },
-          constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-            solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
-          },
-        };
+    for (const strategy of this.#solvingStrategies) {
+      try {
+        this.#strategy = strategy;
+        return await this.#solveSymbolicState();
+      } catch (err) {
+        // Got a diff error unrelated to solving symbolic state,
+        // so we need to respect it and throw it.
+        if (!(err instanceof UnsatError)) {
+          throw err;
+        }
+        lastUnsatError = err;
       }
+    }
 
-      // See comment at top of file.
-      // This object of functions contains logic for the Math.random impl AFTER the January 2026 update.
-      return {
-        recoverMantissa: (n: number): bigint => {
-          const mantissa = Math.floor(n * this.#SCALING_FACTOR_53_BIT_INT);
-          return BigInt(mantissa);
-        },
-        toDouble: (concreteState: Pair<bigint>): number => {
-          const random = uint64(concreteState[0] + concreteState[1]);
-          // Calculate next prediction, using first item in concrete state, before modifying concrete state.
-          const next = Number(random >> 11n) / this.#SCALING_FACTOR_53_BIT_INT;
-          // Modify concrete state.
-          XorShift128Plus.concreteBackwards(concreteState);
-          return next;
-        },
-        constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-          const sum = symbolicState[0].add(symbolicState[1]);
-          solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
-        },
-      };
-    };
+    throw lastUnsatError ?? new Error("No strategies attempted");
   }
 }
