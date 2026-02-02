@@ -55,7 +55,7 @@ const SAFARI_STRATEGIES: SolvingStrategy[] = [
 export default class SafariRandomnessPredictor extends JavaScriptCorePredictor {
   constructor(sequence: number[]) {
     if (sequence.length < MIN_SEQUENCE_LEN) {
-      throw new InsufficientSequenceLengthError(`sequence length must be >= 6 : got ${sequence.length}`);
+      throw new InsufficientSequenceLengthError(`sequence length must be >= ${MIN_SEQUENCE_LEN} : got ${sequence.length}`);
     }
     super(sequence, SAFARI_STRATEGIES);
   }

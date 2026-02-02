@@ -57,7 +57,7 @@ const BUN_STRATEGIES: SolvingStrategy[] = [
 export default class BunRandomnessPredictor extends JavaScriptCorePredictor {
   constructor(sequence?: number[]) {
     if (sequence && sequence.length < MIN_SEQUENCE_LEN) {
-      throw new InsufficientSequenceLengthError(`sequence length must be >= 6 : got ${sequence.length}`);
+      throw new InsufficientSequenceLengthError(`sequence length must be >= ${MIN_SEQUENCE_LEN} : got ${sequence.length}`);
     }
     if (!sequence) {
       if (!ExecutionRuntime.isBun()) {
