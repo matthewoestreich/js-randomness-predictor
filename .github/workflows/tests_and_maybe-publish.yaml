@@ -1,6 +1,10 @@
 name: tests_and_publish.yaml
 
 on:
+  workflow_run:
+    workflows: ["nightly.yaml"]
+    types:
+      - completed
   push:
     branches:
       - main
@@ -179,30 +183,3 @@ jobs:
           patch-wording: "#patch"
       - name: Publish to npm
         run: npm publish --access public
-#  maybe-publish:
-#    needs: [test-imports, test-cli, test-legacy-node-versions, test-supported-node-versions, test-bun, test-browsers, test-deno]
-#    if: github.event_name == 'push' && startsWith(github.event.head_commit.message, '[publish] ')
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#      - name: Setup Node
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 24.x
-#          registry-url: "https://registry.npmjs.org/"
-#      - name: Install dependencies
-#        run: npm install --ignore-scripts
-#      - name: Automated Version Bump
-#        uses: phips28/gh-action-bump-version@v11.0.7
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          major-wording: "#major"
-#          minor-wording: "#minor"
-#          patch-wording: "#patch"
-#      - name: Publish to npm
-#        shell: bash
-#        run: npm publish
-#        env:
-#          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
