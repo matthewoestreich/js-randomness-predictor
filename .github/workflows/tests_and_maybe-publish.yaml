@@ -123,9 +123,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Deno
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.x
+          deno-version: rc
       - name: Install dependencies
         run: deno install
       - name: Build
