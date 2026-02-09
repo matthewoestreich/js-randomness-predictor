@@ -87,7 +87,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Echo Node.js version
-        run: echo "Node.js version = ${{ matrix.node-version }}"
+        run: echo "Node.js version = ${{ node -v }}"
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Build
