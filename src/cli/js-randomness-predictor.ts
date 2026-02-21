@@ -92,7 +92,10 @@ yargs(hideBin(process.argv))
   .argv;
 
 /**
- * The yargs handler
+ * This method is responsible for running the predictor. It validates user input
+ * and throws errors, if any exist.
+ *
+ * This is essentially the "core" of our CLI.
  */
 async function executePredictionCommand(argv: ArgumentsCamelCase<PredictorArgs>): Promise<void> {
   try {
