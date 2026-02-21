@@ -6,7 +6,7 @@ import { RuntimeType } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
-import { RUNTIMES } from "../../src/constants.ts";
+import { RUNTIMES, V8_MAX_PREDICTIONS } from "../../src/constants.ts";
 
 describe("Base Tests", () => {
   it(`[${RUNTIMES.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
@@ -146,6 +146,20 @@ describe("Deno", () => {
     // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS IN DENO REPL
     const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
     const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
+    const jsonResult = JSON.parse(result.stdout.toString());
+    assert.deepStrictEqual(jsonResult.predictions, expected);
+  });
+});
+
+// Even though we are using Node runtime, we could use any runtime that uses V8 under the hood.
+describe("V8", () => {
+  it(`should allow for number of predictions + sequence length to equal V8 max predictions (${V8_MAX_PREDICTIONS})`, async () => {
+    const sequence_size = 5;
+    const expected_size = V8_MAX_PREDICTIONS - sequence_size;
+    assert.equal(sequence_size + expected_size, V8_MAX_PREDICTIONS);
+    const sequence = Array.from({ length: sequence_size }, Math.random);
+    const expected = Array.from({ length: expected_size }, Math.random);
+    const result = callJsRandomnessPredictorCli({ environment: "node", sequence, predictions: expected.length });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
