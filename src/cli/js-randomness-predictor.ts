@@ -107,9 +107,13 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       );
     }
 
-    // If execution runtime is Node and user provided "-e node" as well as "--env-version N" without "--sequence",
-    // but the current Node execution runtime version doesn't match with "--env-version N", it means we can't generate
-    // a reliable sequence, so the user HAS to provide a "--sequence" argument. Let them know about this error.
+    //
+    // Check if we can auto-generate a sequence.
+    //
+    // If execution runtime is Node and user provided "-e node" as well as "--env-version N" without "--sequence", but the current Node
+    // execution runtime version doesn't match with "--env-version N", it means we can't generate a reliable sequence, so the user HAS
+    // to provide a "--sequence" argument. Let them know about this error.
+    //
     if (
       ExecutionRuntime.isNode() &&
       argv.environment === "node" &&
@@ -132,14 +136,16 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       _info: [],
     };
 
-    // If our current execution environment is Node and it matches what the user provided as "--env-version N"
-    const nodeExecutionVersionMatchesArgvVersion = getCurrentNodeJsMajorVersion() === argv.envVersion;
-
     let numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUMBER_OF_PREDICTIONS;
 
-    // If the user provided an '--environment' that is built with V8, we cannot predict accurately
-    // past 64 total calls to Math.random without solving symbolic state again.
+    //
+    // V8 specific : check if we will exhaust our pool.
+    //
+    // If the user provided an '--environment' that is built with V8, we cannot predict accurately past 64 total calls to Math.random
+    // without solving symbolic state again.
+    //
     // See here for why https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
+    //
     if (RUNTIME_ENGINE[argv.environment] === "v8" && numPredictions + result.sequence.length > V8_MAX_PREDICTIONS) {
       // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
       if (result.sequence.length >= V8_MAX_PREDICTIONS) {
@@ -155,20 +161,21 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       );
     }
 
-    // Return early if we are just testing conditions and don't want to actually run the predictor.
     if (process.env.JSRP_DRY_RUN === "1") {
       return result;
     }
 
-    // Make our predictor.
     const predictor: Predictor = JSRandomnessPredictor[argv.environment](result.sequence);
+    const nodeMajorVersion = getCurrentNodeJsMajorVersion();
 
-    // We need to run `setNodeVersion(x)` on the current Predictor if the user provided a command
-    // that includes `--environment node --env-version N`, but the Node version of the current
-    // execution environment (the runtime this script is being executed in) does not match the
-    // `--env-version N` provided by the user. This means the user wants to target a different
-    // Node version than they are currently running.
-    if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && !nodeExecutionVersionMatchesArgvVersion) {
+    //
+    // Check if user wants to target a different Node version than what they are currently running.
+    //
+    // We need to run `setNodeVersion(x)` on the current Predictor if the user provided a command that includes `--environment node --env-version N`,
+    // but the Node version of the current execution environment (the runtime this script is being executed in) does not match the `--env-version N`
+    // provided by the user.
+    //
+    if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && nodeMajorVersion !== argv.envVersion) {
       const v = { major: Number(argv.envVersion), minor: 0, patch: 0 };
       predictor.setNodeVersion?.(v);
     }
@@ -184,7 +191,7 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       // Make sure the environment matches the runtime
       switch (argv.environment) {
         case "node": {
-          if (ExecutionRuntime.isNode() && (!argv.envVersion || nodeExecutionVersionMatchesArgvVersion)) {
+          if (ExecutionRuntime.isNode() && (!argv.envVersion || nodeMajorVersion === argv.envVersion)) {
             result.actual = callMathRandom(numPredictions);
           }
           break;
@@ -204,12 +211,9 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       }
     }
 
-    // If our results object `.actual` is an array, it means we can check for accuracy.
     if (Array.isArray(result.actual)) {
       result.isCorrect = result.actual.every((v, i) => v === result.predictions[i]);
     }
-
-    // Export results to file.
     if (argv.export) {
       exportResult(argv, result);
     }
