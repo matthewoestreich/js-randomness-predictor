@@ -100,15 +100,14 @@ yargs(hideBin(process.argv))
  */
 export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult> {
   try {
+    //
     // If the current execution runtime does not equal '--environment' it means we can't auto generate sequence.
+    //
     if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
       throw new SequenceNotFoundError(
         `'--sequence' is required when '--environment' is '${argv.environment}' and '${EXECUTION_RUNTIME_ENV_VAR_KEY}' is '${ExecutionRuntime.type()}'`,
       );
     }
-
-    //
-    // Check if we can auto-generate a sequence.
     //
     // If execution runtime is Node and user provided "-e node" as well as "--env-version N" without "--sequence", but the current Node
     // execution runtime version doesn't match with "--env-version N", it means we can't generate a reliable sequence, so the user HAS
@@ -126,7 +125,6 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       );
     }
 
-    // Default results
     const result: PredictorResult = {
       actual: "You'll need to get this yourself via the same way you generated the sequence",
       sequence: argv.sequence ? argv.sequence : callMathRandom(DEFAULT_SEQUENCE_LENGTH[argv.environment]),
@@ -180,15 +178,18 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       predictor.setNodeVersion?.(v);
     }
 
-    // Make predictions
     for (let i = 0; i < numPredictions; i++) {
       const p = await predictor.predictNext();
       result.predictions.push(p);
     }
 
-    // We may be able to auto check if predictions are accurate because we generated the sequence.
+    //
+    // Validate results, if possible.
+    //
+    // We may be able to auto check if predictions are accurate because we generated the sequence. In order to be able
+    // to validate results, no sequence should have been provided and the environment must match execution runtime.
+    //
     if (!argv.sequence) {
-      // Make sure the environment matches the runtime
       switch (argv.environment) {
         case "node": {
           if (ExecutionRuntime.isNode() && (!argv.envVersion || nodeMajorVersion === argv.envVersion)) {
