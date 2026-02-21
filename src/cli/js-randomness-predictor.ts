@@ -2,7 +2,7 @@
 
 import nodefs from "node:fs";
 import nodepath from "node:path";
-import yargs, { Arguments, CommandModule } from "yargs";
+import yargs, { ArgumentsCamelCase, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { NodeJsMajorVersion, Predictor, PredictorArgs, PredictorResult } from "../types.js";
 import Logger from "../logger.js";
@@ -23,7 +23,7 @@ import JSRandomnessPredictor from "../index.js";
 /**
  * The `yargs` command
  */
-const predictCommand: CommandModule = {
+const predictCommand: CommandModule<{}, PredictorArgs> = {
   command: "*",
   describe: "Predict future Math.random() values",
   builder: (yargs) => {
@@ -78,8 +78,8 @@ const predictCommand: CommandModule = {
         type: "boolean",
       });
   },
-  handler: async (argv: Arguments) => {
-    await handlePredictor(argv);
+  handler: async (argv: ArgumentsCamelCase<PredictorArgs>) => {
+    await executePredictionCommand(argv);
   },
 };
 
@@ -92,38 +92,11 @@ yargs(hideBin(process.argv))
   .argv;
 
 /**
- * This method is responsible for running the predictor. It validates user input
- * and throws errors, if any exist. This is essentially the "core" of our CLI.
- *
- * @param {PredictorArgs} argv : the flags used by the cli.
- * @returns {Promise<PredictorResult>}
+ * The yargs handler
  */
-export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult> {
+async function executePredictionCommand(argv: ArgumentsCamelCase<PredictorArgs>): Promise<void> {
   try {
-    //
-    // If the current execution runtime does not equal '--environment' it means we can't auto generate sequence.
-    //
-    if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
-      throw new SequenceNotFoundError(
-        `'--sequence' is required when '--environment' is '${argv.environment}' and '${EXECUTION_RUNTIME_ENV_VAR_KEY}' is '${ExecutionRuntime.type()}'`,
-      );
-    }
-    //
-    // If execution runtime is Node and user provided "-e node" as well as "--env-version N" without "--sequence", but the current Node
-    // execution runtime version doesn't match with "--env-version N", it means we can't generate a reliable sequence, so the user HAS
-    // to provide a "--sequence" argument. Let them know about this error.
-    //
-    if (
-      ExecutionRuntime.isNode() &&
-      argv.environment === "node" &&
-      argv.envVersion &&
-      !argv.sequence &&
-      argv.envVersion !== getCurrentNodeJsMajorVersion()
-    ) {
-      throw new SequenceNotFoundError(
-        `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version! Current Node version is '${getCurrentNodeJsMajorVersion()}' but --env-version is '${argv.envVersion}'`,
-      );
-    }
+    assertSequenceRequirements(argv);
 
     const result: PredictorResult = {
       actual: "You'll need to get this yourself via the same way you generated the sequence",
@@ -134,108 +107,22 @@ export async function runPredictor(argv: PredictorArgs): Promise<PredictorResult
       _info: [],
     };
 
-    let numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUMBER_OF_PREDICTIONS;
+    const numPredictions = computePredictionCount(argv, result);
 
-    //
-    // V8 specific : check if we will exhaust our pool.
-    //
-    // If the user provided an '--environment' that is built with V8, we cannot predict accurately past 64 total calls to Math.random
-    // without solving symbolic state again.
-    //
-    // See here for why https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
-    //
-    if (RUNTIME_ENGINE[argv.environment] === "v8" && numPredictions + result.sequence.length > V8_MAX_PREDICTIONS) {
-      // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
-      if (result.sequence.length >= V8_MAX_PREDICTIONS) {
-        throw new Error(`Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${result.sequence.length}'`);
-      }
-      const numPredictionsLeft = V8_MAX_PREDICTIONS - result.sequence.length;
-      numPredictions = numPredictionsLeft; // Truncate predictions to fit bounds.
-      result._warnings!.push(
-        `Exceeded max predictions!\n` +
-          ` - For a sequence length of '${result.sequence.length}', max number of predictions allowed is '${numPredictionsLeft}'.\n` +
-          ` - Truncated number of predictions to '${numPredictionsLeft}'.\n` +
-          ` - Why? See here : https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion`,
-      );
-    }
-
-    if (process.env.JSRP_DRY_RUN === "1") {
-      return result;
-    }
-
-    const predictor: Predictor = JSRandomnessPredictor[argv.environment](result.sequence);
-    const nodeMajorVersion = getCurrentNodeJsMajorVersion();
-
-    //
-    // Check if user wants to target a different Node version than what they are currently running.
-    //
-    // We need to run `setNodeVersion(x)` on the current Predictor if the user provided a command that includes `--environment node --env-version N`,
-    // but the Node version of the current execution environment (the runtime this script is being executed in) does not match the `--env-version N`
-    // provided by the user.
-    //
-    if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && nodeMajorVersion !== argv.envVersion) {
-      const v = { major: Number(argv.envVersion), minor: 0, patch: 0 };
-      predictor.setNodeVersion?.(v);
-    }
-
-    for (let i = 0; i < numPredictions; i++) {
-      const p = await predictor.predictNext();
-      result.predictions.push(p);
-    }
-
-    //
-    // Validate results, if possible.
-    //
-    // We may be able to auto check if predictions are accurate because we generated the sequence. In order to be able
-    // to validate results, no sequence should have been provided and the environment must match execution runtime.
-    //
-    if (!argv.sequence) {
-      switch (argv.environment) {
-        case "node": {
-          if (ExecutionRuntime.isNode() && (!argv.envVersion || nodeMajorVersion === argv.envVersion)) {
-            result.actual = callMathRandom(numPredictions);
-          }
-          break;
-        }
-        case "deno": {
-          if (ExecutionRuntime.isDeno()) {
-            result.actual = callMathRandom(numPredictions);
-          }
-          break;
-        }
-        case "bun": {
-          if (ExecutionRuntime.isBun()) {
-            result.actual = callMathRandom(numPredictions);
-          }
-          break;
-        }
-      }
-    }
-
-    if (Array.isArray(result.actual)) {
-      result.isCorrect = result.actual.every((v, i) => v === result.predictions[i]);
-    }
-    if (argv.export) {
-      exportResult(argv, result);
-    }
-
-    return result;
-  } catch (e) {
-    return Promise.reject(e);
-  }
-}
-
-/**
- * The yargs handler
- */
-async function handlePredictor(argv: Arguments): Promise<void> {
-  try {
-    const result = await runPredictor(argv as PredictorArgs & Arguments);
-
-    // If dry run, just log everything, including unformatted warnings/info.
     if (process.env.JSRP_DRY_RUN === "1") {
       console.log(JSON.stringify(result, null, 2));
       process.exit(0);
+    }
+
+    const predictor: Predictor = JSRandomnessPredictor[argv.environment](result.sequence);
+
+    applyTargetNodeVersionMaybe(argv, predictor);
+    await makePredictions(predictor, result, numPredictions);
+    populateActualResults(argv, result, numPredictions);
+    evaluatePredictionAccuracy(result);
+
+    if (argv.export) {
+      exportResult(argv, result);
     }
 
     const finalResult: PredictorResult = {
@@ -267,6 +154,135 @@ async function handlePredictor(argv: Arguments): Promise<void> {
     console.log();
     Logger.error(`Something went wrong!`, (err as Error)?.message, "\n");
     process.exit(1);
+  }
+}
+
+/**
+ * Ensures we were given a sequence if one is required based upon args.
+ *
+ * Will throw an error if either of the following is true:
+ *
+ * 1. If a `--sequence` was not provided and the current execution runtime does not equal '--environment',
+ *   it means we can't auto generate sequence.
+ *
+ * 2. If a `--sequence` was not provided and the following flags were used: `--environment node --env-version N` where
+ *   `--env-version N` does not match current execution runtime version. This means we cannot automatically generate a
+ *   reliable sequence and the user will need to provide a `--sequence`.
+ */
+function assertSequenceRequirements(argv: PredictorArgs): void {
+  if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
+    throw new SequenceNotFoundError(
+      `'--sequence' is required when '--environment' is '${argv.environment}' and '${EXECUTION_RUNTIME_ENV_VAR_KEY}' is '${ExecutionRuntime.type()}'`,
+    );
+  }
+  if (
+    ExecutionRuntime.isNode() &&
+    argv.environment === "node" &&
+    argv.envVersion &&
+    !argv.sequence &&
+    argv.envVersion !== getCurrentNodeJsMajorVersion()
+  ) {
+    throw new SequenceNotFoundError(
+      `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version! Current Node version is '${getCurrentNodeJsMajorVersion()}' but --env-version is '${argv.envVersion}'`,
+    );
+  }
+}
+
+/**
+ * Computes the number of predictions to make. Accounts for V8 pool exhaustion.
+ *
+ * If the user provided an '--environment' that is built with V8, we cannot predict accurately past 64 total calls to Math.random
+ * without solving symbolic state again.
+ *
+ * See here for why https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
+ */
+function computePredictionCount(argv: PredictorArgs, result: PredictorResult): number {
+  let numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUMBER_OF_PREDICTIONS;
+
+  if (RUNTIME_ENGINE[argv.environment] === "v8" && numPredictions + result.sequence.length > V8_MAX_PREDICTIONS) {
+    // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
+    if (result.sequence.length >= V8_MAX_PREDICTIONS) {
+      throw new Error(`Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${result.sequence.length}'`);
+    }
+
+    const numPredictionsLeft = V8_MAX_PREDICTIONS - result.sequence.length;
+
+    result._warnings!.push(
+      `Exceeded max predictions!\n` +
+        ` - For a sequence length of '${result.sequence.length}', max number of predictions allowed is '${numPredictionsLeft}'.\n` +
+        ` - Truncated number of predictions to '${numPredictionsLeft}'.\n` +
+        ` - Why? See here : https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion`,
+    );
+
+    // Truncate predictions to fit bounds.
+    return numPredictionsLeft;
+  }
+
+  return numPredictions;
+}
+
+/**
+ * Only applicable if `--environment` is `node`! Check if user wants to target a different Node version than what they are currently running.
+ *
+ * We need to run `setNodeVersion(x)` on the current Predictor if the user provided a command that includes `--environment node --env-version N`,
+ * but the Node version of the current execution environment (the runtime this script is being executed in) does not match the `--env-version N`
+ * provided by the user.
+ */
+function applyTargetNodeVersionMaybe(argv: PredictorArgs, predictor: Predictor): void {
+  if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && getCurrentNodeJsMajorVersion() !== argv.envVersion) {
+    predictor.setNodeVersion?.({ major: Number(argv.envVersion), minor: 0, patch: 0 });
+  }
+}
+
+/**
+ * Generate actual Math.random output and add to result (specifically, the `result.actual` field), if possible.
+ *
+ * We may be able to auto check if predictions are accurate because we generated the sequence. In order to be able
+ * to validate results, no sequence should have been provided and the environment must match execution runtime.
+ */
+function populateActualResults(argv: PredictorArgs, result: PredictorResult, numPredictions: number): void {
+  // The user provided a sequence, meaning we cannot automatically validate results.
+  if (argv.sequence) {
+    return;
+  }
+  switch (argv.environment) {
+    case "node": {
+      if (ExecutionRuntime.isNode() && (!argv.envVersion || getCurrentNodeJsMajorVersion() === argv.envVersion)) {
+        result.actual = callMathRandom(numPredictions);
+      }
+      break;
+    }
+    case "deno": {
+      if (ExecutionRuntime.isDeno()) {
+        result.actual = callMathRandom(numPredictions);
+      }
+      break;
+    }
+    case "bun": {
+      if (ExecutionRuntime.isBun()) {
+        result.actual = callMathRandom(numPredictions);
+      }
+      break;
+    }
+  }
+}
+
+/**
+ * Make predictions and add them to result
+ */
+async function makePredictions(predictor: Predictor, result: PredictorResult, numPredictions: number): Promise<void> {
+  for (let i = 0; i < numPredictions; i++) {
+    const p = await predictor.predictNext();
+    result.predictions.push(p);
+  }
+}
+
+/**
+ * If we have `actual` values, validate them.
+ */
+function evaluatePredictionAccuracy(result: PredictorResult): void {
+  if (Array.isArray(result.actual)) {
+    result.isCorrect = result.actual.every((v, i) => v === result.predictions[i]);
   }
 }
 
