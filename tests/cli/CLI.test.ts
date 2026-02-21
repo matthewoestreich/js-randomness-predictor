@@ -161,6 +161,7 @@ describe("V8", () => {
     const expected = Array.from({ length: expected_size }, Math.random);
     const result = callJsRandomnessPredictorCli({ environment: "node", sequence, predictions: expected.length });
     const jsonResult = JSON.parse(result.stdout.toString());
+    assert.equal(jsonResult.predictions.length + jsonResult.sequence.length, V8_MAX_PREDICTIONS);
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
 });
