@@ -213,7 +213,7 @@ function computePredictionCount(argv: PredictorArgs, result: PredictorResult): n
   }
 
   // We are within bounds.
-  if (numPredictions + result.sequence.length < V8_MAX_PREDICTIONS) {
+  if (numPredictions + result.sequence.length <= V8_MAX_PREDICTIONS) {
     return numPredictions;
   }
 
