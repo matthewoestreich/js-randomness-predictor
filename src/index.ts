@@ -1,4 +1,4 @@
-import type { Predictor, SemanticVersion } from "./public_types.js";
+import type { Predictor, SemanticVersion } from "./types.js";
 import {
   FirefoxRandomnessPredictor,
   ChromeRandomnessPredictor,
@@ -6,7 +6,7 @@ import {
   SafariRandomnessPredictor,
   BunRandomnessPredictor,
   DenoRandomnessPredictor,
-} from "./public_types.js";
+} from "./predictors/index.js";
 
 export type { Predictor, SemanticVersion };
 

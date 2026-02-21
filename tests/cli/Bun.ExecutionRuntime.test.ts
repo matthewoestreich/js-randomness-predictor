@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import stderrThrows from "./stderrThrows.ts";
-import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/types.ts";
+import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
 
 describe("Execution Runtime : Bun", () => {
   const executionRuntime = "bun";

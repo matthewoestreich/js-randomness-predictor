@@ -7,10 +7,9 @@ import {
   SafariRandomnessPredictor,
   BunRandomnessPredictor,
   DenoRandomnessPredictor,
-} from "../public_types.js";
+} from "../predictors/index.js";
 
-import type { BrowserRuntimeType } from "../types.js";
-import type { Predictor, SemanticVersion } from "../public_types.js";
+import type { BrowserRuntimeType, Predictor, SemanticVersion } from "../types.js";
 
 // Invoke immediately upon page load.
 loader();

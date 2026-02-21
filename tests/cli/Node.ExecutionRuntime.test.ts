@@ -1,9 +1,10 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { NODE_MAJOR_VERSIONS, NodeJsMajorVersion } from "../../src/types.ts";
+import { NodeJsMajorVersion } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
+import { NODE_MAJOR_VERSIONS } from "../../src/constants.ts";
 
 describe("Node", () => {
   const CURR_NODE_MAJOR_VER = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;

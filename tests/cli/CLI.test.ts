@@ -2,10 +2,11 @@ import { describe, it, after } from "node:test";
 import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
-import { RuntimeType, RUNTIMES } from "../../src/types.ts";
+import { RuntimeType } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
+import { RUNTIMES } from "../../src/constants.ts";
 
 describe("Base Tests", () => {
   it(`[${RUNTIMES.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
