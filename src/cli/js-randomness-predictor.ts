@@ -202,26 +202,30 @@ function assertSequenceRequirements(argv: PredictorArgs): void {
 function computePredictionCount(argv: PredictorArgs, result: PredictorResult): number {
   let numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUMBER_OF_PREDICTIONS;
 
-  if (RUNTIME_ENGINE[argv.environment] === "v8" && numPredictions + result.sequence.length > V8_MAX_PREDICTIONS) {
-    // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
-    if (result.sequence.length >= V8_MAX_PREDICTIONS) {
-      throw new Error(`Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${result.sequence.length}'`);
-    }
-
-    const numPredictionsLeft = V8_MAX_PREDICTIONS - result.sequence.length;
-
-    result._warnings!.push(
-      `Exceeded max predictions!\n` +
-        ` - For a sequence length of '${result.sequence.length}', max number of predictions allowed is '${numPredictionsLeft}'.\n` +
-        ` - Truncated number of predictions to '${numPredictionsLeft}'.\n` +
-        ` - Why? See here : https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion`,
-    );
-
-    // Truncate predictions to fit bounds.
-    return numPredictionsLeft;
+  // If not V8, we have no limit.
+  if (RUNTIME_ENGINE[argv.environment] !== "v8") {
+    return numPredictions;
   }
 
-  return numPredictions;
+  // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
+  if (result.sequence.length >= V8_MAX_PREDICTIONS) {
+    throw new Error(`Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${result.sequence.length}'`);
+  }
+
+  // We are within bounds.
+  if (numPredictions + result.sequence.length < V8_MAX_PREDICTIONS) {
+    return numPredictions;
+  }
+
+  // We are out of bounds; truncate predictions to fit bounds.
+  const numPredictionsRemaining = V8_MAX_PREDICTIONS - result.sequence.length;
+  result._warnings!.push(
+    `Exceeded max predictions!\n` +
+      ` - For a sequence length of '${result.sequence.length}', max number of predictions allowed is '${numPredictionsRemaining}'.\n` +
+      ` - Truncated number of predictions to '${numPredictionsRemaining}'.\n` +
+      ` - Why? See here : https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion`,
+  );
+  return numPredictionsRemaining;
 }
 
 /**
