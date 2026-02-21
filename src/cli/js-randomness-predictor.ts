@@ -248,29 +248,16 @@ function applyTargetNodeVersionMaybe(argv: PredictorArgs, predictor: Predictor):
  * to validate results, no sequence should have been provided and the environment must match execution runtime.
  */
 function populateActualResults(argv: PredictorArgs, result: PredictorResult, numPredictions: number): void {
-  // The user provided a sequence, meaning we cannot automatically validate results.
+  // The user provided a sequence, which means we did not auto-generate the sequence, which means we cannot automatically validate results.
   if (argv.sequence) {
     return;
   }
-  switch (argv.environment) {
-    case "node": {
-      if (ExecutionRuntime.isNode() && (!argv.envVersion || getCurrentNodeJsMajorVersion() === argv.envVersion)) {
-        result.actual = callMathRandom(numPredictions);
-      }
-      break;
-    }
-    case "deno": {
-      if (ExecutionRuntime.isDeno()) {
-        result.actual = callMathRandom(numPredictions);
-      }
-      break;
-    }
-    case "bun": {
-      if (ExecutionRuntime.isBun()) {
-        result.actual = callMathRandom(numPredictions);
-      }
-      break;
-    }
+  if (
+    ("node" === argv.environment && ExecutionRuntime.isNode() && (!argv.envVersion || getCurrentNodeJsMajorVersion() === argv.envVersion)) ||
+    ("deno" === argv.environment && ExecutionRuntime.isDeno()) ||
+    ("bun" === argv.environment && ExecutionRuntime.isBun())
+  ) {
+    result.actual = callMathRandom(numPredictions);
   }
 }
 
