@@ -119,7 +119,7 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<PredictorArgs>)
 
     const predictor: Predictor = JSRandomnessPredictor[argv.environment](result.sequence);
 
-    applyTargetNodeVersionMaybe(argv, predictor);
+    applyTargetNodeVersion(argv, predictor);
     await makePredictions(predictor, result, numPredictions);
     populateActualResults(argv, result, numPredictions);
     evaluatePredictionAccuracy(result);
@@ -200,7 +200,7 @@ function assertSequenceRequirements(argv: PredictorArgs): void {
  * See here for why https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
  */
 function computePredictionCount(argv: PredictorArgs, result: PredictorResult): number {
-  let numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUMBER_OF_PREDICTIONS;
+  const numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUMBER_OF_PREDICTIONS;
 
   // If not V8, we have no limit.
   if (RUNTIME_ENGINE[argv.environment] !== "v8") {
@@ -235,7 +235,7 @@ function computePredictionCount(argv: PredictorArgs, result: PredictorResult): n
  * but the Node version of the current execution environment (the runtime this script is being executed in) does not match the `--env-version N`
  * provided by the user.
  */
-function applyTargetNodeVersionMaybe(argv: PredictorArgs, predictor: Predictor): void {
+function applyTargetNodeVersion(argv: PredictorArgs, predictor: Predictor): void {
   if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && getCurrentNodeJsMajorVersion() !== argv.envVersion) {
     predictor.setNodeVersion?.({ major: Number(argv.envVersion), minor: 0, patch: 0 });
   }
