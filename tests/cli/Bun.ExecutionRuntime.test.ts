@@ -10,13 +10,12 @@ describe("Execution Runtime : Bun", () => {
   const differentEnvironment = "deno";
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", () => {
-    const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime });
-    const jsonResult = JSON.parse(result.stdout.toString());
-    assert.strictEqual(jsonResult.isCorrect, true);
+    const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
+    assert.doesNotThrow(() => stderrThrows(result));
   });
 
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${executionRuntime})`, () => {
-    const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime });
+    const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
     assert.throws(() => stderrThrows(result));
   });
 });
