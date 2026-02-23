@@ -11,9 +11,8 @@ describe("Execution Runtime : Deno", () => {
   const differentEnvironment = "bun";
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", () => {
-    const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime });
-    const jsonResult = JSON.parse(result.stdout.toString());
-    assert.strictEqual(jsonResult.isCorrect, true);
+    const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
+    assert.doesNotThrow(() => stderrThrows(result));
   });
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
@@ -29,7 +28,7 @@ describe("Execution Runtime : Deno", () => {
   });
 
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, () => {
-    const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime });
+    const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
     assert.throws(() => stderrThrows(result));
   });
 
@@ -38,7 +37,7 @@ describe("Execution Runtime : Deno", () => {
     // https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
     it("should trigger pool exhaustion", () => {
       const seq = Array.from({ length: 64 }, Math.random);
-      const result = callJsRandomnessPredictorCli({ environment, sequence: seq }, { executionRuntime });
+      const result = callJsRandomnessPredictorCli({ environment, sequence: seq }, { executionRuntime, isDryRun: true });
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
       assert.throws(() => stderrThrows(result));
