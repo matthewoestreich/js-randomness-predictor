@@ -59,8 +59,3 @@ export type SolvingStrategy = {
   symbolicXorShift: SymbolicXorShiftFn;
   concreteXorShift: ConcreteXorShiftFn;
 };
-
-export type XorShiftStrategy = {
-  symbolic: SymbolicXorShiftFn;
-  concrete: ConcreteXorShiftFn;
-};
