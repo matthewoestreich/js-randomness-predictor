@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import nodefs from "node:fs";
-import nodepath from "node:path";
+import * as nodefs from "node:fs";
+import * as nodepath from "node:path";
 import yargs, { ArgumentsCamelCase, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
-import { NodeJsMajorVersion, Predictor, PredictorArgs, PredictorResult } from "../types.js";
+import { NodeJsMajorVersion, Predictor, CliArgs, CliResult } from "../types.js";
 import Logger from "../logger.js";
 import {
   RUNTIMES,
@@ -23,7 +23,7 @@ import JSRandomnessPredictor from "../index.js";
 /**
  * The `yargs` command
  */
-const predictCommand: CommandModule<{}, PredictorArgs> = {
+const predictCommand: CommandModule<{}, CliArgs> = {
   command: "*",
   describe: "Predict future Math.random() values",
   builder: (yargs) => {
@@ -78,7 +78,7 @@ const predictCommand: CommandModule<{}, PredictorArgs> = {
         type: "boolean",
       });
   },
-  handler: async (argv: ArgumentsCamelCase<PredictorArgs>) => {
+  handler: async (argv: ArgumentsCamelCase<CliArgs>) => {
     await executePredictionCommand(argv);
   },
 };
@@ -97,11 +97,11 @@ yargs(hideBin(process.argv))
  *
  * This is essentially the "core" of our CLI.
  */
-async function executePredictionCommand(argv: ArgumentsCamelCase<PredictorArgs>): Promise<void> {
+async function executePredictionCommand(argv: ArgumentsCamelCase<CliArgs>): Promise<void> {
   try {
     assertSequenceRequirements(argv);
 
-    const result: PredictorResult = {
+    const result: CliResult = {
       actual: "You'll need to get this yourself via the same way you generated the sequence",
       sequence: argv.sequence ? argv.sequence : callMathRandom(DEFAULT_SEQUENCE_LENGTH[argv.environment]),
       isCorrect: undefined,
@@ -128,27 +128,23 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<PredictorArgs>)
       exportResult(argv, result);
     }
 
-    const finalResult: PredictorResult = {
+    const finalResult: CliResult = {
       sequence: result.sequence,
       predictions: result.predictions,
       actual: result.actual,
     };
 
-    // Have to check for undefined here, bc well, isCorrect=false is falsey, too.
     if (result?.isCorrect !== undefined) {
       finalResult.isCorrect = result.isCorrect;
     }
 
-    // Show user the final result(s)
+    // Show user results
     console.log(JSON.stringify(finalResult, null, 2));
 
-    // If any info, show them after results.
     if (result._info && result._info.length) {
       console.log();
       result._info.forEach((info) => Logger.info(info, "\n"));
     }
-
-    // If any warnings, show them after results.
     if (result._warnings && result._warnings.length) {
       console.log();
       result._warnings.forEach((warning) => Logger.warn(warning, "\n"));
@@ -172,7 +168,7 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<PredictorArgs>)
  *   `--env-version N` does not match current execution runtime version. This means we cannot automatically generate a
  *   reliable sequence and the user will need to provide a `--sequence`.
  */
-function assertSequenceRequirements(argv: PredictorArgs): void {
+function assertSequenceRequirements(argv: CliArgs): void {
   if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
     throw new SequenceNotFoundError(
       `'--sequence' is required when '--environment' is '${argv.environment}' and '${EXECUTION_RUNTIME_ENV_VAR_KEY}' is '${ExecutionRuntime.type()}'`,
@@ -199,7 +195,7 @@ function assertSequenceRequirements(argv: PredictorArgs): void {
  *
  * See here for why https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
  */
-function computePredictionCount(argv: PredictorArgs, result: PredictorResult): number {
+function computePredictionCount(argv: CliArgs, result: CliResult): number {
   const numPredictions = argv.predictions !== undefined ? argv.predictions : DEFAULT_NUMBER_OF_PREDICTIONS;
 
   // If not V8, we have no limit.
@@ -235,7 +231,7 @@ function computePredictionCount(argv: PredictorArgs, result: PredictorResult): n
  * but the Node version of the current execution environment (the runtime this script is being executed in) does not match the `--env-version N`
  * provided by the user.
  */
-function applyTargetNodeVersion(argv: PredictorArgs, predictor: Predictor): void {
+function applyTargetNodeVersion(argv: CliArgs, predictor: Predictor): void {
   if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && getCurrentNodeJsMajorVersion() !== argv.envVersion) {
     predictor.setNodeVersion?.({ major: Number(argv.envVersion), minor: 0, patch: 0 });
   }
@@ -247,7 +243,7 @@ function applyTargetNodeVersion(argv: PredictorArgs, predictor: Predictor): void
  * We may be able to auto check if predictions are accurate because we generated the sequence. In order to be able
  * to validate results, no sequence should have been provided and the environment must match execution runtime.
  */
-function populateActualResults(argv: PredictorArgs, result: PredictorResult, numPredictions: number): void {
+function populateActualResults(argv: CliArgs, result: CliResult, numPredictions: number): void {
   // The user provided a sequence, which means we did not auto-generate the sequence, which means we cannot automatically validate results.
   if (argv.sequence) {
     return;
@@ -264,7 +260,7 @@ function populateActualResults(argv: PredictorArgs, result: PredictorResult, num
 /**
  * Make predictions and add them to result
  */
-async function makePredictions(predictor: Predictor, result: PredictorResult, numPredictions: number): Promise<void> {
+async function makePredictions(predictor: Predictor, result: CliResult, numPredictions: number): Promise<void> {
   for (let i = 0; i < numPredictions; i++) {
     const p = await predictor.predictNext();
     result.predictions.push(p);
@@ -274,7 +270,7 @@ async function makePredictions(predictor: Predictor, result: PredictorResult, nu
 /**
  * If we have `actual` values, validate them.
  */
-function evaluatePredictionAccuracy(result: PredictorResult): void {
+function evaluatePredictionAccuracy(result: CliResult): void {
   if (Array.isArray(result.actual)) {
     result.isCorrect = result.actual.every((v, i) => v === result.predictions[i]);
   }
@@ -290,7 +286,7 @@ function getCurrentNodeJsMajorVersion(): NodeJsMajorVersion {
 /**
  * Helper to export predictor results to file.
  */
-function exportResult(argv: PredictorArgs, result: PredictorResult): void {
+function exportResult(argv: CliArgs, result: CliResult): void {
   const exportPath = nodepath.resolve(process.cwd(), argv.export!.toString());
   const dirPath = nodepath.dirname(exportPath);
   const fileExists = nodefs.existsSync(exportPath);
@@ -325,9 +321,9 @@ function exportResult(argv: PredictorArgs, result: PredictorResult): void {
   writeResultsToFile(exportPath, result);
 }
 
-function writeResultsToFile(path: string, result: PredictorResult): void {
+function writeResultsToFile(path: string, result: CliResult): void {
   try {
-    const json: PredictorResult = { sequence: result.sequence, predictions: result.predictions, actual: result.actual };
+    const json: CliResult = { sequence: result.sequence, predictions: result.predictions, actual: result.actual };
     if (result.isCorrect !== undefined) {
       json.isCorrect = result.isCorrect;
     }

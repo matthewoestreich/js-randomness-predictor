@@ -11,7 +11,7 @@ export interface Predictor {
   setNodeVersion?(version: SemanticVersion): void;
 }
 
-export interface PredictorArgs {
+export interface CliArgs {
   environment: RuntimeType;
   sequence?: number[];
   envVersion?: NodeJsMajorVersion;
@@ -43,7 +43,7 @@ export type SemanticVersion = {
   patch: number;
 };
 
-export type PredictorResult = {
+export type CliResult = {
   sequence: number[];
   predictions: number[];
   actual: string | number[];
