@@ -1,11 +1,30 @@
 /**
  *
- * This file is meant to test older, unsupported (meaning, unsupported by this package) versions of Node.
  *
- * While these versions are unsupported (due to being unable to build Z3), you can still
- * make predictions with numbers generated in those legacy versions.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * --- !!! IMPORTANT !!! ---
+ *
+ * Why do we need tests for version of Node that we don't support?
+ *
+ * While these Node versions are unsupported by this package (due to being unable to build Z3),
+ * you can still make predictions with numbers generated in those legacy versions.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  *
  */
+
 import JSRandomnessPredictor from "../../../dist/esm/index.js";
 import { describe, it } from "node:test";
 import assert from "node:assert";
