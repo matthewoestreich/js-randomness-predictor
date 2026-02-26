@@ -48,6 +48,7 @@ export type CliResult = {
   predictions: number[];
   actual: string | number[];
   isCorrect?: boolean;
+  runtime: RuntimeType;
   _warnings?: string[];
   _info?: string[];
 };

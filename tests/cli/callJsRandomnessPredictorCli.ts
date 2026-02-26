@@ -1,19 +1,16 @@
 import nodepath from "node:path";
 import { spawnSync, SpawnSyncReturns, SpawnSyncOptionsWithStringEncoding } from "node:child_process";
-import { PredictorArgs } from "../../src/types.ts";
-import { CallJsRandomnessPredictorCliExtendedOptions } from "../types.ts";
+import { CliArgs } from "../../src/types.ts";
+import { CliEnvironmentArgs } from "../types.ts";
 
 const JSRP_CLI_PATH = nodepath.resolve(import.meta.dirname, "../../dist/cli/cli.js");
 
 /**
  * Programmatically call js-randomness-predictor CLI
  * @param {PredictorArgs} args
- * @param {CallJsRandomnessPredictorCliExtendedOptions} extendedOptions : misc environmental options unrelated to CLI args.
+ * @param {CliEnvironmentArgs} extendedOptions : misc environmental options unrelated to CLI args. Not to be confused with env vars.
  */
-export default function callJsRandomnessPredictorCli(
-  args: PredictorArgs,
-  extendedOptions?: CallJsRandomnessPredictorCliExtendedOptions,
-): SpawnSyncReturns<string> {
+export default function callJsRandomnessPredictorCli(args: CliArgs, extendedOptions?: CliEnvironmentArgs): SpawnSyncReturns<string> {
   if (!extendedOptions?.jsRandomnessPredictorCliPath) {
     (extendedOptions ||= {}).jsRandomnessPredictorCliPath = JSRP_CLI_PATH;
   }

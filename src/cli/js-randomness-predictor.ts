@@ -106,6 +106,7 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<CliArgs>): Prom
       sequence: argv.sequence ? argv.sequence : callMathRandom(DEFAULT_SEQUENCE_LENGTH[argv.environment]),
       isCorrect: undefined,
       predictions: [],
+      runtime: ExecutionRuntime.type(),
       _warnings: [],
       _info: [],
     };
@@ -132,6 +133,7 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<CliArgs>): Prom
       sequence: result.sequence,
       predictions: result.predictions,
       actual: result.actual,
+      runtime: result.runtime,
     };
 
     if (result?.isCorrect !== undefined) {
@@ -319,7 +321,7 @@ function exportResult(argv: CliArgs, result: CliResult): void {
 
 function writeResultsToFile(path: string, result: CliResult): void {
   try {
-    const json: CliResult = { sequence: result.sequence, predictions: result.predictions, actual: result.actual };
+    const json: CliResult = { sequence: result.sequence, predictions: result.predictions, actual: result.actual, runtime: result.runtime };
     if (result.isCorrect !== undefined) {
       json.isCorrect = result.isCorrect;
     }

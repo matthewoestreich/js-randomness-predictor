@@ -4,11 +4,12 @@ import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import stderrThrows from "./stderrThrows.ts";
 import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
+import { CliResult, RuntimeType } from "../../src/types.ts";
 
 describe("Execution Runtime : Deno", () => {
-  const executionRuntime = "deno";
-  const environment = "deno";
-  const differentEnvironment = "bun";
+  const executionRuntime: RuntimeType = "deno";
+  const environment: RuntimeType = "deno";
+  const differentEnvironment: RuntimeType = "bun";
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
@@ -30,6 +31,13 @@ describe("Execution Runtime : Deno", () => {
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, () => {
     const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
     assert.throws(() => stderrThrows(result));
+  });
+
+  it(`results show execution runtime type is ${executionRuntime}`, async () => {
+    const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
+    const jsonResult = JSON.parse(result.stdout.toString()) as CliResult;
+    const expectedRuntimeType: RuntimeType = "deno";
+    assert.equal(jsonResult.runtime, expectedRuntimeType);
   });
 
   describe("Random Number Pool Exhaustion", () => {

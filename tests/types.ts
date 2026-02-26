@@ -10,7 +10,7 @@ export type RandomNumberGenerationMethod = "ArrayFrom" | "MathRandom";
 export type SequenceAndExpectedRandoms = { sequence: number[]; expected: number[] };
 
 // For the callJsRandomnessPredictorCli (calling js-randomness-predictor CLI, but programmatically)
-export type CallJsRandomnessPredictorCliExtendedOptions = {
+export type CliEnvironmentArgs = {
   isDryRun?: boolean;
   jsRandomnessPredictorCliPath?: string;
   executionRuntime?: ServerRuntimeType;
