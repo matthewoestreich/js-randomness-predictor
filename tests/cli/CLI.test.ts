@@ -110,9 +110,6 @@ describe("Bun", () => {
   const environment = "bun";
   const runtime = "bun";
 
-  /**
-   * TODO : this test is running very slow! Troubleshoot it
-   **/
   it("should be correct when using Array.fom", { skip: false }, async () => {
     // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS.
     const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true } });
