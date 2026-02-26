@@ -7,6 +7,7 @@ import queryDb from "../queryRandomNumbersDatabase.ts";
 import { CliResult, RuntimeType } from "../../src/types.ts";
 
 describe("Execution Runtime : Deno", () => {
+  const runtime: RuntimeType = "deno";
   const executionRuntime: RuntimeType = "deno";
   const environment: RuntimeType = "deno";
   const differentEnvironment: RuntimeType = "bun";
@@ -38,6 +39,22 @@ describe("Execution Runtime : Deno", () => {
     const jsonResult = JSON.parse(result.stdout.toString()) as CliResult;
     const expectedRuntimeType: RuntimeType = "deno";
     assert.equal(jsonResult.runtime, expectedRuntimeType);
+  });
+
+  it("should be correct when using Array.fom generated in REPL", async () => {
+    // NUMBERS WERE GENERATED USING `Array.from({ length N }, Math.random)` CALLS IN DENO REPL.
+    const { sequence, expected } = queryDb({ runtime, tags: { arrayFrom: true, repl: true } });
+    const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
+    const jsonResult = JSON.parse(result.stdout.toString());
+    assert.deepStrictEqual(jsonResult.predictions, expected);
+  });
+
+  it("should be correct when using Math.random() standalone calls generated in REPL", async () => {
+    // NUMBERS WERE GENERATED USING SINGLE `Math.random()` CALLS IN DENO REPL
+    const { sequence, expected } = queryDb({ runtime, tags: { mathRandomStandalone: true, repl: true } });
+    const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
+    const jsonResult = JSON.parse(result.stdout.toString());
+    assert.deepStrictEqual(jsonResult.predictions, expected);
   });
 
   describe("Random Number Pool Exhaustion", () => {
