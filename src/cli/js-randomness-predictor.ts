@@ -6,6 +6,10 @@ import yargs, { ArgumentsCamelCase, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { NodeJsMajorVersion, Predictor, CliArgs, CliResult } from "../types.js";
 import Logger from "../logger.js";
+import callMathRandom from "../callMathRandom.js";
+import { SequenceNotFoundError } from "../errors.js";
+import ExecutionRuntime from "../ExecutionRuntime.js";
+import JSRandomnessPredictor from "../index.js";
 import {
   RUNTIMES,
   NODE_MAJOR_VERSIONS,
@@ -15,10 +19,6 @@ import {
   RUNTIME_ENGINE,
   V8_MAX_PREDICTIONS,
 } from "../constants.js";
-import callMathRandom from "../callMathRandom.js";
-import { SequenceNotFoundError } from "../errors.js";
-import ExecutionRuntime from "../ExecutionRuntime.js";
-import JSRandomnessPredictor from "../index.js";
 
 /**
  * The `yargs` command
@@ -142,16 +142,13 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<CliArgs>): Prom
     console.log(JSON.stringify(finalResult, null, 2));
 
     if (result._info && result._info.length) {
-      console.log();
-      result._info.forEach((info) => Logger.info(info, "\n"));
+      result._info.forEach((info) => Logger.info("\n", info, "\n"));
     }
     if (result._warnings && result._warnings.length) {
-      console.log();
-      result._warnings.forEach((warning) => Logger.warn(warning, "\n"));
+      result._warnings.forEach((warning) => Logger.warn("\n", warning, "\n"));
     }
   } catch (err: unknown) {
-    console.log();
-    Logger.error(`Something went wrong!`, (err as Error)?.message, "\n");
+    Logger.error(`\nSomething went wrong!`, (err as Error)?.message, "\n");
     process.exit(1);
   }
 }
@@ -215,7 +212,7 @@ function computePredictionCount(argv: CliArgs, result: CliResult): number {
 
   // We are out of bounds; truncate predictions to fit bounds.
   const numPredictionsRemaining = V8_MAX_PREDICTIONS - result.sequence.length;
-  result._warnings!.push(
+  (result._warnings ??= []).push(
     `Exceeded max predictions!\n` +
       ` - For a sequence length of '${result.sequence.length}', max number of predictions allowed is '${numPredictionsRemaining}'.\n` +
       ` - Truncated number of predictions to '${numPredictionsRemaining}'.\n` +
@@ -262,8 +259,7 @@ function populateActualResults(argv: CliArgs, result: CliResult, numPredictions:
  */
 async function makePredictions(predictor: Predictor, result: CliResult, numPredictions: number): Promise<void> {
   for (let i = 0; i < numPredictions; i++) {
-    const p = await predictor.predictNext();
-    result.predictions.push(p);
+    result.predictions.push(await predictor.predictNext());
   }
 }
 
@@ -328,8 +324,8 @@ function writeResultsToFile(path: string, result: CliResult): void {
       json.isCorrect = result.isCorrect;
     }
     nodefs.writeFileSync(path, JSON.stringify(json, null, 2), { encoding: "utf-8" });
-    result._info?.push(`Exported results to '${path}'`);
+    (result._info ??= []).push(`Exported results to '${path}'`);
   } catch (e: unknown) {
-    result._warnings?.push(`Unable to export results! ${(e as Error).message}`);
+    (result._warnings ??= []).push(`Unable to export results! ${(e as Error).message}`);
   }
 }

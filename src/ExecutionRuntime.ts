@@ -26,16 +26,15 @@ export default class ExecutionRuntime {
   }
 
   static isFirefox(): boolean {
-    // @ts-ignore
     return typeof window !== "undefined" && navigator.userAgent.indexOf("Firefox") > -1;
   }
 
   static isChrome(): boolean {
-    return typeof window !== undefined && navigator.userAgent.indexOf("Chrome") > -1;
+    return typeof window !== "undefined" && navigator.userAgent.indexOf("Chrome") > -1;
   }
 
   static isSafari(): boolean {
-    return typeof window !== undefined && navigator.userAgent.indexOf("Safari") > -1;
+    return typeof window !== "undefined" && navigator.userAgent.indexOf("Safari") > -1;
   }
 
   static type(): RuntimeType {
