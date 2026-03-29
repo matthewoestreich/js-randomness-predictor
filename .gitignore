@@ -5,6 +5,8 @@ deno.lock
 bun.lock
 dist-staging
 
+dyn_seq_test.json
+
 # Logs
 logs
 *.log
