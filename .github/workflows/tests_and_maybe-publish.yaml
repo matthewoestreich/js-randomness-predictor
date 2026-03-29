@@ -43,7 +43,9 @@ jobs:
           curl -fsSL https://deno.land/x/install/install.sh | sh
           echo "$HOME/.deno/bin" >> $GITHUB_PATH
       - name: Echo Deno version
-        run: echo deno -v
+        run: echo $(deno -v)
+      - name: Echo ls -a node_modules/z3-solver-jsrp
+        run: echo $(ls -a node_modules/z3-solver-jsrp)
       - name: Install Bun manually
         run: |
           curl -fsSL https://bun.sh/install | bash
