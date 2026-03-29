@@ -44,14 +44,14 @@ jobs:
           echo "$HOME/.deno/bin" >> $GITHUB_PATH
       - name: Echo Deno version
         run: echo $(deno -v)
-      - name: Echo ls -a node_modules/z3-solver-jsrp
-        run: echo $(ls -a node_modules/z3-solver-jsrp)
       - name: Install Bun manually
         run: |
           curl -fsSL https://bun.sh/install | bash
           echo "$HOME/.bun/bin" >> $GITHUB_PATH
       - name: Install dependencies
         run: npm install --ignore-scripts && deno install
+      - name: Echo ls -a node_modules/z3-solver-jsrp
+        run: echo $(ls -a node_modules/z3-solver-jsrp)
       - name: Build
         shell: bash
         run: npm run build:ci
