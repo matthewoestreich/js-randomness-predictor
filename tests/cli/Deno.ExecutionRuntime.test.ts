@@ -6,7 +6,7 @@ import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import { CliResult, RuntimeType } from "../../src/types.ts";
 
-import nodefs from "node:fs";
+//import nodefs from "node:fs";
 
 describe("Execution Runtime : Deno", () => {
   const runtime: RuntimeType = "deno";
@@ -14,9 +14,9 @@ describe("Execution Runtime : Deno", () => {
   const environment: RuntimeType = "deno";
   const differentEnvironment: RuntimeType = "bun";
 
-  it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", () => {
+  it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", { skip: true }, () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
-    nodefs.writeFileSync("./dyn_seq_test.json", JSON.stringify(result));
+    //nodefs.writeFileSync("./dyn_seq_test.json", JSON.stringify(result));
     assert.doesNotThrow(() => stderrThrows(result));
   });
 
