@@ -48,8 +48,10 @@ jobs:
         run: |
           curl -fsSL https://bun.sh/install | bash
           echo "$HOME/.bun/bin" >> $GITHUB_PATH
+      - name: Echo Bun version
+        run: echo $(bun -v)
       - name: Install dependencies
-        run: npm install --ignore-scripts && deno install
+        run: npm install --ignore-scripts
       - name: Echo ls -a node_modules/z3-solver-jsrp
         run: echo $(ls -a node_modules/z3-solver-jsrp)
       - name: Build

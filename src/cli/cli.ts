@@ -29,8 +29,8 @@ if (executionRuntime === "deno") {
   const importMap = nodepath.resolve(import.meta.dirname, denoImportMapRelative);
 
   // Deno forces us to put the "--allow-*" commands PRIOR to the script!
-  // So the command ultimately becomes:`deno --allow-env --allow-read js-randomness-predictor.js <rest_of_cli_args>`
-  childProcessArgs.unshift("--allow-env", "--allow-read", `--import-map=${importMap}`);
+  // So the command ultimately becomes:`deno --node-modules-dir --allow-env --allow-read js-randomness-predictor.js <rest_of_cli_args>`
+  childProcessArgs.unshift("--node-modules-dir=auto", "--allow-env", "--allow-read", `--import-map=${importMap}`);
 
   // So we can use imports that arent prefixed with "npm:", eg `import x from "npm:x"`
   childProcessOptions.env!.DENO_COMPAT = "1";
