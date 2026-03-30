@@ -52,8 +52,6 @@ jobs:
         run: echo $(bun -v)
       - name: Install dependencies
         run: npm install --ignore-scripts
-      - name: Echo ls -a node_modules/z3-solver-jsrp
-        run: echo $(ls -a node_modules/z3-solver-jsrp)
       - name: Build
         shell: bash
         run: npm run build:ci
