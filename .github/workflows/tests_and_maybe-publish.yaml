@@ -183,45 +183,19 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Generate Changelog, Bump Version, and Tag
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           # Determine the type of release from commit message
-          if [[ "${GITHUB_HEAD_COMMIT_MESSAGE}" == *"#major"* ]]; then
+          if [[ "$COMMIT_MSG" == *"#major"* ]]; then
             npm exec standard-version -- --release-as major --verbose
-          elif [[ "${GITHUB_HEAD_COMMIT_MESSAGE}" == *"#minor"* ]]; then
+          elif [[ "$COMMIT_MSG" == *"#minor"* ]]; then
             npm exec standard-version -- --release-as minor --verbose
-          else
+          elif [[ "$COMMIT_MSG" == *"#patch"* ]]; then
             npm exec standard-version -- --release-as patch --verbose
+          else 
+            echo "[ERROR] Unrecognized release type! Expected commit message to contain release type (one of [#major, #minor, #patch])"
+            exit 1
           fi
-      - name: Push commits & tags
-        run: |
-          git push origin main --follow-tags
-      - name: Publish to npm
-        run: npm publish --access public
-#  maybe-publish:
-#    needs: [test-imports, test-cli, test-legacy-node-versions, test-supported-node-versions, test-bun, test-browsers, test-deno]
-#    if: github.event_name == 'push' && startsWith(github.event.head_commit.message, '[publish] ')
-#    runs-on: ubuntu-latest
-#    permissions:
-#      contents: write # needed for auto version bump
-#      id-token: write # required for OIDC
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#      - name: Setup Node
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 24.x
-#          registry-url: "https://registry.npmjs.org/"
-#          always-auth: true # ensures the OIDC token is used automatically
-#      - name: Install dependencies
-#        run: npm install --ignore-scripts
-#      - name: Automated Version Bump
-#        uses: phips28/gh-action-bump-version@v11.0.7
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          major-wording: "#major"
-#          minor-wording: "#minor"
-#          patch-wording: "#patch"
-#      - name: Publish to npm
-#        run: npm publish --access public
+      - name: Push commits + tags && publish to npm
+        run: git push origin main --follow-tags && npm publish --access public
