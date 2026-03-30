@@ -31,6 +31,9 @@
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,json,yaml,yml,py,cpp,md}": "prettier --write"
   },
+  "standard-version": {
+    "tagPrefix": ""
+  },
   "prettier": {
     "semi": true,
     "singleQuote": false,
