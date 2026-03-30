@@ -52,7 +52,6 @@
     "build:cli": "tsc -p build/tsconfig/tsconfig.esm.cli.json",
     "build:umd": "cross-env BUILD_TARGET='umd' vite --config build/vite.config.ts build",
     "build:browser:cjs": "cross-env BUILD_TARGET='cjs' vite --config build/vite.config.ts build",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "test": "npm run build && npm run test:nobuild",
     "test:nobuild": "node build/runCommands.js ./npm.run.test.json",
     "test:imports": "node --test tests/import/*.test.*",
