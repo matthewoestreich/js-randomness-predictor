@@ -14,7 +14,6 @@ describe("Execution Runtime : Deno", () => {
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", { skip: false }, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
     const resultJsonString = JSON.stringify(result, null, 2);
-    (await import("node:fs")).writeFileSync("./dyn_seq_test.json", resultJsonString);
     const expectedStatus = 0;
     assert.equal(result.status, expectedStatus, `Expected status = 0, got status = ${result.status} :: Full result : \n${resultJsonString}`);
   });

@@ -62,8 +62,6 @@ jobs:
         run: npm run test:cli
         env:
           FORCE_COLOR: "1"
-      - name: cat results
-        run: echo $(cat ./dyn_seq_test.json)
   test-legacy-node-versions:
     runs-on: ubuntu-latest
     steps:
