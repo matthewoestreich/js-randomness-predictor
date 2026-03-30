@@ -2,7 +2,6 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { CliResult, NodeJsMajorVersion, RuntimeType } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
-import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import { NODE_MAJOR_VERSIONS } from "../../src/constants.ts";
 
@@ -29,6 +28,8 @@ describe("Execution Runtime : Node", () => {
   });
 
   it("enforces proper node version when sequence not provided", () => {
+    // Expect failure status
+    const expectedStatus = 1;
     // We need to ensure we have a node version than the current execution runtime.
     let diffNodeMajor: NodeJsMajorVersion | undefined;
     for (let i = NODE_MAJOR_VERSIONS.length - 1; i >= 0; i--) {
@@ -39,12 +40,21 @@ describe("Execution Runtime : Node", () => {
     }
     assert.ok(diffNodeMajor);
     const result = callJsRandomnessPredictorCli({ environment, envVersion: diffNodeMajor });
-    assert.throws(() => stderrThrows(result));
+    assert.equal(
+      result.status,
+      expectedStatus,
+      `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
+    );
   });
 
   it("should not require a sequence if specified --env-version matches current execution runtime version", () => {
     const result = callJsRandomnessPredictorCli({ environment, envVersion: CURR_NODE_MAJOR_VER });
-    assert.doesNotThrow(() => stderrThrows(result));
+    const expectedStatus = 0; // Expect process to exit cleanly
+    assert.equal(
+      result.status,
+      expectedStatus,
+      `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
+    );
   });
 
   it(`results show execution runtime type is node`, async () => {
@@ -57,11 +67,16 @@ describe("Execution Runtime : Node", () => {
   describe("Random Number Pool Exhaustion", () => {
     // https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
     it("should trigger pool exhaustion", () => {
+      const expectedStatus = 1; // Expect process to exit with error
       const seq = Array.from({ length: 64 }, Math.random);
       const result = callJsRandomnessPredictorCli({ environment, sequence: seq });
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
-      assert.throws(() => stderrThrows(result));
+      assert.equal(
+        result.status,
+        expectedStatus,
+        `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
+      );
     });
 
     // Normally, if an environment is specified that uses V8 under the hood, we are limited to 64 total

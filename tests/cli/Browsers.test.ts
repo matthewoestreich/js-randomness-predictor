@@ -1,7 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
-import stderrThrows from "./stderrThrows.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 
 describe("Browsers", () => {
@@ -17,16 +16,26 @@ describe("Browsers", () => {
     });
 
     it("enforces sequence", () => {
+      const expectedStatus = 1; // Expect error
       const result = callJsRandomnessPredictorCli({ environment });
-      assert.throws(() => stderrThrows(result));
+      assert.equal(
+        result.status,
+        expectedStatus,
+        `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
+      );
     });
   });
 
   describe("Chrome", () => {
     const environment = "chrome";
     it("enforces sequence", () => {
+      const expectedStatus = 1; // Expect error
       const result = callJsRandomnessPredictorCli({ environment });
-      assert.throws(() => stderrThrows(result));
+      assert.equal(
+        result.status,
+        expectedStatus,
+        `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
+      );
     });
 
     it(`should predict accurately using numbers after Jan 2026 update`, async () => {
@@ -40,8 +49,13 @@ describe("Browsers", () => {
   describe("Safari", () => {
     const environment = "safari";
     it("enforces sequence", () => {
+      const expectedStatus = 1; // Expect error
       const result = callJsRandomnessPredictorCli({ environment });
-      assert.throws(() => stderrThrows(result));
+      assert.equal(
+        result.status,
+        expectedStatus,
+        `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
+      );
     });
   });
 });

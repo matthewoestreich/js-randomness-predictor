@@ -1,7 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
-import stderrThrows from "./stderrThrows.ts";
 import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import { CliResult, RuntimeType } from "../../src/types.ts";
@@ -69,11 +68,16 @@ describe("Execution Runtime : Deno", () => {
     // Since Deno uses V8
     // https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
     it("should trigger pool exhaustion", () => {
+      const expectedStatus = 1; // Expect the process to exit with failure status.
       const seq = Array.from({ length: 64 }, Math.random);
       const result = callJsRandomnessPredictorCli({ environment, sequence: seq }, { executionRuntime, isDryRun: true });
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
-      assert.throws(() => stderrThrows(result));
+      assert.equal(
+        result.status,
+        expectedStatus,
+        `Expected status = ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
+      );
     });
 
     // Normally, if an environment is specified that uses V8 under the hood, we are limited to 64 total
