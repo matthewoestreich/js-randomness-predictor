@@ -36,4 +36,5 @@ if (executionRuntime === "deno") {
   childProcessOptions.env!.DENO_COMPAT = "1";
 }
 
-spawnSync(`${executionRuntime.toString()} ${childProcessArgs.join(" ")}`, childProcessOptions);
+const result = spawnSync(`${executionRuntime.toString()} ${childProcessArgs.join(" ")}`, childProcessOptions);
+process.exit(result.status ?? 1);

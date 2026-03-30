@@ -14,8 +14,10 @@ describe("Execution Runtime : Deno", () => {
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", { skip: false }, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
-    //(await import("node:fs")).writeFileSync("./dyn_seq_test.json", JSON.stringify(JSON.parse(result.stdout.toString()), null, 2));
-    assert.doesNotThrow(() => stderrThrows(result));
+    const resultJsonString = JSON.stringify(result, null, 2);
+    (await import("node:fs")).writeFileSync("./dyn_seq_test.json", resultJsonString);
+    const expectedStatus = 0;
+    assert.equal(result.status, expectedStatus, `Expected status = 0, got status = ${result.status} :: Full result : \n${resultJsonString}`);
   });
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
@@ -30,9 +32,14 @@ describe("Execution Runtime : Deno", () => {
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
 
-  it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, () => {
+  it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, async () => {
     const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
-    assert.throws(() => stderrThrows(result));
+    const expectedStatus = 1;
+    assert.equal(
+      result.status,
+      expectedStatus,
+      `Expected this to fail (status = 1) but got status = ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
+    );
   });
 
   it(`results show execution runtime type is ${executionRuntime}`, async () => {
