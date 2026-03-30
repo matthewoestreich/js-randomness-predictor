@@ -68,9 +68,9 @@
     "prepare": "husky",
     "minify": "rollup -c ./build/rollup.config.cjs",
     "emit:types": "tsc -p build/tsconfig/tsconfig.types.json --emitDeclarationOnly",
-    "publish:main:major": "npm run changelog && git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
-    "publish:main:minor": "npm run changelog && git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
-    "publish:main:patch": "npm run changelog && git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main",
+    "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
+    "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
+    "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main",
     "release:major": "standard-version --release-as major",
     "release:minor": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch"
