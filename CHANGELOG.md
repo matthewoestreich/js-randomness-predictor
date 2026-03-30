@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.5](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.4.4...3.4.5) (2026-03-30)
+
+
+### Features
+
+* **test:** ignore me ([52b263c](https://github.com/matthewoestreich/js-randomness-predictor/commit/52b263ce41d2ba795857266fbd64744e5528958d))
+
 ### 3.4.4 (2026-03-30)
 
 ### 3.4.3 (2026-03-30)
