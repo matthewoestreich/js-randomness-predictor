@@ -49,6 +49,7 @@
     "build:cli": "tsc -p build/tsconfig/tsconfig.esm.cli.json",
     "build:umd": "cross-env BUILD_TARGET='umd' vite --config build/vite.config.ts build",
     "build:browser:cjs": "cross-env BUILD_TARGET='cjs' vite --config build/vite.config.ts build",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "test": "npm run build && npm run test:nobuild",
     "test:nobuild": "node build/runCommands.js ./npm.run.test.json",
     "test:imports": "node --test tests/import/*.test.*",
@@ -67,9 +68,9 @@
     "prepare": "husky",
     "minify": "rollup -c ./build/rollup.config.cjs",
     "emit:types": "tsc -p build/tsconfig/tsconfig.types.json --emitDeclarationOnly",
-    "publish:main:major": "git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
-    "publish:main:minor": "git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
-    "publish:main:patch": "git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
+    "publish:main:major": "npm run changelog && git add . && git commit --allow-empty -m \"[publish] #major\" && git push origin main",
+    "publish:main:minor": "npm run changelog && git add . && git commit --allow-empty -m \"[publish] #minor\" && git push origin main",
+    "publish:main:patch": "npm run changelog && git add . && git commit --allow-empty -m \"[publish] #patch\" && git push origin main"
   },
   "keywords": [
     "predict-javascript-math-random",
@@ -107,6 +108,7 @@
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "bun-types": "^1.2.22",
+    "conventional-changelog-cli": "^5.0.0",
     "cross-env": "^10.1.0",
     "eslint": "^9.35.0",
     "glob": "^11.0.3",

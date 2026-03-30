@@ -417,6 +417,45 @@ $ js-randomness-predictor -e deno -v 23 -s 1 2 3 4
 
 # Contributing
 
+## Commit Messages
+
+We follow the **Angular style commit message** convention. The main commit types are:
+
+- `feat:` A new feature.
+- `fix:` A bug fix.
+- `perf:` A code change that improves performance.
+- `build:` Changes that affect the build system or external dependencies (e.g., npm, gulp).
+- `ci:` Changes to CI configuration files and scripts (e.g., GitHub Actions, Travis).
+- `revert:` Reverts a previous commit.
+- `docs:` Documentation-only changes.
+- `style:` Changes that do not affect code functionality (e.g., formatting, white-space).
+- `refactor:` Code changes that neither fix a bug nor add a feature.
+- `test:` Adding or correcting tests.
+- `chore:` Other changes that do not modify source or test files.
+
+### Important Notes
+
+- **Breaking Changes:** Must be noted in the commit footer as `BREAKING CHANGE:` to appear in the changelog.
+- **Visibility:** By default, only `feat`, `fix`, `perf`, and `BREAKING CHANGE` appear prominently in generated changelogs. Other types are typically ignored unless configured otherwise.
+
+### Examples
+
+#### Feature with scope
+
+feat(cli): add runtime field
+
+#### Bug fix
+
+fix(core): handle edge case in sequence generation
+
+#### Breaking change
+
+feat(cli): change output format
+
+BREAKING CHANGE: removed 'actual' field from CLI output
+
+## JavaScript Engine Sources
+
 - [V8 Source Code](https://source.chromium.org/chromium/chromium/src/+/main:v8)
   - V8 source code is part of the Chromium repo
   - Used by `Node`, `Chrome`, `Deno`
