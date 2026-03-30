@@ -184,11 +184,11 @@ jobs:
         run: |
           # Determine the type of release from commit message
           if [[ "${GITHUB_HEAD_COMMIT_MESSAGE}" == *"#major"* ]]; then
-            npm exec standard-version -- --release-as major
+            npm exec standard-version -- --release-as major --verbose
           elif [[ "${GITHUB_HEAD_COMMIT_MESSAGE}" == *"#minor"* ]]; then
-            npm exec standard-version -- --release-as minor
+            npm exec standard-version -- --release-as minor --verbose
           else
-            npm exec standard-version -- --release-as patch
+            npm exec standard-version -- --release-as patch --verbose
           fi
       - name: Push commits & tags
         run: |
