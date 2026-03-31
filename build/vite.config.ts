@@ -1,4 +1,4 @@
-import { BuildEnvironmentOptions, defineConfig } from "vite";
+import { BuildEnvironmentOptions, defineConfig, LibraryOptions } from "vite";
 import nodepath from "node:path";
 
 const BUILD_TARGETS = ["umd", "cjs"] as const;
@@ -11,30 +11,31 @@ type BuildTarget = (typeof BUILD_TARGETS)[number];
  * @param {BuildTarget} target - Target build type
  */
 function createBuildOptions(target: BuildTarget): BuildEnvironmentOptions {
-  const defaultLibOptions = {
+  const libOpts: LibraryOptions = {
     name: "JSRandomnessPredictor",
+    entry: nodepath.resolve(__dirname, "../src/browser/index.ts"),
   };
 
   switch (target) {
     case "umd":
       return {
+        minify: true,
+        outDir: nodepath.resolve(__dirname, "../dist/umd"),
         lib: {
-          ...defaultLibOptions,
-          entry: nodepath.resolve(__dirname, "../src/browser/index.ts"),
+          ...libOpts,
           formats: ["umd"],
           fileName: () => "js-randomness-predictor.js",
         },
-        outDir: nodepath.resolve(__dirname, "../dist/umd"),
       };
     case "cjs":
       return {
+        minify: true,
+        outDir: nodepath.resolve(__dirname, "../dist/browser"),
         lib: {
-          ...defaultLibOptions,
-          entry: nodepath.resolve(__dirname, "../src/browser/index.ts"),
+          ...libOpts,
           formats: ["cjs"],
           fileName: () => "index.js",
         },
-        outDir: nodepath.resolve(__dirname, "../dist/browser"),
       };
     default:
       throw new Error(`[vite] Unknown build target in 'process.env.BUILD_TARGET'. Expected one of '${BUILD_TARGETS.join(", ")}' got '${target}'`);
@@ -51,7 +52,6 @@ export default defineConfig({
     },
   },
   build: {
-    minify: true,
     ...createBuildOptions(process.env.BUILD_TARGET as BuildTarget),
   },
 });
