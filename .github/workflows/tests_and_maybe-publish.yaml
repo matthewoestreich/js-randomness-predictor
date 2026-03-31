@@ -186,6 +186,7 @@ jobs:
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
+          echo "commit message = '$COMMIT_MSG'"
           # Determine the type of release from commit message
           if [[ "$COMMIT_MSG" == *"#major"* ]]; then
             npm exec standard-version -- --release-as major --verbose
