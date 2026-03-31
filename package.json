@@ -32,7 +32,53 @@
     "*.{js,mjs,cjs,ts,tsx,json,yaml,yml,py,cpp,md}": "prettier --write"
   },
   "standard-version": {
-    "tagPrefix": ""
+    "tagPrefix": "",
+    "types": [
+      {
+        "type": "feat",
+        "section": "Features"
+      },
+      {
+        "type": "fix",
+        "section": "Bug Fixes"
+      },
+      {
+        "type": "perf",
+        "section": "Performance Improvements"
+      },
+      {
+        "type": "build",
+        "section": "Build System"
+      },
+      {
+        "type": "ci",
+        "section": "CI"
+      },
+      {
+        "type": "revert",
+        "section": "Reverts"
+      },
+      {
+        "type": "docs",
+        "section": "Documentation"
+      },
+      {
+        "type": "style",
+        "section": "Styles"
+      },
+      {
+        "type": "refactor",
+        "section": "Refactors"
+      },
+      {
+        "type": "test",
+        "section": "Tests"
+      },
+      {
+        "type": "chore",
+        "section": "Chores"
+      }
+    ]
   },
   "prettier": {
     "semi": true,
