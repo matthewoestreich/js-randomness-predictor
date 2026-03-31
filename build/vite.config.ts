@@ -51,7 +51,5 @@ export default defineConfig({
       "z3-solver-jsrp-high-level": "z3-solver-jsrp/dist/build/browser/high-level",
     },
   },
-  build: {
-    ...createBuildOptions(process.env.BUILD_TARGET as BuildTarget),
-  },
+  build: createBuildOptions(process.env.BUILD_TARGET as BuildTarget),
 });
