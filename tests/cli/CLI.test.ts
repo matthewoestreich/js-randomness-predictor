@@ -5,6 +5,7 @@ import path from "node:path";
 import { RuntimeType } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import { RUNTIMES } from "../../src/constants.ts";
+import assertProcessStatusEquals from "./assertProcessStatusEquals.ts";
 
 describe("CLI Functionality", () => {
   describe("Base Tests", () => {
@@ -12,11 +13,7 @@ describe("CLI Functionality", () => {
       const expectedStatus = 1; // Expect process to exit with Error
       RUNTIMES.forEach((e: RuntimeType) => {
         const result = callJsRandomnessPredictorCli({ environment: e, predictions: -1, sequence: [1, 2, 3] });
-        assert.equal(
-          result.status,
-          expectedStatus,
-          `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-        );
+        assertProcessStatusEquals(result, expectedStatus);
       });
     });
   });
@@ -42,11 +39,7 @@ describe("CLI Functionality", () => {
     it("export results to file", () => {
       const expectedStatus = 0; // Expect process to exit cleanly
       const result = callJsRandomnessPredictorCli({ environment, export: relativeExportPath });
-      assert.equal(
-        result.status,
-        expectedStatus,
-        `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-      );
+      assertProcessStatusEquals(result, expectedStatus);
       assert.ok(fs.existsSync(absoluteExportPath), "Exported file does not exist");
     });
 

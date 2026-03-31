@@ -4,6 +4,7 @@ import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
 import { CliResult, RuntimeType } from "../../src/types.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
+import assertProcessStatusEquals from "./assertProcessStatusEquals.ts";
 
 describe("Execution Runtime : Bun", () => {
   const runtime: RuntimeType = "bun";
@@ -14,21 +15,13 @@ describe("Execution Runtime : Bun", () => {
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", () => {
     const expectedStatus = 0; // Expect no error
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
-    assert.equal(
-      result.status,
-      expectedStatus,
-      `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-    );
+    assertProcessStatusEquals(result, expectedStatus);
   });
 
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${executionRuntime})`, () => {
     const expectedStatus = 1; // Expect error
     const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
-    assert.equal(
-      result.status,
-      expectedStatus,
-      `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-    );
+    assertProcessStatusEquals(result, expectedStatus);
   });
 
   it(`results show execution runtime type is ${executionRuntime}`, async () => {

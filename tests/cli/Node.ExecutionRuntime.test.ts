@@ -4,6 +4,7 @@ import { CliResult, NodeJsMajorVersion, RuntimeType } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import { NODE_MAJOR_VERSIONS } from "../../src/constants.ts";
+import assertProcessStatusEquals from "./assertProcessStatusEquals.ts";
 
 describe("Execution Runtime : Node", () => {
   const CURR_NODE_MAJOR_VER = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
@@ -40,21 +41,13 @@ describe("Execution Runtime : Node", () => {
     }
     assert.ok(diffNodeMajor);
     const result = callJsRandomnessPredictorCli({ environment, envVersion: diffNodeMajor });
-    assert.equal(
-      result.status,
-      expectedStatus,
-      `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-    );
+    assertProcessStatusEquals(result, expectedStatus);
   });
 
   it("should not require a sequence if specified --env-version matches current execution runtime version", () => {
     const result = callJsRandomnessPredictorCli({ environment, envVersion: CURR_NODE_MAJOR_VER });
     const expectedStatus = 0; // Expect process to exit cleanly
-    assert.equal(
-      result.status,
-      expectedStatus,
-      `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-    );
+    assertProcessStatusEquals(result, expectedStatus);
   });
 
   it(`results show execution runtime type is node`, async () => {
@@ -72,11 +65,7 @@ describe("Execution Runtime : Node", () => {
       const result = callJsRandomnessPredictorCli({ environment, sequence: seq });
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
-      assert.equal(
-        result.status,
-        expectedStatus,
-        `Expected status ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-      );
+      assertProcessStatusEquals(result, expectedStatus);
     });
 
     // Normally, if an environment is specified that uses V8 under the hood, we are limited to 64 total

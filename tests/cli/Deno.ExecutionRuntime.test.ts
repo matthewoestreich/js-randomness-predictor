@@ -4,6 +4,7 @@ import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import { CliResult, RuntimeType } from "../../src/types.ts";
+import assertProcessStatusEquals from "./assertProcessStatusEquals.ts";
 
 describe("Execution Runtime : Deno", () => {
   const runtime: RuntimeType = "deno";
@@ -13,9 +14,8 @@ describe("Execution Runtime : Deno", () => {
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", { skip: false }, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
-    const resultJsonString = JSON.stringify(result, null, 2);
     const expectedStatus = 0;
-    assert.equal(result.status, expectedStatus, `Expected status = 0, got status = ${result.status} :: Full result : \n${resultJsonString}`);
+    assertProcessStatusEquals(result, expectedStatus);
   });
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
@@ -33,11 +33,7 @@ describe("Execution Runtime : Deno", () => {
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, async () => {
     const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
     const expectedStatus = 1;
-    assert.equal(
-      result.status,
-      expectedStatus,
-      `Expected this to fail (status = 1) but got status = ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-    );
+    assertProcessStatusEquals(result, expectedStatus);
   });
 
   it(`results show execution runtime type is ${executionRuntime}`, async () => {
@@ -72,11 +68,7 @@ describe("Execution Runtime : Deno", () => {
       const result = callJsRandomnessPredictorCli({ environment, sequence: seq }, { executionRuntime, isDryRun: true });
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
-      assert.equal(
-        result.status,
-        expectedStatus,
-        `Expected status = ${expectedStatus} got ${result.status} :: Full results : \n${JSON.stringify(result, null, 2)}`,
-      );
+      assertProcessStatusEquals(result, expectedStatus);
     });
 
     // Normally, if an environment is specified that uses V8 under the hood, we are limited to 64 total

@@ -37,4 +37,5 @@ if (executionRuntime === "deno") {
 }
 
 const result = spawnSync(`${executionRuntime.toString()} ${childProcessArgs.join(" ")}`, childProcessOptions);
+// Bubble up process status
 process.exit(result.status ?? 1);
