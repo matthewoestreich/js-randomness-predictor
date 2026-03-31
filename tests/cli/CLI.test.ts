@@ -5,15 +5,14 @@ import path from "node:path";
 import { RuntimeType } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import { RUNTIMES } from "../../src/constants.ts";
-import assertProcessStatusEquals from "./assertProcessStatusEquals.ts";
+import assertProcessStatus from "./assertProcessStatus.ts";
 
 describe("CLI Functionality", () => {
   describe("Base Tests", () => {
     it(`[${RUNTIMES.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
-      const expectedStatus = 1; // Expect process to exit with Error
       RUNTIMES.forEach((e: RuntimeType) => {
         const result = callJsRandomnessPredictorCli({ environment: e, predictions: -1, sequence: [1, 2, 3] });
-        assertProcessStatusEquals(result, expectedStatus);
+        assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
       });
     });
   });
@@ -37,9 +36,8 @@ describe("CLI Functionality", () => {
     });
 
     it("export results to file", () => {
-      const expectedStatus = 0; // Expect process to exit cleanly
       const result = callJsRandomnessPredictorCli({ environment, export: relativeExportPath });
-      assertProcessStatusEquals(result, expectedStatus);
+      assertProcessStatus.equals(result, 0);
       assert.ok(fs.existsSync(absoluteExportPath), "Exported file does not exist");
     });
 

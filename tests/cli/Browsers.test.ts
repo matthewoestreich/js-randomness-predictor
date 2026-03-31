@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
-import assertProcessStatusEquals from "./assertProcessStatusEquals.ts";
+import assertProcessStatus from "./assertProcessStatus.ts";
 
 describe("Browsers", () => {
   describe("Firefox", () => {
@@ -17,18 +17,16 @@ describe("Browsers", () => {
     });
 
     it("enforces sequence", () => {
-      const expectedStatus = 1; // Expect error
       const result = callJsRandomnessPredictorCli({ environment });
-      assertProcessStatusEquals(result, expectedStatus);
+      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
   });
 
   describe("Chrome", () => {
     const environment = "chrome";
     it("enforces sequence", () => {
-      const expectedStatus = 1; // Expect error
       const result = callJsRandomnessPredictorCli({ environment });
-      assertProcessStatusEquals(result, expectedStatus);
+      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
 
     it(`should predict accurately using numbers after Jan 2026 update`, async () => {
@@ -42,9 +40,8 @@ describe("Browsers", () => {
   describe("Safari", () => {
     const environment = "safari";
     it("enforces sequence", () => {
-      const expectedStatus = 1; // Expect error
       const result = callJsRandomnessPredictorCli({ environment });
-      assertProcessStatusEquals(result, expectedStatus);
+      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
   });
 });

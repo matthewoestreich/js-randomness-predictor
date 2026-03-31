@@ -4,7 +4,7 @@ import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import { CliResult, RuntimeType } from "../../src/types.ts";
-import assertProcessStatusEquals from "./assertProcessStatusEquals.ts";
+import assertProcessStatus from "./assertProcessStatus.ts";
 
 describe("Execution Runtime : Deno", () => {
   const runtime: RuntimeType = "deno";
@@ -14,8 +14,7 @@ describe("Execution Runtime : Deno", () => {
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", { skip: false }, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
-    const expectedStatus = 0;
-    assertProcessStatusEquals(result, expectedStatus);
+    assertProcessStatus.equals(result, 0); // Not expecting error code
   });
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
@@ -32,8 +31,7 @@ describe("Execution Runtime : Deno", () => {
 
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, async () => {
     const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
-    const expectedStatus = 1;
-    assertProcessStatusEquals(result, expectedStatus);
+    assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
   });
 
   it(`results show execution runtime type is ${executionRuntime}`, async () => {
@@ -63,12 +61,11 @@ describe("Execution Runtime : Deno", () => {
     // Since Deno uses V8
     // https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
     it("should trigger pool exhaustion", () => {
-      const expectedStatus = 1; // Expect the process to exit with failure status.
       const seq = Array.from({ length: 64 }, Math.random);
       const result = callJsRandomnessPredictorCli({ environment, sequence: seq }, { executionRuntime, isDryRun: true });
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
-      assertProcessStatusEquals(result, expectedStatus);
+      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
 
     // Normally, if an environment is specified that uses V8 under the hood, we are limited to 64 total
