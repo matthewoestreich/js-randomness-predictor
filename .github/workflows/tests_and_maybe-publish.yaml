@@ -179,7 +179,6 @@ jobs:
         with:
           node-version: 24.x
           registry-url: "https://registry.npmjs.org/"
-          always-auth: true
       - name: Install dependencies
         run: npm ci
       - name: Generate Changelog, Bump Version, and Tag
