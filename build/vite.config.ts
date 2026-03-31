@@ -11,6 +11,10 @@ type BuildTarget = (typeof BUILD_TARGETS)[number];
  * @param {BuildTarget} target - Target build type
  */
 function createBuildOptions(target: BuildTarget): BuildEnvironmentOptions {
+  const baseBuildOpts: BuildEnvironmentOptions = {
+    minify: true,
+  };
+
   const baseLibOpts: LibraryOptions = {
     name: "JSRandomnessPredictor",
     entry: nodepath.resolve(__dirname, "../src/browser/index.ts"),
@@ -19,7 +23,7 @@ function createBuildOptions(target: BuildTarget): BuildEnvironmentOptions {
   switch (target) {
     case "umd":
       return {
-        minify: true,
+        ...baseBuildOpts,
         outDir: nodepath.resolve(__dirname, "../dist/umd"),
         lib: {
           ...baseLibOpts,
@@ -29,7 +33,7 @@ function createBuildOptions(target: BuildTarget): BuildEnvironmentOptions {
       };
     case "cjs":
       return {
-        minify: true,
+        ...baseBuildOpts,
         outDir: nodepath.resolve(__dirname, "../dist/browser"),
         lib: {
           ...baseLibOpts,
