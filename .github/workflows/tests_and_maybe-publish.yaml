@@ -181,7 +181,7 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
           always-auth: true
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: npm ci
       - name: Generate Changelog, Bump Version, and Tag
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
