@@ -18,7 +18,7 @@ describe("Browsers", () => {
 
     it("enforces sequence", () => {
       const result = callJsRandomnessPredictorCli({ environment });
-      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+      assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
   });
 
@@ -26,7 +26,7 @@ describe("Browsers", () => {
     const environment = "chrome";
     it("enforces sequence", () => {
       const result = callJsRandomnessPredictorCli({ environment });
-      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+      assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
 
     it(`should predict accurately using numbers after Jan 2026 update`, async () => {
@@ -41,7 +41,7 @@ describe("Browsers", () => {
     const environment = "safari";
     it("enforces sequence", () => {
       const result = callJsRandomnessPredictorCli({ environment });
-      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+      assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
   });
 });

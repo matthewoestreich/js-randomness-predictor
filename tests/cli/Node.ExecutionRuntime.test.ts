@@ -39,12 +39,12 @@ describe("Execution Runtime : Node", () => {
     }
     assert.ok(diffNodeMajor);
     const result = callJsRandomnessPredictorCli({ environment, envVersion: diffNodeMajor });
-    assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+    assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
   });
 
   it("should not require a sequence if specified --env-version matches current execution runtime version", () => {
     const result = callJsRandomnessPredictorCli({ environment, envVersion: CURR_NODE_MAJOR_VER });
-    assertProcessStatus.equals(result, 0);
+    assertProcessStatus.equal(result, 0);
   });
 
   it(`results show execution runtime type is node`, async () => {
@@ -61,7 +61,7 @@ describe("Execution Runtime : Node", () => {
       const result = callJsRandomnessPredictorCli({ environment, sequence: seq });
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
-      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+      assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
 
     // Normally, if an environment is specified that uses V8 under the hood, we are limited to 64 total

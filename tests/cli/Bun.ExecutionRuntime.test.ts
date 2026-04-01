@@ -14,12 +14,12 @@ describe("Execution Runtime : Bun", () => {
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
-    assertProcessStatus.equals(result, 0);
+    assertProcessStatus.equal(result, 0);
   });
 
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${executionRuntime})`, () => {
     const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
-    assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+    assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
   });
 
   it(`results show execution runtime type is ${executionRuntime}`, async () => {

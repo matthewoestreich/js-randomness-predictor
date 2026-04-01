@@ -14,7 +14,7 @@ describe("Execution Runtime : Deno", () => {
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", { skip: false }, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
-    assertProcessStatus.equals(result, 0); // Not expecting error code
+    assertProcessStatus.equal(result, 0); // Not expecting error code
   });
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
@@ -31,7 +31,7 @@ describe("Execution Runtime : Deno", () => {
 
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, async () => {
     const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
-    assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+    assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
   });
 
   it(`results show execution runtime type is ${executionRuntime}`, async () => {
@@ -65,7 +65,7 @@ describe("Execution Runtime : Deno", () => {
       const result = callJsRandomnessPredictorCli({ environment, sequence: seq }, { executionRuntime, isDryRun: true });
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
-      assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+      assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
     });
 
     // Normally, if an environment is specified that uses V8 under the hood, we are limited to 64 total

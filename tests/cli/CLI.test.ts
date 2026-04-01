@@ -12,7 +12,7 @@ describe("CLI Functionality", () => {
     it(`[${RUNTIMES.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
       RUNTIMES.forEach((e: RuntimeType) => {
         const result = callJsRandomnessPredictorCli({ environment: e, predictions: -1, sequence: [1, 2, 3] });
-        assertProcessStatus.notEquals(result, 0); // Any non-zero status signals an error (we are expecting an error)
+        assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
       });
     });
   });
@@ -37,7 +37,7 @@ describe("CLI Functionality", () => {
 
     it("export results to file", () => {
       const result = callJsRandomnessPredictorCli({ environment, export: relativeExportPath });
-      assertProcessStatus.equals(result, 0);
+      assertProcessStatus.equal(result, 0);
       assert.ok(fs.existsSync(absoluteExportPath), "Exported file does not exist");
     });
 
