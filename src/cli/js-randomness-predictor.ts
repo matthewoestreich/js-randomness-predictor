@@ -2,6 +2,7 @@
 
 import * as nodefs from "node:fs";
 import * as nodepath from "node:path";
+import { fileURLToPath } from "node:url";
 import yargs, { ArgumentsCamelCase, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { NodeJsMajorVersion, Predictor, CliArgs, CliResult } from "../types.js";
@@ -83,13 +84,14 @@ const predictCommand: CommandModule<{}, CliArgs> = {
   },
 };
 
-// prettier-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-yargs(hideBin(process.argv))
-  .scriptName("js-randomness-predictor")
-  .command(predictCommand)
-  .help()
-  .argv;
+export default function buildCli() {
+  return yargs(hideBin(process.argv)).scriptName("js-randomness-predictor").command(predictCommand).help();
+}
+
+// If this script was executed and not just being used for its export(s), run yargs.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  buildCli().parse();
+}
 
 /**
  * This method is responsible for running the predictor. It validates user input
