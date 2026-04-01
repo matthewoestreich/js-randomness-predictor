@@ -2,7 +2,7 @@
 
 import * as nodefs from "node:fs";
 import * as nodepath from "node:path";
-import yargs, { ArgumentsCamelCase, CommandModule } from "yargs";
+import yargs, { ArgumentsCamelCase, CommandModule, Argv } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { NodeJsMajorVersion, Predictor, CliArgs, CliResult } from "../types.js";
 import Logger from "../logger.js";
@@ -27,7 +27,7 @@ if (process.env.JSRP_LIB_IS_MAIN === "1") {
 }
 
 // Allows other scripts to call us programmatically.
-export default function buildCli() {
+export default function buildCli(): Argv<{}> {
   return yargs(hideBin(process.argv))
     .scriptName("js-randomness-predictor")
     .command(makeCommand())
