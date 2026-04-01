@@ -2,7 +2,6 @@
 
 import * as nodefs from "node:fs";
 import * as nodepath from "node:path";
-import { fileURLToPath } from "node:url";
 import yargs, { ArgumentsCamelCase, CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { NodeJsMajorVersion, Predictor, CliArgs, CliResult } from "../types.js";
@@ -21,77 +20,83 @@ import {
   V8_MAX_PREDICTIONS,
 } from "../constants.js";
 
-/**
- * The `yargs` command
- */
-const predictCommand: CommandModule<{}, CliArgs> = {
-  command: "*",
-  describe: "Predict future Math.random() values",
-  builder: (yargs) => {
-    return yargs
-      .option("environment", {
-        alias: "e",
-        describe: "Predictor environment",
-        choices: RUNTIMES,
-        demandOption: true,
-        type: "string",
-      })
-      .option("sequence", {
-        alias: "s",
-        describe: "Observed sequence",
-        type: "array",
-        coerce: (arr: number[]) => {
-          return arr.map((v) => {
-            const n = Number(v);
-            if (isNaN(n)) {
-              throw new Error(`Invalid number in sequence: ${v}`);
-            }
-            return n;
-          });
-        },
-      })
-      .option("predictions", {
-        alias: "p",
-        describe: "Number of predictions",
-        type: "number",
-        default: 10,
-        coerce: (numPredictions: number) => {
-          if (numPredictions <= 0) {
-            throw new Error(`--predictions must be greater than 0! Got ${numPredictions}`);
-          }
-          return numPredictions;
-        },
-      })
-      .option("env-version", {
-        alias: "v",
-        describe: "Node.js major version",
-        type: "number",
-        choices: NODE_MAJOR_VERSIONS,
-      })
-      .option("export", {
-        alias: "x",
-        describe: "File path to export results. Must be to a .json file. Path relative to current working directory!",
-        type: "string",
-      })
-      .option("force", {
-        alias: "f",
-        describe: "If exporting, overwrite existing file or create needed directories in path",
-        type: "boolean",
-      });
-  },
-  handler: async (argv: ArgumentsCamelCase<CliArgs>) => {
-    await executePredictionCommand(argv);
-  },
-};
-
-export default function buildCli() {
-  return yargs(hideBin(process.argv)).scriptName("js-randomness-predictor").command(predictCommand).help();
-}
-
 // If this script was executed and not just being used for its export(s), run yargs.
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+// This is used when a runtime other than Node is being used to run js-randomness-predictor.
+if (process.env.JSRP_LIB_IS_MAIN === "1") {
   buildCli().parse();
 }
+
+// Allows other scripts to call us programmatically.
+export default function buildCli() {
+  return yargs(hideBin(process.argv)).scriptName("js-randomness-predictor").command(makeCommand()).help();
+}
+
+// Create the yargs command module.
+function makeCommand(): CommandModule<{}, CliArgs> {
+  return {
+    command: "*",
+    describe: "Predict future Math.random() values",
+    builder: (yargs) => {
+      return yargs
+        .option("environment", {
+          alias: "e",
+          describe: "Predictor environment",
+          choices: RUNTIMES,
+          demandOption: true,
+          type: "string",
+        })
+        .option("sequence", {
+          alias: "s",
+          describe: "Observed sequence",
+          type: "array",
+          coerce: (arr: number[]) => {
+            return arr.map((v) => {
+              const n = Number(v);
+              if (isNaN(n)) {
+                throw new Error(`Invalid number in sequence: ${v}`);
+              }
+              return n;
+            });
+          },
+        })
+        .option("predictions", {
+          alias: "p",
+          describe: "Number of predictions",
+          type: "number",
+          default: 10,
+          coerce: (numPredictions: number) => {
+            if (numPredictions <= 0) {
+              throw new Error(`--predictions must be greater than 0! Got ${numPredictions}`);
+            }
+            return numPredictions;
+          },
+        })
+        .option("env-version", {
+          alias: "v",
+          describe: "Node.js major version",
+          type: "number",
+          choices: NODE_MAJOR_VERSIONS,
+        })
+        .option("export", {
+          alias: "x",
+          describe: "File path to export results. Must be to a .json file. Path relative to current working directory!",
+          type: "string",
+        })
+        .option("force", {
+          alias: "f",
+          describe: "If exporting, overwrite existing file or create needed directories in path",
+          type: "boolean",
+        });
+    },
+    handler: async (argv: ArgumentsCamelCase<CliArgs>) => {
+      await executePredictionCommand(argv);
+    },
+  };
+}
+
+// ============================================================================================================
+// ============= Helper Functions =============================================================================
+// ============================================================================================================
 
 /**
  * This method is responsible for running the predictor. It validates user input

@@ -3,24 +3,28 @@
 import { spawnSync, SpawnSyncOptionsWithBufferEncoding } from "node:child_process";
 import nodepath from "node:path";
 import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../constants.js";
+import buildCli from "./lib.js";
 
 const executionRuntime = process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]?.trim() || "node";
 
 // No need for child process if we are using Node execution runtime, since we are already in Node.
 if (executionRuntime === "node") {
-  // File MUST be imported at runtime, otherwise this won't work!!
-  import("./js-randomness-predictor.js").then(({ default: buildCli }) => buildCli().parse()).catch(() => process.exit(1));
+  buildCli().parse();
 } else {
   /**
    * Need child process for runtimes other than Node.
    **/
 
-  const argv = [nodepath.resolve(import.meta.dirname, "./js-randomness-predictor.js"), ...process.argv.slice(2)];
+  const argv = [nodepath.resolve(import.meta.dirname, "./lib.js"), ...process.argv.slice(2)];
   const childProcessOptions: SpawnSyncOptionsWithBufferEncoding = {
     stdio: "inherit",
     env: { ...process.env },
     shell: true, // Must be true for Windows...
   };
+
+  // When spawning a non-Node runtime (e.g. deno/bun), this flag tells the CLI core
+  // to behave like a "main" module and execute immediately instead of acting as a library.
+  childProcessOptions.env!.JSRP_LIB_IS_MAIN = "1";
 
   if (executionRuntime === "deno") {
     // Deno needs an import map...smh

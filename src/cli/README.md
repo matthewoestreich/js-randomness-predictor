@@ -1,6 +1,6 @@
 # CLI
 
-- `cli.ts` is the entry-point for the CLI
+- `main.ts` is the entry-point for the CLI
 
 ## Dry Run
 
