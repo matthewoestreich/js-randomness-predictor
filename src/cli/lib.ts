@@ -28,7 +28,17 @@ if (process.env.JSRP_LIB_IS_MAIN === "1") {
 
 // Allows other scripts to call us programmatically.
 export default function buildCli() {
-  return yargs(hideBin(process.argv)).scriptName("js-randomness-predictor").command(makeCommand()).help();
+  return yargs(hideBin(process.argv))
+    .scriptName("js-randomness-predictor")
+    .command(makeCommand())
+    .fail((msg, err) => {
+      // Prefer the actual error if present
+      if (err) {
+        throw err;
+      }
+      throw new Error(msg);
+    })
+    .help();
 }
 
 // Create the yargs command module.
