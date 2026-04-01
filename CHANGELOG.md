@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.4.8...3.5.0) (2026-04-01)
+
+
+### Performance Improvements
+
+* **cli:** if execution runtime is node, no need to create child process ([88a4c91](https://github.com/matthewoestreich/js-randomness-predictor/commit/88a4c91d638f2dfa9dc57572f534c436a9281ce3))
+
+
+### Chores
+
+* **standard-version:** include more types in changelog ([0199acb](https://github.com/matthewoestreich/js-randomness-predictor/commit/0199acb72204822341182778e7c7ee73ff883cb7))
+
+
+### Tests
+
+* **cli:** rename assertProcessStatus methods ([10544d9](https://github.com/matthewoestreich/js-randomness-predictor/commit/10544d97176d4eca5f807db854865354ddac507a))
+
+
+### Refactors
+
+* **cli:** add explicit return type to buildCli ([15abce7](https://github.com/matthewoestreich/js-randomness-predictor/commit/15abce7c4d45e57431f2abe77005df6280a2e62d))
+* **cli:** early process exit if node; explicitly throw errs from yargs ([ce71232](https://github.com/matthewoestreich/js-randomness-predictor/commit/ce7123248f1aedcd31402d4a4c8786acc7a9b3aa))
+* **cli:** if execution runtime is node, there is no need to spawn child process ([d956e92](https://github.com/matthewoestreich/js-randomness-predictor/commit/d956e925c81afd198c06f8b3d463d7ea5da78d4d))
+* **cli:** if execution runtime is node, there is no need to spawn child process ([9cfe9a2](https://github.com/matthewoestreich/js-randomness-predictor/commit/9cfe9a27c8585d6c61768b34822b19923274c0c4))
+* **cli:** rename files to better reflect purpose; use env var as flag to check if lib behaves as main; general cleanup ([09aab61](https://github.com/matthewoestreich/js-randomness-predictor/commit/09aab616397062a4a1f957675c68ca5f450f64c1))
+
 ### [3.4.8](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.4.7...3.4.8) (2026-03-31)
 
 ### [3.4.7](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.4.6...3.4.7) (2026-03-30)
