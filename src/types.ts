@@ -12,7 +12,7 @@ export interface Predictor {
 }
 
 export interface CliArgs {
-  environment: RuntimeType;
+  environment: Runtime;
   sequence?: number[];
   envVersion?: NodeJsMajorVersion;
   predictions?: number;
@@ -25,10 +25,10 @@ export interface CliArgs {
  *********************************************************************************************************/
 
 export type Z3Api = Z3HighLevel & Z3LowLevel;
-export type RuntimeType = (typeof RUNTIMES)[number];
-export type EngineType = (typeof JAVASCRIPT_ENGINES)[number];
-export type ServerRuntimeType = (typeof SERVER_RUNTIMES)[number];
-export type BrowserRuntimeType = (typeof BROWSER_RUNTIMES)[number];
+export type Runtime = (typeof RUNTIMES)[number];
+export type Engine = (typeof JAVASCRIPT_ENGINES)[number];
+export type ServerRuntime = (typeof SERVER_RUNTIMES)[number];
+export type BrowserRuntime = (typeof BROWSER_RUNTIMES)[number];
 export type NodeJsMajorVersion = (typeof NODE_MAJOR_VERSIONS)[number];
 export type Pair<T> = [T, T];
 export type SymbolicXorShiftFn = (symbolicState: Pair<BitVec>) => void;
@@ -48,7 +48,7 @@ export type CliResult = {
   predictions: number[];
   actual: string | number[];
   isCorrect?: boolean;
-  runtime: RuntimeType;
+  runtime: Runtime;
   _warnings?: string[];
   _info?: string[];
 };

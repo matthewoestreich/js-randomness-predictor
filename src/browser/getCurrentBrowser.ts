@@ -1,7 +1,7 @@
 import ExecutionRuntime from "../ExecutionRuntime.js";
-import type { BrowserRuntimeType } from "../types.js";
+import type { BrowserRuntime } from "../types.js";
 
-export default function getCurrentBrowser(): BrowserRuntimeType | undefined {
+export default function getCurrentBrowser(): BrowserRuntime | undefined {
   if (ExecutionRuntime.isChrome()) {
     return "chrome";
   }

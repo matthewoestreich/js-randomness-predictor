@@ -1,5 +1,5 @@
 import { UnexpectedRuntimeError } from "./errors.js";
-import { RuntimeType } from "./types.js";
+import { Runtime } from "./types.js";
 
 // Detect the runtime that has been used to invoke us.
 export default class ExecutionRuntime {
@@ -37,7 +37,7 @@ export default class ExecutionRuntime {
     return typeof window !== "undefined" && navigator.userAgent.indexOf("Safari") > -1;
   }
 
-  static type(): RuntimeType {
+  static type(): Runtime {
     if (this.isNode()) {
       return "node";
     }

@@ -1,4 +1,4 @@
-import { RuntimeType, ServerRuntimeType, BrowserRuntimeType, EngineType } from "./types.js";
+import { Runtime, ServerRuntime, BrowserRuntime, Engine } from "./types.js";
 
 /** The env var KEY (not the value) that determines which runtime the CLI uses. */
 export const EXECUTION_RUNTIME_ENV_VAR_KEY = "JSRP_RUNTIME";
@@ -10,22 +10,22 @@ export const SERVER_RUNTIMES = ["node", "bun", "deno"] as const;
 export const JAVASCRIPT_ENGINES = ["v8", "javascriptcore", "spidermonkey"] as const;
 export const BROWSER_RUNTIMES = ["chrome", "safari", "firefox"] as const;
 
-export const IS_SERVER_RUNTIME: Record<RuntimeType, boolean> = Object.fromEntries(
-  RUNTIMES.map((r: RuntimeType) => [r, SERVER_RUNTIMES.includes(r as ServerRuntimeType)]),
-) as Record<RuntimeType, boolean>;
+export const IS_SERVER_RUNTIME: Record<Runtime, boolean> = Object.fromEntries(
+  RUNTIMES.map((r: Runtime) => [r, SERVER_RUNTIMES.includes(r as ServerRuntime)]),
+) as Record<Runtime, boolean>;
 
-export const IS_BROWSER_RUNTIME: Record<RuntimeType, boolean> = Object.fromEntries(
-  RUNTIMES.map((r: RuntimeType) => [r, BROWSER_RUNTIMES.includes(r as BrowserRuntimeType)]),
-) as Record<RuntimeType, boolean>;
+export const IS_BROWSER_RUNTIME: Record<Runtime, boolean> = Object.fromEntries(
+  RUNTIMES.map((r: Runtime) => [r, BROWSER_RUNTIMES.includes(r as BrowserRuntime)]),
+) as Record<Runtime, boolean>;
 
-export const JAVASCRIPT_ENGINE_REQUIRED_SEQUENCE_LENGTH: Record<EngineType, number> = {
+export const JAVASCRIPT_ENGINE_REQUIRED_SEQUENCE_LENGTH: Record<Engine, number> = {
   v8: 4,
   javascriptcore: 6, // TODO: update when bug fix lands
   spidermonkey: 4,
 } as const;
 
 // Get engine from runtime
-export const RUNTIME_ENGINE: Record<RuntimeType, EngineType> = {
+export const RUNTIME_ENGINE: Record<Runtime, Engine> = {
   node: "v8",
   bun: "javascriptcore",
   deno: "v8",
@@ -37,18 +37,18 @@ export const RUNTIME_ENGINE: Record<RuntimeType, EngineType> = {
 // Get runtime(s) from engine, returns [] even if only one runtime exists for an engine.
 export const ENGINE_RUNTIME = Object.entries(RUNTIME_ENGINE).reduce(
   (acc, [runtime, engine]) => {
-    (acc[engine] ||= []).push(runtime as RuntimeType);
+    (acc[engine] ||= []).push(runtime as Runtime);
     return acc;
   },
-  {} as Record<EngineType, RuntimeType[]>,
+  {} as Record<Engine, Runtime[]>,
 );
 
 // Get default sequence length from runtime
-export const DEFAULT_SEQUENCE_LENGTH: Record<RuntimeType, number> = Object.fromEntries(
+export const DEFAULT_SEQUENCE_LENGTH: Record<Runtime, number> = Object.fromEntries(
   Object.entries(RUNTIME_ENGINE).map(([runtime, engine]) => [runtime, JAVASCRIPT_ENGINE_REQUIRED_SEQUENCE_LENGTH[engine]]),
-) as Record<RuntimeType, number>;
+) as Record<Runtime, number>;
 
-export const SUPPORTED_BROWSER_RUNTIMES: Record<BrowserRuntimeType, boolean> = {
+export const SUPPORTED_BROWSER_RUNTIMES: Record<BrowserRuntime, boolean> = {
   firefox: true,
   chrome: true,
   safari: true,
