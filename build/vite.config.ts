@@ -1,6 +1,14 @@
 import { BuildEnvironmentOptions, defineConfig, LibraryOptions } from "vite";
 import nodepath from "node:path";
 
+/**
+ *
+ * Calling vite to build requires an env var be set first!
+ *
+ * The `BUILD_TARGET` env var must be one of the values defined in the `BUILD_TARGETS` variable (defined below).
+ *
+ **/
+
 const BUILD_TARGETS = ["umd", "cjs"] as const;
 
 // Create union type from const array
