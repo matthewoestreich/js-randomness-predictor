@@ -23,7 +23,14 @@ import {
   SERVER_RUNTIMES,
 } from "../constants.js";
 
-async function main() {
+const executionRuntime = runtimeTypeFromString(process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]);
+
+/**
+ * @condition `executionRuntime === "node"` - We are already in Node, there is no need for child process, we can just call the CLI.
+ * @condition `process.env.JSRP_CHILD === "1"` - Prevents infinite recursion. This is needed because if a user wants to
+ * run the CLI in a runtime other than Node, we just call this script as a child process using the chosen runtime.
+ **/
+if (executionRuntime === "node" || process.env.JSRP_CHILD === "1") {
   try {
     await buildCli().parseAsync();
     process.exit(0);
@@ -31,17 +38,6 @@ async function main() {
     console.error((e as Error).message);
     process.exit(1);
   }
-}
-
-const executionRuntime = runtimeTypeFromString(process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]);
-
-/**
- * @condition `process.env.JSRP_CHILD === "1"` - Prevents infinite recursion. This is needed because if a user wants to
- * run the CLI in a runtime other than Node, we just call this script as a child process using the chosen runtime.
- * @condition `executionRuntime === "node"` - We are already in Node, there is no need for child process, we can just call the CLI.
- **/
-if (process.env.JSRP_CHILD === "1" || executionRuntime === "node") {
-  await main();
 }
 
 /**
