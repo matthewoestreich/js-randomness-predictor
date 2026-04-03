@@ -33,16 +33,14 @@ async function main() {
   }
 }
 
-// Prevents infinite recursion. This is needed because if a user wants to run the CLI in a
-// runtime other than Node, we just call this script as a child process using the chosen runtime.
-if (process.env.JSRP_CHILD === "1") {
-  await main();
-}
-
 const executionRuntime = runtimeTypeFromString(process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]);
 
-// Bc we are already in Node, there is no need for child process, we can just call the CLI.
-if (executionRuntime === "node") {
+/**
+ * @condition `process.env.JSRP_CHILD === "1"` - Prevents infinite recursion. This is needed because if a user wants to
+ * run the CLI in a runtime other than Node, we just call this script as a child process using the chosen runtime.
+ * @condition `executionRuntime === "node"` - We are already in Node, there is no need for child process, we can just call the CLI.
+ **/
+if (process.env.JSRP_CHILD === "1" || executionRuntime === "node") {
   await main();
 }
 
