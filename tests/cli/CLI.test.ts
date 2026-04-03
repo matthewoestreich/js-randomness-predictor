@@ -2,7 +2,7 @@ import { describe, it, after } from "node:test";
 import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
-import { RuntimeType } from "../../src/types.ts";
+import { Runtime } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import { RUNTIMES } from "../../src/constants.ts";
 import assertProcessStatus from "./assertProcessStatus.ts";
@@ -10,7 +10,7 @@ import assertProcessStatus from "./assertProcessStatus.ts";
 describe("CLI Functionality", () => {
   describe("Base Tests", () => {
     it(`[${RUNTIMES.join("|")}] -> each don't allow '--predictions' less than or equal to 0`, () => {
-      RUNTIMES.forEach((e: RuntimeType) => {
+      RUNTIMES.forEach((e: Runtime) => {
         const result = callJsRandomnessPredictorCli({ environment: e, predictions: -1, sequence: [1, 2, 3] });
         assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
       });

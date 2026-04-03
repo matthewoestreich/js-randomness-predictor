@@ -2,9 +2,11 @@
 
 import * as nodefs from "node:fs";
 import * as nodepath from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawnSync, SpawnSyncOptionsWithBufferEncoding } from "node:child_process";
 import yargs, { ArgumentsCamelCase, CommandModule, Argv } from "yargs";
 import { hideBin } from "yargs/helpers";
-import { NodeJsMajorVersion, Predictor, CliArgs, CliResult } from "../types.js";
+import { NodeJsMajorVersion, Predictor, CliArgs, CliResult, ServerRuntime } from "../types.js";
 import Logger from "../logger.js";
 import callMathRandom from "../callMathRandom.js";
 import { SequenceNotFoundError } from "../errors.js";
@@ -18,13 +20,62 @@ import {
   EXECUTION_RUNTIME_ENV_VAR_KEY,
   RUNTIME_ENGINE,
   V8_MAX_PREDICTIONS,
+  SERVER_RUNTIMES,
 } from "../constants.js";
 
-// If this script was executed and not just being used for its export(s), run yargs.
-// This is used when a runtime other than Node is being used to run js-randomness-predictor.
-if (process.env.JSRP_LIB_IS_MAIN === "1") {
-  buildCli().parse();
+async function main() {
+  try {
+    await buildCli().parseAsync();
+    process.exit(0);
+  } catch (e: unknown) {
+    console.error((e as Error).message);
+    process.exit(1);
+  }
 }
+
+// Prevents infinite recursion. This is needed because if a user wants to run the CLI in a
+// runtime other than Node, we just call this script as a child process using the chosen runtime.
+if (process.env.JSRP_CHILD === "1") {
+  await main();
+}
+
+const executionRuntime = runtimeTypeFromString(process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]);
+
+// Bc we are already in Node, there is no need for child process, we can just call the CLI.
+if (executionRuntime === "node") {
+  await main();
+}
+
+/**
+ * Need child process for runtimes other than Node.
+ **/
+
+const argv = [fileURLToPath(import.meta.url), ...process.argv.slice(2)];
+const childProcessOptions: SpawnSyncOptionsWithBufferEncoding = {
+  stdio: "inherit",
+  env: { ...process.env },
+  shell: true, // Must be true for Windows...
+};
+
+// To prevent infinite recursion
+childProcessOptions.env!.JSRP_CHILD = "1";
+
+if (executionRuntime === "deno") {
+  // Deno needs an import map...smh
+  const importMap = nodepath.resolve(import.meta.dirname, "./deno_import_map.json");
+  // Deno forces us to put switches BEFORE the script! So the command ultimately becomes:`deno <switches> <script>.js`
+  argv.unshift("--node-modules-dir=auto", "--allow-env", "--allow-read", `--import-map=${importMap}`);
+  // So we can use imports that arent prefixed with "npm:", eg `import x from "npm:x"`
+  childProcessOptions.env!.DENO_COMPAT = "1";
+}
+
+const result = spawnSync(`${executionRuntime.toString()} ${argv.join(" ")}`, childProcessOptions);
+// Bubble up process status
+process.exit(result.status ?? 1);
+
+// ============================================================================================================
+// ============= yargs Functions ==============================================================================
+// ============================================================================================================
 
 // Allows other scripts to call us programmatically.
 export default function buildCli(): Argv<{}> {
@@ -107,6 +158,15 @@ function makeCommand(): CommandModule<{}, CliArgs> {
 // ============================================================================================================
 // ============= Helper Functions =============================================================================
 // ============================================================================================================
+
+/**
+ * Attempts to parse a string into ServerRuntime type.
+ * Defaults to "node" ServerRuntime if an invalid ServerRuntime string is provided, or is undefined!
+ **/
+function runtimeTypeFromString(value: string | undefined): ServerRuntime {
+  const v = value?.trim();
+  return (SERVER_RUNTIMES as readonly string[]).includes(v ?? "") ? (v as ServerRuntime) : "node";
+}
 
 /**
  * This method is responsible for running the predictor. It validates user input

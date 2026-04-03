@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { CliResult, NodeJsMajorVersion, RuntimeType } from "../../src/types.ts";
+import { CliResult, NodeJsMajorVersion, Runtime } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import { NODE_MAJOR_VERSIONS } from "../../src/constants.ts";
@@ -50,8 +50,8 @@ describe("Execution Runtime : Node", () => {
   it(`results show execution runtime type is node`, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime: "node", isDryRun: true });
     const jsonResult = JSON.parse(result.stdout.toString()) as CliResult;
-    const expectedRuntimeType: RuntimeType = "node";
-    assert.equal(jsonResult.runtime, expectedRuntimeType);
+    const expectedRuntime: Runtime = "node";
+    assert.equal(jsonResult.runtime, expectedRuntime);
   });
 
   describe("Random Number Pool Exhaustion", () => {

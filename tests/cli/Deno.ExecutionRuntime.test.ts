@@ -3,14 +3,14 @@ import assert from "node:assert";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
-import { CliResult, RuntimeType } from "../../src/types.ts";
+import { CliResult, Runtime } from "../../src/types.ts";
 import assertProcessStatus from "./assertProcessStatus.ts";
 
 describe("Execution Runtime : Deno", () => {
-  const runtime: RuntimeType = "deno";
-  const executionRuntime: RuntimeType = "deno";
-  const environment: RuntimeType = "deno";
-  const differentEnvironment: RuntimeType = "bun";
+  const runtime: Runtime = "deno";
+  const executionRuntime: Runtime = "deno";
+  const environment: Runtime = "deno";
+  const differentEnvironment: Runtime = "bun";
 
   it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", { skip: false }, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
@@ -37,8 +37,8 @@ describe("Execution Runtime : Deno", () => {
   it(`results show execution runtime type is ${executionRuntime}`, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
     const jsonResult = JSON.parse(result.stdout.toString()) as CliResult;
-    const expectedRuntimeType: RuntimeType = "deno";
-    assert.equal(jsonResult.runtime, expectedRuntimeType);
+    const expectedRuntime: Runtime = "deno";
+    assert.equal(jsonResult.runtime, expectedRuntime);
   });
 
   it("should be correct when using Array.fom generated in REPL", async () => {

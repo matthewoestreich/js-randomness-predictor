@@ -2,13 +2,13 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import { EXECUTION_RUNTIME_ENV_VAR_KEY } from "../../src/constants.ts";
-import { CliResult, RuntimeType } from "../../src/types.ts";
+import { CliResult, Runtime } from "../../src/types.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
 import assertProcessStatus from "./assertProcessStatus.ts";
 
 describe("Execution Runtime : Bun", () => {
-  const runtime: RuntimeType = "bun";
-  const executionRuntime: RuntimeType = "bun";
+  const runtime: Runtime = "bun";
+  const executionRuntime: Runtime = "bun";
   const environment = "bun";
   const differentEnvironment = "deno";
 
@@ -25,7 +25,7 @@ describe("Execution Runtime : Bun", () => {
   it(`results show execution runtime type is ${executionRuntime}`, async () => {
     const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
     const jsonResult = JSON.parse(result.stdout.toString()) as CliResult;
-    const expectedRuntimeType: RuntimeType = "bun";
+    const expectedRuntimeType: Runtime = "bun";
     assert.equal(jsonResult.runtime, expectedRuntimeType);
   });
 
