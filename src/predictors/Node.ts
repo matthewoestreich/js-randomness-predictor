@@ -4,6 +4,7 @@ import { UnexpectedRuntimeError } from "../errors.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import V8Predictor from "./engines/V8.js";
+import uint64 from "../uint64.js";
 
 /**
  *
@@ -44,6 +45,12 @@ import V8Predictor from "./engines/V8.js";
  *      }
  *      ```
  *
+ *  - >= v26.x.x : JANUARY 2026 UPDATE (comment written on Feb 1, 2026)
+ *    - See this issue : https://github.com/matthewoestreich/js-randomness-predictor/issues/25
+ *    - V8 updated their Math.random implementation in the following commit:
+ *        - https://source.chromium.org/chromium/_/chromium/v8/v8/+/0596ead5b04f5988d7742c2a4559637a4f81b849
+ *    - AT THE TIME OF WRITING THIS COMMENT, we now first try to old algo - if we get UNSAT, we
+ *      try again with the updated algo. If the updated algo produces an error, we return it.
  */
 
 // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
@@ -111,18 +118,37 @@ function getNodeSolvingStrategy(nodeVersion: SemanticVersion): SolvingStrategy {
     };
   }
 
-  // Latest Node version (major version >= 24)
+  if (major <= 25) {
+    return {
+      recoverMantissa: (n: number): bigint => {
+        const mantissa = Math.floor(n * SCALING_FACTOR_53_BIT_INT);
+        return BigInt(mantissa);
+      },
+      toDouble: (concreteState: Pair<bigint>): number => {
+        // Calculate next random number before we modify concrete state.
+        return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
+      },
+      constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+        solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
+      },
+      symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+      concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    };
+  }
+
+  // Current NodeJS version (>= 26.x.x)
   return {
     recoverMantissa: (n: number): bigint => {
       const mantissa = Math.floor(n * SCALING_FACTOR_53_BIT_INT);
       return BigInt(mantissa);
     },
     toDouble: (concreteState: Pair<bigint>): number => {
-      // Calculate next random number before we modify concrete state.
-      return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
+      const random = uint64(concreteState[0] + concreteState[1]);
+      return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
     constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-      solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
+      const sum = symbolicState[0].add(symbolicState[1]);
+      solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
