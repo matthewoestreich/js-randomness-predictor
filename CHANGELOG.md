@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.5.0...3.6.0) (2026-05-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cli and types:** rename exported type BrowserRuntimeType to BrowserRuntime
+
+### Features
+
+* **node:** add new V8 algo to Node v26.x.x predictor ([f888a53](https://github.com/matthewoestreich/js-randomness-predictor/commit/f888a53f7d47ecb0651ae50dd190bd1436e91adc))
+* **node:** add Node.js v26 support ([3781613](https://github.com/matthewoestreich/js-randomness-predictor/commit/378161326f5e2d68b64860c6780c18f3d9b6dedf))
+* **node:** add Node.js v26 to supported versions ([bfdc2cf](https://github.com/matthewoestreich/js-randomness-predictor/commit/bfdc2cf65af2b55ad76f52918f6a4fec02492691))
+
+
+### Build System
+
+* **docs:** create README in build to document build workflow; add comment to vite config ([06a9361](https://github.com/matthewoestreich/js-randomness-predictor/commit/06a936195d704774eff234bdec52eee46667f333))
+
+
+### Refactors
+
+* **cli and types:** convert parsed execution runtime string as ServerRuntim; remove Type prefix from types ([276f7f4](https://github.com/matthewoestreich/js-randomness-predictor/commit/276f7f48fcf821b044b70c5816ea4622e186111e))
+* **cli and types:** convert parsed execution runtime string as ServerRuntim; remove Type prefix from types\n\nBREAKING CHANGE: rename exported type BrowserRuntimeType to BrowserRuntime ([0224c22](https://github.com/matthewoestreich/js-randomness-predictor/commit/0224c22144b62892f8e570a89a0c3afb86a640af))
+* **cli:** clean up logic; add comment ([930cdf8](https://github.com/matthewoestreich/js-randomness-predictor/commit/930cdf8fb2204014e3109e18639b19698ead4452))
+* **cli:** clean up logic; add comment ([2c3af09](https://github.com/matthewoestreich/js-randomness-predictor/commit/2c3af092d9b70968914ebe5e6b16a76f8f563506))
+* **cli:** merge all cli code into single file; update tests ([bf6885f](https://github.com/matthewoestreich/js-randomness-predictor/commit/bf6885fc7066fdfefb2ac2fe434114a52aa166c7))
+
 ## [3.5.0](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.4.8...3.5.0) (2026-04-01)
 
 
