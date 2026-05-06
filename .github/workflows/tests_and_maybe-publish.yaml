@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, node] # 'node' means latest stable version
+        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x, node] # 'node' means latest stable version
         #node-version: [18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, node] # 'node' means latest stable version
     steps:
       - uses: actions/checkout@v4
@@ -98,7 +98,14 @@ jobs:
         shell: bash
         run: npm run build:ci
       - name: Run tests (>= v20.x)
-        if: ${{ matrix.node-version == '20.x' || matrix.node-version == '21.x' || matrix.node-version == '22.x' || matrix.node-version == '23.x' || matrix.node-version == '24.x' || matrix.node-version == 'node' }}
+        if: >
+          matrix.node-version == '20.x' ||
+          matrix.node-version == '21.x' ||
+          matrix.node-version == '22.x' ||
+          matrix.node-version == '23.x' ||
+          matrix.node-version == '24.x' ||
+          matrix.node-version == '25.x' ||
+          matrix.node-version == 'node'
         shell: bash
         run: npm run test:node:versions:GE:20
         env:
