@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync, SpawnSyncOptionsWithBufferEncoding } from "node:child_process";
 import yargs, { ArgumentsCamelCase, CommandModule, Argv } from "yargs";
 import { hideBin } from "yargs/helpers";
-import { NodeJsMajorVersion, Predictor, CliArgs, CliResult, ServerRuntime } from "../types.js";
+import { Predictor, CliArgs, CliResult, ServerRuntime } from "../types.js";
 import Logger from "../logger.js";
 import callMathRandom from "../callMathRandom.js";
 import { SequenceNotFoundError } from "../errors.js";
@@ -14,9 +14,8 @@ import ExecutionRuntime from "../ExecutionRuntime.js";
 import JSRandomnessPredictor from "../index.js";
 import {
   RUNTIMES,
-  NODE_MAJOR_VERSIONS,
   DEFAULT_NUMBER_OF_PREDICTIONS,
-  DEFAULT_SEQUENCE_LENGTH,
+  MIN_SEQUENCE_LENGTH,
   EXECUTION_RUNTIME_ENV_VAR_KEY,
   RUNTIME_ENGINE,
   V8_MAX_PREDICTIONS,
@@ -126,12 +125,6 @@ function makeCommand(): CommandModule<{}, CliArgs> {
             return numPredictions;
           },
         })
-        .option("env-version", {
-          alias: "v",
-          describe: "Node.js major version",
-          type: "number",
-          choices: NODE_MAJOR_VERSIONS,
-        })
         .option("export", {
           alias: "x",
           describe: "File path to export results. Must be to a .json file. Path relative to current working directory!",
@@ -174,7 +167,7 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<CliArgs>): Prom
 
     const result: CliResult = {
       actual: "You'll need to get this yourself via the same way you generated the sequence",
-      sequence: argv.sequence ? argv.sequence : callMathRandom(DEFAULT_SEQUENCE_LENGTH[argv.environment]),
+      sequence: argv.sequence ? argv.sequence : callMathRandom(MIN_SEQUENCE_LENGTH[argv.environment]),
       isCorrect: undefined,
       predictions: [],
       runtime: ExecutionRuntime.type(),
@@ -191,7 +184,6 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<CliArgs>): Prom
 
     const predictor: Predictor = JSRandomnessPredictor[argv.environment](result.sequence);
 
-    applyTargetNodeVersion(argv, predictor);
     await makePredictions(predictor, result, numPredictions);
     populateActualResults(argv, result, numPredictions);
     evaluatePredictionAccuracy(result);
@@ -233,26 +225,11 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<CliArgs>): Prom
  *
  * 1. If a `--sequence` was not provided and the current execution runtime does not equal '--environment',
  *   it means we can't auto generate sequence.
- *
- * 2. If a `--sequence` was not provided and the following flags were used: `--environment node --env-version N` where
- *   `--env-version N` does not match current execution runtime version. This means we cannot automatically generate a
- *   reliable sequence and the user will need to provide a `--sequence`.
  */
 function assertSequenceRequirements(argv: CliArgs): void {
   if (!argv.sequence && ExecutionRuntime.type() !== argv.environment) {
     throw new SequenceNotFoundError(
       `'--sequence' is required when '--environment' is '${argv.environment}' and '${EXECUTION_RUNTIME_ENV_VAR_KEY}' is '${ExecutionRuntime.type()}'`,
-    );
-  }
-  if (
-    ExecutionRuntime.isNode() &&
-    argv.environment === "node" &&
-    argv.envVersion &&
-    !argv.sequence &&
-    argv.envVersion !== getCurrentNodeJsMajorVersion()
-  ) {
-    throw new SequenceNotFoundError(
-      `'--sequence' is required when '--environment' is '${argv.environment}' and '--env-version' is different than your current Node.js version! Current Node version is '${getCurrentNodeJsMajorVersion()}' but --env-version is '${argv.envVersion}'`,
     );
   }
 }
@@ -295,19 +272,6 @@ function computePredictionCount(argv: CliArgs, result: CliResult): number {
 }
 
 /**
- * Only applicable if `--environment` is `node`! Check if user wants to target a different Node version than what they are currently running.
- *
- * We need to run `setNodeVersion(x)` on the current Predictor if the user provided a command that includes `--environment node --env-version N`,
- * but the Node version of the current execution environment (the runtime this script is being executed in) does not match the `--env-version N`
- * provided by the user.
- */
-function applyTargetNodeVersion(argv: CliArgs, predictor: Predictor): void {
-  if (ExecutionRuntime.isNode() && argv.envVersion && argv.environment === "node" && getCurrentNodeJsMajorVersion() !== argv.envVersion) {
-    predictor.setNodeVersion?.({ major: Number(argv.envVersion), minor: 0, patch: 0 });
-  }
-}
-
-/**
  * Generate actual Math.random output and add to result (specifically, the `result.actual` field), if possible.
  *
  * We may be able to auto check if predictions are accurate because we generated the sequence. In order to be able
@@ -319,7 +283,7 @@ function populateActualResults(argv: CliArgs, result: CliResult, numPredictions:
     return;
   }
   if (
-    ("node" === argv.environment && ExecutionRuntime.isNode() && (!argv.envVersion || getCurrentNodeJsMajorVersion() === argv.envVersion)) ||
+    ("node" === argv.environment && ExecutionRuntime.isNode()) ||
     ("deno" === argv.environment && ExecutionRuntime.isDeno()) ||
     ("bun" === argv.environment && ExecutionRuntime.isBun())
   ) {
@@ -343,13 +307,6 @@ function evaluatePredictionAccuracy(result: CliResult): void {
   if (Array.isArray(result.actual)) {
     result.isCorrect = result.actual.every((v, i) => v === result.predictions[i]);
   }
-}
-
-/**
- * Gets the current Node.js major version
- */
-function getCurrentNodeJsMajorVersion(): NodeJsMajorVersion {
-  return Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
 }
 
 /**

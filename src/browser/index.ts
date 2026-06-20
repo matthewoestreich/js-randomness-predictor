@@ -9,12 +9,12 @@ import {
   DenoRandomnessPredictor,
 } from "../predictors/index.js";
 
-import type { BrowserRuntime, Predictor, SemanticVersion } from "../types.js";
+import type { BrowserRuntime, Predictor } from "../types.js";
 
 // Invoke immediately upon page load.
 loader();
 
-export type { BrowserRuntime, Predictor, SemanticVersion };
+export type { BrowserRuntime, Predictor };
 
 const node = (sequence?: number[]): NodeRandomnessPredictor => new NodeRandomnessPredictor(sequence);
 const firefox = (sequence: number[]): FirefoxRandomnessPredictor => new FirefoxRandomnessPredictor(sequence);
