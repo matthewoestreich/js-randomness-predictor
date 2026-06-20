@@ -15,12 +15,8 @@ export default function callJsRandomnessPredictorCli(args: CliArgs, extendedOpti
     (extendedOptions ||= {}).jsRandomnessPredictorCliPath = JSRP_CLI_PATH;
   }
 
-  const { environment, envVersion, sequence, predictions, force, export: exportPath } = args;
+  const { environment, sequence, predictions, force, export: exportPath } = args;
   const cmd: string[] = ["-e", environment];
-
-  if (envVersion) {
-    cmd.push("-v", envVersion.toString());
-  }
 
   if (sequence?.length) {
     cmd.push("-s", ...sequence.map(String));

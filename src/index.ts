@@ -1,4 +1,4 @@
-import type { Predictor, SemanticVersion } from "./types.js";
+import type { Predictor } from "./types.js";
 import {
   FirefoxRandomnessPredictor,
   ChromeRandomnessPredictor,
@@ -8,7 +8,7 @@ import {
   DenoRandomnessPredictor,
 } from "./predictors/index.js";
 
-export type { Predictor, SemanticVersion };
+export type { Predictor };
 
 const JSRandomnessPredictor = {
   node: (sequence?: number[]): NodeRandomnessPredictor => new NodeRandomnessPredictor(sequence),

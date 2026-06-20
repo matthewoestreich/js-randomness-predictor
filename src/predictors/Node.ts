@@ -1,5 +1,5 @@
 import * as z3 from "z3-solver-jsrp";
-import { SemanticVersion, SolvingStrategy, Pair } from "../types.js";
+import { SolvingStrategy, Pair } from "../types.js";
 import { UnexpectedRuntimeError } from "../errors.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";

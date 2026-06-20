@@ -21,6 +21,7 @@
 - We recommend at least **6 numbers** in the **initial sequence** for **Bun and Safari**, and at least **4 numbers** for **Node, Chrome, Firefox, and Deno**.
 - **Breaking changes in `v2.0.0`!** The V8 Predictor was deprecated! Use the predictor that matches your runtime instead.
 - **In `v3.0.0`, native runtime support for Bun and Deno was added!** You can run the Bun predictor natively in Bun, and the Deno predictor natively in Deno!
+- **In `v4.0.0`**, you no longer need to specify a NodeJS version if you want to target a different version than the currently installed version.
 
 # Installation
 
@@ -65,9 +66,9 @@ const JSRandomnessPredictor = require("js-randomness-predictor");
 import JSRandomnessPredictor from "npm:js-randomness-predictor";
 ```
 
-## Frontend/Browser
+**Frontend/Browser**
 
-Browser usage is a little painful. :grimacing: [Please see here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md) **THIS GUIDE INCUDES dev servers, eg. the dev servers that `vite`, `webpack`, etc.. offer.**
+Browser usage is a little painful. :grimacing: [Please see here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md) **This guide includes dev servers, eg. the dev servers that `vite`, `webpack`, etc.. offer.**
 
 # Node Predictor
 
@@ -97,38 +98,9 @@ const nextPrediction = await nodePredictor.predictNext();
 const isAccurate = nextPrediction === Math.random();
 ```
 
-## Targeting a Different Node.js Version
-
-You can target Node.js versions that are either **older or newer** than your current version.
-
-For example:
-
-- If you're currently running Node.js `v24.x.x` but want to predict values generated in `v22.x.x`
-- Or if you're on Node.js `v18.x.x` and want to predict values from a newer version like `v20.x.x`
-
-You can do this via the `setNodeVersion(version)` method.  
-Essentially, setting the Node.js version tells the predictor: **"The sequence I provided was generated using Node.js version X."**
-
-⚠️ The provided sequence (and expected sequence) must be generated in the matching Node.js version used in `setNodeVersion(...)`!
-
-<!-- prettier-ignore -->
-```js
-// Current Node.js: v24.x.x
-const nodePredictor = JSRandomnessPredictor.node(sequenceFromNodeV22);
-nodePredictor.setNodeVersion({ major: 22, minor: 0, patch: 0 });
-
-const expectedPredictionsFromNodeV22 = [/* Copied from Node.js v22 */];
-const nextPrediction = await nodePredictor.predictNext();
-const isCorrect = expectedPredictionsFromNodeV22[0] === nextPrediction;
-```
-
 # Bun Predictor
 
 [See known Bun issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)
-
-:fire: As of `v3.0.0`, you can run the Bun predictor natively in Bun! :fire:
-
-:construction: Only use "standalone" `Math.random()` calls in Bun (for now) - [see here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun) :construction:
 
 **If you are running natively in Bun**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you. **If you are using the Bun Predictor outside of Bun**, you must provide a sequence that was generated in Bun and copied over!
 
@@ -146,24 +118,22 @@ const sequence = [
 const bunPredictor = JSRandomnessPredictor.bun(sequence);
 const nextPrediction = await bunPredictor.predictNext();
 // We can programmatically verify since we are running in Bun.
+// **IMPORTANT** : must be running natively in Bun for this to work!
 const isAccurate = nextPrediction === Math.random();
 ```
 
 ## Automatically Generate Sequence
-
-**IMPORTANT** : must be running natively in Bun for this to work!
 
 ```js
 // Automatically creates sequence behind the scenes
 const bunPredictor = JSRandomnessPredictor.bun();
 const nextPrediction = await bunPredictor.predictNext();
 // We can programmatically verify since we are running in Bun.
+// **IMPORTANT** : must be running natively in Bun for this to work!
 const isAccurate = nextPrediction === Math.random();
 ```
 
 # Deno Predictor
-
-:fire: As of `v3.0.0`, you can run the Deno predictor natively in Deno! :fire:
 
 **If you are running natively in Deno**, you can either provide your own initial sequence, or allow us to create one behind the scenes for you. **If you are using the Deno Predictor outside of Deno**, you must provide a sequence that was generated in Deno and copied over!
 
@@ -175,18 +145,18 @@ const sequence = Array.from({ length: 4 }, Math.random);
 const denoPredictor = JSRandomnessPredictor.deno(sequence);
 const nextPrediction = await denoPredictor.predictNext();
 // We can programmatically verify since we are running in Deno.
+// **IMPORTANT** : must be running natively in Deno for this to work!
 const isAccurate = nextPrediction === Math.random();
 ```
 
 ## Automatically Generate Sequence
-
-**IMPORTANT** : must be running natively in Deno for this to work!
 
 ```js
 // Automatically creates sequence behind the scenes
 const denoPredictor = JSRandomnessPredictor.deno();
 const nextPrediction = await denoPredictor.predictNext();
 // We can programmatically verify since we are running in Deno.
+// **IMPORTANT** : must be running natively in Deno for this to work!
 const isAccurate = nextPrediction === Math.random();
 ```
 
@@ -216,8 +186,6 @@ const nextPrediction = await firefoxPredictor.predictNext();
 
 :exclamation: The initial sequence must contain at least 6 elements! :exclamation:
 
-:construction: Only use "standalone" `Math.random()` calls in Safari (for now) - [see here for more info](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari) :construction:
-
 ```js
 // MUST HAVE AT LEAST 6 ELEMENTS IN SEQUENCE!
 const sequence = [...];
@@ -240,11 +208,10 @@ js-randomness-predictor --help
 # You can use shorthand for flags.
 js-randomness-predictor
   -e <environment>
-  [-v <environment_version>]
   [-s <sequence...>]
   [-p <num_predictions>]
   [-x <export_path>]
-  [-f <force_overwrite_export_file_or_export_path_creation>]
+  [-f <force_export>]
 ```
 
 ## Global Usage
@@ -321,98 +288,49 @@ $ js-randomness-predictor --environment node --sequence 1 2 3 4
 $ js-randomness-predictor --environment node --sequence 1 2 3 4 --predictions 15
 ```
 
-#### Targeting a Different Node.js Version
-
-You can target Node.js versions that are either **older or newer** than your current version.
-
-For example:
-
-- If you're currently running Node.js `v24.x.x` but want to predict values generated in `v22.x.x`
-- Or if you're on Node.js `v18.x.x` and want to predict values from a newer version like `v20.x.x`
-
-You can do this using the `--env-version` (or `-v`) flag.  
-Essentially, this flag tells the predictor: **"The sequence I provided was generated using Node.js version X."**
-
-⚠️ Only the **major version number is needed** for `--env-version` value.
-
-```bash
-# Specify environment version explicitly
-$ js-randomness-predictor --environment node --env-version 22 --sequence 1 2 3 4
-
-# Shorthand version
-$ js-randomness-predictor -e node -v 22 -s 1 2 3 4
-```
-
-⚠️ If you use `--env-version` with a version different from your current Node.js version, the `--sequence` flag is **required**:
-
-```bash
-# Current Node.js: v24.2.0
-$ js-randomness-predictor -e node -v 22 # ERROR!
-```
-
 ### Chrome
-
-If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
 $ js-randomness-predictor --environment chrome --sequence 1 2 3 4
 # Output 5 predictions
 $ js-randomness-predictor --environment chrome --sequence 1 2 3 4 --predictions 5
-# --env-version (-v) ignored
-$ js-randomness-predictor -e chrome -v 23 -s 1 2 3 4
 ```
 
 ### Firefox
-
-If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
 $ js-randomness-predictor --environment firefox --sequence 1 2 3 4
 # Output 5 predictions
 $ js-randomness-predictor --environment firefox --sequence 1 2 3 4 --predictions 5
-# --env-version (-v) ignored
-$ js-randomness-predictor -e firefox -v 23 -s 1 2 3 4
 ```
 
 ### Safari
-
-If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
 $ js-randomness-predictor --environment safari --sequence 1 2 3 4
 # Output 5 predictions
 $ js-randomness-predictor --environment safari --sequence 1 2 3 4 --predictions 5
-# --env-version (-v) ignored
-$ js-randomness-predictor -e safari -v 23 -s 1 2 3 4
 ```
 
 ### Bun
-
-If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
 $ js-randomness-predictor --environment bun --sequence 1 2 3 4
 # Output 5 predictions
 $ js-randomness-predictor --environment bun --sequence 1 2 3 4 --predictions 5
-# --env-version (-v) ignored
-$ js-randomness-predictor -e bun -v 23 -s 1 2 3 4
 ```
 
 ### Deno
-
-If the `--env-version` flag is provided and the `--environment` flag is not `node`, the `--env-version` flag is ignored!
 
 ```bash
 # Output 10 predictions by default
 $ js-randomness-predictor --environment deno --sequence 1 2 3 4
 # Output 5 predictions
 $ js-randomness-predictor --environment deno --sequence 1 2 3 4 --predictions 5
-# --env-version (-v) ignored
-$ js-randomness-predictor -e deno -v 23 -s 1 2 3 4
 ```
 
 # Contributing

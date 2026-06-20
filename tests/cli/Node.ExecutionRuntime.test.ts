@@ -1,13 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { CliResult, NodeJsMajorVersion, Runtime } from "../../src/types.ts";
+import { CliResult, Runtime } from "../../src/types.ts";
 import callJsRandomnessPredictorCli from "./callJsRandomnessPredictorCli.ts";
 import queryDb from "../queryRandomNumbersDatabase.ts";
-import { NODE_MAJOR_VERSIONS } from "../../src/constants.ts";
 import assertProcessStatus from "./assertProcessStatus.ts";
 
 describe("Execution Runtime : Node", () => {
-  const CURR_NODE_MAJOR_VER = Number(process.versions.node.split(".")[0]) as NodeJsMajorVersion;
   const environment = "node";
 
   it("[dynamic sequence] should not require a sequence if execution runtime (and version) match '--environment' and '--env-version'", () => {
@@ -26,25 +24,6 @@ describe("Execution Runtime : Node", () => {
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.equal(jsonResult.predictions.length, expectedNumPreds);
     assert.deepStrictEqual(jsonResult.predictions, expected);
-  });
-
-  it("enforces proper node version when sequence not provided", () => {
-    // We need to ensure we have a node version than the current execution runtime.
-    let diffNodeMajor: NodeJsMajorVersion | undefined;
-    for (let i = NODE_MAJOR_VERSIONS.length - 1; i >= 0; i--) {
-      diffNodeMajor = NODE_MAJOR_VERSIONS[i];
-      if (diffNodeMajor !== CURR_NODE_MAJOR_VER) {
-        break;
-      }
-    }
-    assert.ok(diffNodeMajor);
-    const result = callJsRandomnessPredictorCli({ environment, envVersion: diffNodeMajor });
-    assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
-  });
-
-  it("should not require a sequence if specified --env-version matches current execution runtime version", () => {
-    const result = callJsRandomnessPredictorCli({ environment, envVersion: CURR_NODE_MAJOR_VER });
-    assertProcessStatus.equal(result, 0);
   });
 
   it(`results show execution runtime type is node`, async () => {
