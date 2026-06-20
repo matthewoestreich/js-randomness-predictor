@@ -1,11 +1,12 @@
-<h1 align="center">
-  <a href="https://matthewoestreich.github.io/js-randomness-predictor-demos/">Live Demo</a>
-</h1>
+<h2 align="center"><code>js-randomness-predictor</code></h2>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/js-randomness-predictor">
     <img src="https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000" alt="npm version" />
-  </a>
+  </a></br>
+  <a href="https://matthewoestreich.github.io/js-randomness-predictor-demos/">Live Demo</a></br>
+  <a href="https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/HOW_DOES_IT_WORK.md">How Does It Work?</a></br>
+  <a href="https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md">Known Issues</a></br>
 </p>
 
 ---
@@ -22,29 +23,6 @@ const nextPrediction = await predictor.predictNext();
 
 console.log(nextPrediction);
 ```
-
-- [How Does It Work?](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/HOW_DOES_IT_WORK.md)
-- [Known Issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md)
-- [Browser Usage Guide](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md)
-- [Changelog](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/CHANGELOG.md)
-
-# Breaking Changes
-
-### v4.x.x
-
-- Node.js version no longer needs to be specified.
-- Automatic Node.js version detection was added.
-- Node.js sequence length increased from **4** to **5**.
-
-### v3.x.x
-
-- Added native Bun support.
-- Added native Deno support.
-
-### v2.x.x
-
-- Deprecated the V8 predictor.
-- Use runtime-specific predictors instead.
 
 # Installation
 
@@ -88,26 +66,24 @@ const JSRandomnessPredictor = require("js-randomness-predictor");
 import JSRandomnessPredictor from "npm:js-randomness-predictor";
 ```
 
-# Predictors
-
-### Runtime Capabilities
-
-| Runtime | Auto Generate Sequence | Recommended Length |
-| ------- | ---------------------- | ------------------ |
-| Node.js | ✅                     | 5                  |
-| Bun     | ✅ Native Bun only     | 6                  |
-| Deno    | ✅ Native Deno only    | 4                  |
-| Chrome  | ❌                     | 4                  |
-| Firefox | ❌                     | 4                  |
-| Safari  | ❌                     | 6                  |
-
-### Browser Usage
+## Browser
 
 Browser usage requires additional setup: [browser usage guide](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md).
 
-## Node
+# Predictors
 
-- [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#node)
+## Runtime Capabilities
+
+| Runtime | Auto Generate Sequence | Sequence Length | [Known Issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md) |
+| ------- | ---------------------- | :-------------: | :-----------------------------------------------------------------------------------------------------------: |
+| Node.js | ✅                     |        5        |  [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#node)   |
+| Bun     | ✅ Native Bun only     |        6        |   [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)   |
+| Deno    | ✅ Native Deno only    |        4        |                                                       -                                                       |
+| Chrome  | ❌                     |        4        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#chrome)  |
+| Firefox | ❌                     |        4        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#firefox) |
+| Safari  | ❌                     |        6        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)  |
+
+## Node
 
 **Generate a sequence automatically**:
 
@@ -128,7 +104,6 @@ const isAccurate = prediction === Math.random();
 
 ## Bun
 
-- [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)
 - If running natively in Bun, a sequence can be generated automatically.
 - If using the Bun predictor outside of Bun, you must provide a sequence that was originally generated in Bun.
 
@@ -169,8 +144,6 @@ const isAccurate = prediction === Math.random();
 
 ## Chrome
 
-- [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#chrome)
-
 ```js
 const predictor = JSRandomnessPredictor.chrome(sequence);
 const prediction = await predictor.predictNext();
@@ -178,16 +151,12 @@ const prediction = await predictor.predictNext();
 
 ## Firefox
 
-- [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#firefox)
-
 ```js
 const predictor = JSRandomnessPredictor.firefox(sequence);
 const prediction = await predictor.predictNext();
 ```
 
 ## Safari
-
-- [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)
 
 ```js
 const predictor = JSRandomnessPredictor.safari(sequence);
@@ -210,19 +179,16 @@ npm i -g js-randomness-predictor
 node_modules/.bin/js-randomness-predictor [options]
 ```
 
-## Help
+## Quick Start
 
 ```bash
+# Help
 js-randomness-predictor --help
-```
-
-## Version
-
-```bash
+# Version
 js-randomness-predictor --version
 ```
 
-## Options
+### Options
 
 ```bash
 js-randomness-predictor
