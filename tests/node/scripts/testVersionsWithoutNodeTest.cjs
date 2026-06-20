@@ -7,7 +7,7 @@ const JsRandomnessPredictor = require("../../../dist/cjs/index.js");
  * Therefore, we have to use this script.
  */
 
-const INITIAL_SEQUENCE_LEN = 4;
+const INITIAL_SEQUENCE_LEN = 5;
 const EXPECTED_PREDICTIONS_LEN = 10;
 const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
 const EXIT = { code: 0 };
