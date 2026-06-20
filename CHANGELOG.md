@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.1](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.0...4.0.1) (2026-06-20)
+
+
+### Documentation
+
+* **readme:** major cleanup ([857ad38](https://github.com/matthewoestreich/js-randomness-predictor/commit/857ad3896d013da1d543b2a4caf55a993d1c2974))
+* **readme:** major cleanup ([f9c0eab](https://github.com/matthewoestreich/js-randomness-predictor/commit/f9c0eabe288708d26354b1afaed96df08bd27d99))
+* **readme:** major cleanup ([9e519f0](https://github.com/matthewoestreich/js-randomness-predictor/commit/9e519f0f17e54a0bcfe30464918d8095152f70e3))
+* **readme:** major cleanup ([e8e0977](https://github.com/matthewoestreich/js-randomness-predictor/commit/e8e0977af1eb00c9df874fb898ae29446b3119c8))
+* **readme:** major cleanup ([c60acb8](https://github.com/matthewoestreich/js-randomness-predictor/commit/c60acb88e52a11fc7a31470ca355b2ed3b1f2e8c))
+* **readme:** major cleanup ([0b9201c](https://github.com/matthewoestreich/js-randomness-predictor/commit/0b9201c214b482b1e3ce48a69978d262dced3053))
+* **readme:** major cleanup ([385f145](https://github.com/matthewoestreich/js-randomness-predictor/commit/385f145c06fd238d67dd7258bc0d8d2b1c20cebd))
+* **readme:** major cleanup ([08c5a1f](https://github.com/matthewoestreich/js-randomness-predictor/commit/08c5a1f69299ca64956655dc637e411765747a29))
+* **readme:** major cleanup ([bc9c080](https://github.com/matthewoestreich/js-randomness-predictor/commit/bc9c08028ee975b9ee26834647654bd36437bc91))
+* **readme:** major cleanup ([6a3956e](https://github.com/matthewoestreich/js-randomness-predictor/commit/6a3956eb26819f17bd62d2e40f7261b7fa2693cd))
+
 ## [4.0.0](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.6.0...4.0.0) (2026-06-20)
 
 

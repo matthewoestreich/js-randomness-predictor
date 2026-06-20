@@ -1,6 +1,6 @@
 {
   "name": "js-randomness-predictor",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "engines": {
     "node": ">=17.0.0 <27.0.0"
   },
