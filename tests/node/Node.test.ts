@@ -12,7 +12,7 @@ describe("Node", () => {
 
   it("predict correctly when using Array.from for 'sequence' and 'expected'", async () => {
     await withRetries(async () => {
-      const sequence = Array.from({ length: 4 }, Math.random);
+      const sequence = Array.from({ length: 5 }, Math.random);
       const nodePredictor = JSRandomnessPredictor.node(sequence);
       const expected = Array.from({ length: 5 }, Math.random);
       const predictions: number[] = [];
@@ -25,7 +25,7 @@ describe("Node", () => {
 
   it("predict correctly when using single Math.random() calls for 'sequence' and 'expected'", async () => {
     await withRetries(async () => {
-      const sequence = [Math.random(), Math.random(), Math.random(), Math.random()];
+      const sequence = [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()];
       const nodePredictor = JSRandomnessPredictor.node(sequence);
       const expected = [
         Math.random(),

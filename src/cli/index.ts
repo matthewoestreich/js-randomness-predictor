@@ -15,7 +15,7 @@ import JSRandomnessPredictor from "../index.js";
 import {
   RUNTIMES,
   DEFAULT_NUMBER_OF_PREDICTIONS,
-  DEFAULT_SEQUENCE_LENGTH,
+  MIN_SEQUENCE_LENGTH,
   EXECUTION_RUNTIME_ENV_VAR_KEY,
   RUNTIME_ENGINE,
   V8_MAX_PREDICTIONS,
@@ -167,7 +167,7 @@ async function executePredictionCommand(argv: ArgumentsCamelCase<CliArgs>): Prom
 
     const result: CliResult = {
       actual: "You'll need to get this yourself via the same way you generated the sequence",
-      sequence: argv.sequence ? argv.sequence : callMathRandom(DEFAULT_SEQUENCE_LENGTH[argv.environment]),
+      sequence: argv.sequence ? argv.sequence : callMathRandom(MIN_SEQUENCE_LENGTH[argv.environment]),
       isCorrect: undefined,
       predictions: [],
       runtime: ExecutionRuntime.type(),

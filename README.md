@@ -18,10 +18,24 @@
 
 - Having trouble? [See all known issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md)
 - Use the predictor that matches the environment where the sequence was originally generated. **Meaning, if it came from Chrome, use the Chrome predictor, etc...**.
-- We recommend at least **6 numbers** in the **initial sequence** for **Bun and Safari**, and at least **4 numbers** for **Node, Chrome, Firefox, and Deno**.
-- **Breaking changes in `v2.0.0`!** The V8 Predictor was deprecated! Use the predictor that matches your runtime instead.
-- **In `v3.0.0`, native runtime support for Bun and Deno was added!** You can run the Bun predictor natively in Bun, and the Deno predictor natively in Deno!
-- **In `v4.0.0`**, you no longer need to specify a NodeJS version if you want to target a different version than the currently installed version.
+
+**Recommended Initial Sequence Length**
+
+| Runtime               | Length |
+| --------------------- | ------ |
+| Deno, Chrome, Firefox | 4      |
+| Node                  | 5      |
+| Bun, Safari           | 6      |
+
+**Breaking Changes**
+
+- **In `v2.x.x`**
+  - the V8 Predictor was deprecated! Use the predictor that matches your runtime instead.
+- **In `v3.x.x`**
+  - native runtime support for Bun and Deno was added!\*\* You can run the Bun predictor natively in Bun, and the Deno predictor natively in Deno!
+- **In `v4.x.x`**
+  - you no longer need to specify a Node.js version when targeting a version other than the one currently installed.
+  - to support automatic version detection, the recommended initial sequence length for Node.js has increased from **4** to **5** values.
 
 # Installation
 
@@ -81,7 +95,8 @@ Since we're running in Node, you can dynamically generate the initial sequence b
 
 <!-- prettier-ignore -->
 ```js
-const sequence = Array.from({ length: 4 }, Math.random);
+// Recommended initial sequence length of 5 values!
+const sequence = Array.from({ length: 5 }, Math.random);
 const nodePredictor = JSRandomnessPredictor.node(sequence);
 const nextPrediction = await nodePredictor.predictNext();
 // We can programmatically verify since we are running in Node.
@@ -110,7 +125,7 @@ const isAccurate = nextPrediction === Math.random();
 
 <!-- prettier-ignore -->
 ```js
-// Sequence must contain at least 6 elements!
+// Sequence must contain at least 6 values!
 const sequence = [
   Math.random(), Math.random(), Math.random(),
   Math.random(), Math.random(), Math.random()

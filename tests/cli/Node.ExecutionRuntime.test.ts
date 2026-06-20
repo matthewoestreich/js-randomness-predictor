@@ -15,7 +15,7 @@ describe("Execution Runtime : Node", () => {
   });
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
-    const seqLength = 4;
+    const seqLength = 5;
     const numPreds = 70;
     const expectedNumPreds = 64 - seqLength;
     const seq = Array.from({ length: seqLength }, Math.random);

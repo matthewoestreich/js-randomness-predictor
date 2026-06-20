@@ -17,12 +17,6 @@ export const IS_BROWSER_RUNTIME: Record<Runtime, boolean> = Object.fromEntries(
   RUNTIMES.map((r: Runtime) => [r, BROWSER_RUNTIMES.includes(r as BrowserRuntime)]),
 ) as Record<Runtime, boolean>;
 
-export const JAVASCRIPT_ENGINE_REQUIRED_SEQUENCE_LENGTH: Record<Engine, number> = {
-  v8: 4,
-  javascriptcore: 6, // TODO: update when bug fix lands
-  spidermonkey: 4,
-} as const;
-
 // Get engine from runtime
 export const RUNTIME_ENGINE: Record<Runtime, Engine> = {
   node: "v8",
@@ -43,9 +37,14 @@ export const ENGINE_RUNTIME = Object.entries(RUNTIME_ENGINE).reduce(
 );
 
 // Get default sequence length from runtime
-export const DEFAULT_SEQUENCE_LENGTH: Record<Runtime, number> = Object.fromEntries(
-  Object.entries(RUNTIME_ENGINE).map(([runtime, engine]) => [runtime, JAVASCRIPT_ENGINE_REQUIRED_SEQUENCE_LENGTH[engine]]),
-) as Record<Runtime, number>;
+export const MIN_SEQUENCE_LENGTH: Record<Runtime, number> = {
+  bun: 6,
+  safari: 6,
+  node: 5,
+  chrome: 4,
+  deno: 4,
+  firefox: 4,
+};
 
 export const SUPPORTED_BROWSER_RUNTIMES: Record<BrowserRuntime, boolean> = {
   firefox: true,
