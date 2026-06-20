@@ -66,78 +66,9 @@ const IEEE754_EXPONENT_BITS_MASK = 0x3ff0000000000000n;
 // Map a 53-bit integer into the range [0, 1) as a double
 const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
 
-function getNodeVersion(): SemanticVersion {
-  const [major, minor, patch] = process.versions.node.split(".").map(Number);
-  return { major, minor, patch };
-}
-
-function getNodeSolvingStrategy(nodeVersion: SemanticVersion): SolvingStrategy {
-  const { major } = nodeVersion;
-
-  if (major <= 11) {
-    return {
-      recoverMantissa: (n: number): bigint => {
-        const buffer = Buffer.alloc(8);
-        buffer.writeDoubleLE(n + 1, 0);
-        return buffer.readBigUInt64LE(0) & IEEE754_MANTISSA_BITS_MASK;
-      },
-      toDouble: (concreteState: Pair<bigint>): number => {
-        const n = concreteState[0] + concreteState[1];
-        const buffer = Buffer.alloc(8);
-        buffer.writeBigUInt64LE((n & IEEE754_MANTISSA_BITS_MASK) | IEEE754_EXPONENT_BITS_MASK, 0);
-        // Calculate next random number before we modify concrete state.
-        return buffer.readDoubleLE(0) - 1;
-      },
-      constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-        const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(IEEE754_MANTISSA_BITS_MASK, 64));
-        solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
-      },
-      symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
-      concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
-    };
-  }
-
-  if (major <= 23) {
-    return {
-      recoverMantissa: (n: number): bigint => {
-        const buffer = Buffer.alloc(8);
-        buffer.writeDoubleLE(n + 1, 0);
-        return buffer.readBigUInt64LE(0) & IEEE754_MANTISSA_BITS_MASK;
-      },
-      toDouble: (concreteState: Pair<bigint>): number => {
-        const buffer = Buffer.alloc(8);
-        buffer.writeBigUInt64LE((concreteState[0] >> 12n) | IEEE754_EXPONENT_BITS_MASK, 0);
-        // Calculate next random number before we modify concrete state.
-        return buffer.readDoubleLE(0) - 1;
-      },
-      constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-        solver.add(symbolicState[0].lshr(12).eq(context.BitVec.val(mantissa, 64)));
-      },
-      symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
-      concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
-    };
-  }
-
-  if (major <= 25) {
-    return {
-      recoverMantissa: (n: number): bigint => {
-        const mantissa = Math.floor(n * SCALING_FACTOR_53_BIT_INT);
-        return BigInt(mantissa);
-      },
-      toDouble: (concreteState: Pair<bigint>): number => {
-        // Calculate next random number before we modify concrete state.
-        return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
-      },
-      constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-        solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
-      },
-      symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
-      concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
-    };
-  }
-
+const NODE_STRATEGIES: SolvingStrategy[] = [
   // Current NodeJS version (>= 26.x.x)
-  return {
+  {
     recoverMantissa: (n: number): bigint => {
       const mantissa = Math.floor(n * SCALING_FACTOR_53_BIT_INT);
       return BigInt(mantissa);
@@ -152,8 +83,64 @@ function getNodeSolvingStrategy(nodeVersion: SemanticVersion): SolvingStrategy {
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
-  };
-}
+  },
+  // NodeJS v24 & v25
+  {
+    recoverMantissa: (n: number): bigint => {
+      const mantissa = Math.floor(n * SCALING_FACTOR_53_BIT_INT);
+      return BigInt(mantissa);
+    },
+    toDouble: (concreteState: Pair<bigint>): number => {
+      // Calculate next random number before we modify concrete state.
+      return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
+    },
+    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+      solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
+    },
+    symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+    concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+  },
+  // NodeJS v12 - v23
+  {
+    recoverMantissa: (n: number): bigint => {
+      const buffer = Buffer.alloc(8);
+      buffer.writeDoubleLE(n + 1, 0);
+      return buffer.readBigUInt64LE(0) & IEEE754_MANTISSA_BITS_MASK;
+    },
+    toDouble: (concreteState: Pair<bigint>): number => {
+      const buffer = Buffer.alloc(8);
+      buffer.writeBigUInt64LE((concreteState[0] >> 12n) | IEEE754_EXPONENT_BITS_MASK, 0);
+      // Calculate next random number before we modify concrete state.
+      return buffer.readDoubleLE(0) - 1;
+    },
+    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+      solver.add(symbolicState[0].lshr(12).eq(context.BitVec.val(mantissa, 64)));
+    },
+    symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+    concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+  },
+  // NodeJS version <= v11
+  {
+    recoverMantissa: (n: number): bigint => {
+      const buffer = Buffer.alloc(8);
+      buffer.writeDoubleLE(n + 1, 0);
+      return buffer.readBigUInt64LE(0) & IEEE754_MANTISSA_BITS_MASK;
+    },
+    toDouble: (concreteState: Pair<bigint>): number => {
+      const n = concreteState[0] + concreteState[1];
+      const buffer = Buffer.alloc(8);
+      buffer.writeBigUInt64LE((n & IEEE754_MANTISSA_BITS_MASK) | IEEE754_EXPONENT_BITS_MASK, 0);
+      // Calculate next random number before we modify concrete state.
+      return buffer.readDoubleLE(0) - 1;
+    },
+    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+      const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(IEEE754_MANTISSA_BITS_MASK, 64));
+      solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
+    },
+    symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+    concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+  },
+];
 
 export default class NodeRandomnessPredictor extends V8Predictor {
   constructor(sequence?: number[]) {
@@ -166,13 +153,6 @@ export default class NodeRandomnessPredictor extends V8Predictor {
       }
       sequence = Array.from({ length: DEFAULT_SEQUENCE_LENGTH }, Math.random);
     }
-    const nodeVersion = getNodeVersion();
-    const solvingStrategies = [getNodeSolvingStrategy(nodeVersion)];
-    super(sequence, solvingStrategies);
-  }
-
-  setNodeVersion(version: SemanticVersion): void {
-    // If the version is changed, we must set version specific methods!
-    this.setSolvingStrategies([getNodeSolvingStrategy(version)]);
+    super(sequence, NODE_STRATEGIES);
   }
 }

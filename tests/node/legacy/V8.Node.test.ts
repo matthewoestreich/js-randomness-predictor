@@ -39,7 +39,6 @@ describe("Node : Legacy Node.js Versions", () => {
     const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = JSRandomnessPredictor.node(sequence);
-      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -55,7 +54,6 @@ describe("Node : Legacy Node.js Versions", () => {
     const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = JSRandomnessPredictor.node(sequence);
-      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -71,7 +69,6 @@ describe("Node : Legacy Node.js Versions", () => {
     const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = JSRandomnessPredictor.node(sequence);
-      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -87,7 +84,6 @@ describe("Node : Legacy Node.js Versions", () => {
     const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = JSRandomnessPredictor.node(sequence);
-      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -103,7 +99,6 @@ describe("Node : Legacy Node.js Versions", () => {
     const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = JSRandomnessPredictor.node(sequence);
-      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -119,7 +114,6 @@ describe("Node : Legacy Node.js Versions", () => {
     const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = JSRandomnessPredictor.node(sequence);
-      predictor.setNodeVersion({ major: runtimeVersion, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();
@@ -135,7 +129,6 @@ describe("Node : Legacy Node.js Versions", () => {
     const { sequence, expected } = queryDatabase({ runtime, runtimeVersion, tags: {} });
     it("should predict accurately", async () => {
       const predictor = JSRandomnessPredictor.node(sequence);
-      predictor.setNodeVersion({ major: 16, minor: 0, patch: 0 });
       const predictions: number[] = [];
       for (let i = 0; i < expected.length; i++) {
         const prediction = await predictor.predictNext();

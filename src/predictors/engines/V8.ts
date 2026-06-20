@@ -27,10 +27,6 @@ export default class V8Predictor {
     return next;
   }
 
-  protected setSolvingStrategies(strategies: SolvingStrategy[]): void {
-    this.#solvingStrategies = strategies;
-  }
-
   // Solves symbolic state so we can move forward using concrete state, which
   // is much faster than having to compute symbolic state for every prediction.
   async #solveSymbolicState(): Promise<void> {
