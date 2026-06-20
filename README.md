@@ -2,9 +2,9 @@
   <a href="https://www.npmjs.com/package/js-randomness-predictor">
     <img src="https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000" alt="npm version" />
   </a></br>
-  <a href="https://matthewoestreich.github.io/js-randomness-predictor-demos/">Live Demo</a></br>
-  <a href="https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/HOW_DOES_IT_WORK.md">How Does It Work?</a></br>
-  <a href="https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md">Known Issues</a></br>
+  <a href="https://matthewoestreich.github.io/js-randomness-predictor-demos/">Live Demo</a> 
+  &middot; 
+  <a href="https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/HOW_DOES_IT_WORK.md">How Does It Work?</a>
 </p>
 
 ---
@@ -69,8 +69,6 @@ import JSRandomnessPredictor from "npm:js-randomness-predictor";
 Browser usage requires additional setup: [browser usage guide](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md).
 
 # Predictors
-
-## Runtime Capabilities
 
 | Runtime | Auto Generate Sequence | Sequence Length | [Known Issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md) |
 | ------- | ---------------------- | :-------------: | :-----------------------------------------------------------------------------------------------------------: |
