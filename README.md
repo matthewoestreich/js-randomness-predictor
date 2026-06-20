@@ -1,7 +1,10 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/js-randomness-predictor">
     <img src="https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000" alt="npm version" />
-  </a></br>
+  </a>
+</p>
+
+<p align="center">
   <a href="https://matthewoestreich.github.io/js-randomness-predictor-demos/">Live Demo</a> 
   &middot; 
   <a href="https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/HOW_DOES_IT_WORK.md">How Does It Work?</a>
