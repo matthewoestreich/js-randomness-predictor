@@ -161,38 +161,44 @@ const prediction = await predictor.predictNext();
 
 # Command Line Interface
 
-## Global Usage
+## Installation
+
+#### Global
 
 ```bash
+# Install globally (system wide)
 npm i -g js-randomness-predictor
+
+# Use from anywhere
+js-randomness-predictor [options]
 ```
 
-## Local Usage
-
-- From a project that has `js-randomness-predictor` as a dependency:
+#### Local
 
 ```bash
+# Add as a local project dependency
+npm i js-randomness-predictor
+
+# Manually 'path' to CLI
 node_modules/.bin/js-randomness-predictor [options]
 ```
 
-## Quick Start
+## Basic Usage
 
 ```bash
-# Help
-js-randomness-predictor --help
-# Version
-js-randomness-predictor --version
-```
-
-### Options
-
-```bash
+# Options
 js-randomness-predictor
   -e <environment>
   [-s <sequence...>]
   [-p <num_predictions>]
   [-x <export_path>]
   [-f <force_export>]
+
+# Help
+js-randomness-predictor --help
+
+# Version
+js-randomness-predictor --version
 ```
 
 ## Runtime Selection
