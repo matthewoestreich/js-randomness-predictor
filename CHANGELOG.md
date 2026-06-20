@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.6.0...4.0.0) (2026-06-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* Remove node version requirement
+* **node:** to support automatic version detection, the recommended initial sequence length for Node.js has increased from **4** to **5** values
+* **node_predictor:** remove node version requirement. this removes the '--env-version' (or '-v' shorthand) within the CLI, as well as the 'setNodeVersion' method on the Node predictor. Also removed various types and constants in regards to node version. We now automatically attempt various solving strategies behind the scenes, which cover all nodejs versions, so now it is transparent to the end user, which should make using this library/cli easier.
+
+### CI
+
+* **node:** add Node.js v25.x to be explicitly tested, use "node" for latest version (26) ([d17201b](https://github.com/matthewoestreich/js-randomness-predictor/commit/d17201be8611f3a16001eddb88bfe7f30db025e4))
+
+
+### Refactors
+
+* **node_predictor:** remove node version requirement ([0729bef](https://github.com/matthewoestreich/js-randomness-predictor/commit/0729befc276ca725fa158be0131aeb30b11c3f5a))
+* **node:** have to increase initial sequence size ([9e2bac4](https://github.com/matthewoestreich/js-randomness-predictor/commit/9e2bac4d30bfe6ccd685540dd13845487b2689cd))
+
+
+### Tests
+
+* **node:** fix initial sequence length; increase from 4 to 5 in test ([3ab0741](https://github.com/matthewoestreich/js-randomness-predictor/commit/3ab074121a2aba9f04e2c7d8e6624352981dbfaa))
+* **node:** fix legacy tests ([58328aa](https://github.com/matthewoestreich/js-randomness-predictor/commit/58328aadbc4ab379bac750f4b09a2cca6bd7626f))
+* **node:** troubleshoot flaky test ([9297d4b](https://github.com/matthewoestreich/js-randomness-predictor/commit/9297d4b18b7d267fb1e3ce95f106fb52d1ecf036))
+* **node:** troubleshoot flaky test ([4c79d92](https://github.com/matthewoestreich/js-randomness-predictor/commit/4c79d92dd70f35a6740905b90c5bc9d23b2e6f29))
+
+
+### Documentation
+
+* **readme:** update readme ([6e6f8f1](https://github.com/matthewoestreich/js-randomness-predictor/commit/6e6f8f14aef507e950af45e2c1f17fae792df62b))
+* **README:** update readme ([bec8449](https://github.com/matthewoestreich/js-randomness-predictor/commit/bec8449ab57859ce20c5fa58f232e6e530f50a1a))
+* **README:** update README ([efac5df](https://github.com/matthewoestreich/js-randomness-predictor/commit/efac5dfacea23c0dc95a058df40ee2e2b2ab9da5))
+
+
+* Merge pull request #29 from matthewoestreich/remove-node-version-requirement ([458bf42](https://github.com/matthewoestreich/js-randomness-predictor/commit/458bf424b373704433cfae3e5c40ee87b1b8b267)), closes [#29](https://github.com/matthewoestreich/js-randomness-predictor/issues/29)
+
 ## [3.6.0](https://github.com/matthewoestreich/js-randomness-predictor/compare/3.5.0...3.6.0) (2026-05-06)
 
 
