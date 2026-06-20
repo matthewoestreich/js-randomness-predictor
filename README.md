@@ -19,7 +19,7 @@
 - Having trouble? [See all known issues here](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md)
 - Use the predictor that matches the environment where the sequence was originally generated. **Meaning, if it came from Chrome, use the Chrome predictor, etc...**.
 
-**Recommended Initial Sequence Length**
+### Recommended Initial Sequence Length
 
 | Runtime               | Length |
 | --------------------- | ------ |
@@ -27,7 +27,7 @@
 | Node                  | 5      |
 | Bun, Safari           | 6      |
 
-**Breaking Changes**
+### Breaking Changes
 
 Please see the [CHANGELOG](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/CHANGELOG.md) for more detailed info.
 
