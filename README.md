@@ -32,7 +32,8 @@
 - **In `v2.x.x`**
   - the V8 Predictor was deprecated! Use the predictor that matches your runtime instead.
 - **In `v3.x.x`**
-  - native runtime support for Bun and Deno was added!\*\* You can run the Bun predictor natively in Bun, and the Deno predictor natively in Deno!
+  - native runtime support for Bun and Deno
+  - you can run the Bun predictor natively in Bun, and the Deno predictor natively in Deno!
 - **In `v4.x.x`**
   - you no longer need to specify a Node.js version when targeting a version other than the one currently installed.
   - to support automatic version detection, the recommended initial sequence length for Node.js has increased from **4** to **5** values.
