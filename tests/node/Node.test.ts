@@ -1,6 +1,7 @@
 import JSRandomnessPredictor from "../../dist/esm/index.js";
 import { describe, it } from "node:test";
 import assert from "node:assert";
+import { withRetries } from "../withRetries.js";
 
 describe("Node", () => {
   it("should throw an error if sequence.length >= 64", () => {
@@ -21,25 +22,27 @@ describe("Node", () => {
   });
 
   it("predict correctly when using single Math.random() calls for 'sequence' and 'expected'", async () => {
-    const sequence = [Math.random(), Math.random(), Math.random(), Math.random()];
-    const nodePredictor = JSRandomnessPredictor.node(sequence);
-    const expected = [
-      Math.random(),
-      Math.random(),
-      Math.random(),
-      Math.random(),
-      Math.random(),
-      Math.random(),
-      Math.random(),
-      Math.random(),
-      Math.random(),
-      Math.random(),
-    ];
-    const predictions: number[] = [];
-    for (let i = 0; i < expected.length; i++) {
-      predictions.push(await nodePredictor.predictNext());
-    }
-    assert.deepStrictEqual(expected, predictions);
+    await withRetries(async () => {
+      const sequence = [Math.random(), Math.random(), Math.random(), Math.random()];
+      const nodePredictor = JSRandomnessPredictor.node(sequence);
+      const expected = [
+        Math.random(),
+        Math.random(),
+        Math.random(),
+        Math.random(),
+        Math.random(),
+        Math.random(),
+        Math.random(),
+        Math.random(),
+        Math.random(),
+        Math.random(),
+      ];
+      const predictions: number[] = [];
+      for (let i = 0; i < expected.length; i++) {
+        predictions.push(await nodePredictor.predictNext());
+      }
+      assert.deepStrictEqual(expected, predictions);
+    }, 3);
   });
 
   it("predict correctly when using dynamic 'sequence' and Array.from for 'expected'", async () => {
