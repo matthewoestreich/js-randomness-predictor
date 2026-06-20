@@ -10,7 +10,7 @@
 
 ---
 
-## Quick Start
+# Quick Start
 
 Always use the predictor that matches the environment where the original sequence was generated.
 
@@ -28,7 +28,7 @@ console.log(nextPrediction);
 - [Browser Usage Guide](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md)
 - [Changelog](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/CHANGELOG.md)
 
-## Breaking Changes
+# Breaking Changes
 
 ### v4.x.x
 
