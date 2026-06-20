@@ -29,6 +29,8 @@
 
 **Breaking Changes**
 
+Please see the [CHANGELOG](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/CHANGELOG.md) for more detailed info.
+
 - **`v2.x.x`**
   - the V8 Predictor was deprecated! Use the predictor that matches your runtime instead.
 - **`v3.x.x`**

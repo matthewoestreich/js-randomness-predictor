@@ -30,6 +30,7 @@ Main();
 
 async function Main() {
   const sequence = Array.from({ length: INITIAL_SEQUENCE_LEN }, Math.random);
+  console.log({ sequence });
   const predictor = JsRandomnessPredictor.node(sequence);
   const expected = Array.from({ length: EXPECTED_PREDICTIONS_LEN }, Math.random);
 
