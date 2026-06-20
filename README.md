@@ -88,7 +88,9 @@ const JSRandomnessPredictor = require("js-randomness-predictor");
 import JSRandomnessPredictor from "npm:js-randomness-predictor";
 ```
 
-# Runtime Capabilities
+# Predictors
+
+### Runtime Capabilities
 
 | Runtime | Auto Generate Sequence | Recommended Length |
 | ------- | ---------------------- | ------------------ |
@@ -99,7 +101,11 @@ import JSRandomnessPredictor from "npm:js-randomness-predictor";
 | Firefox | ❌                     | 4                  |
 | Safari  | ❌                     | 6                  |
 
-# Node Predictor
+### Browser Usage
+
+Browser usage requires additional setup: [browser usage guide](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md).
+
+## Node
 
 - [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#node)
 
@@ -120,7 +126,7 @@ const prediction = await predictor.predictNext();
 const isAccurate = prediction === Math.random();
 ```
 
-# Bun Predictor
+## Bun
 
 - [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)
 - If running natively in Bun, a sequence can be generated automatically.
@@ -141,7 +147,7 @@ const prediction = await predictor.predictNext();
 const isAccurate = prediction === Math.random();
 ```
 
-# Deno Predictor
+## Deno
 
 - If running natively in Deno, a sequence can be generated automatically.
 - If using the Deno predictor outside of Deno, you must provide a sequence that was originally generated in Deno.
@@ -161,7 +167,7 @@ const prediction = await predictor.predictNext();
 const isAccurate = prediction === Math.random();
 ```
 
-# Chrome Predictor
+## Chrome
 
 - [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#chrome)
 
@@ -170,7 +176,7 @@ const predictor = JSRandomnessPredictor.chrome(sequence);
 const prediction = await predictor.predictNext();
 ```
 
-# Firefox Predictor
+## Firefox
 
 - [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#firefox)
 
@@ -179,7 +185,7 @@ const predictor = JSRandomnessPredictor.firefox(sequence);
 const prediction = await predictor.predictNext();
 ```
 
-# Safari Predictor
+## Safari
 
 - [Known issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)
 
@@ -187,10 +193,6 @@ const prediction = await predictor.predictNext();
 const predictor = JSRandomnessPredictor.safari(sequence);
 const prediction = await predictor.predictNext();
 ```
-
-# Browser Usage
-
-Browser usage requires additional setup: [browser usage guide](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/BROWSER_USAGE.md).
 
 # Command Line Interface
 
@@ -202,7 +204,7 @@ npm i -g js-randomness-predictor
 
 ## Local Usage
 
-From a project that has `js-randomness-predictor` as a dependency:
+- From a project that has `js-randomness-predictor` as a dependency:
 
 ```bash
 node_modules/.bin/js-randomness-predictor [options]
@@ -233,9 +235,8 @@ js-randomness-predictor
 
 ## Runtime Selection
 
-By default, the CLI executes in Node.js.
-
-Set environment variable `JSRP_RUNTIME` to run the CLI in Bun or Deno.
+- By default, the CLI executes in Node.js.
+- Set environment variable `JSRP_RUNTIME` to run the CLI in Bun or Deno.
 
 ### Bun
 
