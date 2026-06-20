@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.2](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.1...4.0.2) (2026-06-20)
+
+
+### Documentation
+
+* **readme:** major cleanup ([44e2fff](https://github.com/matthewoestreich/js-randomness-predictor/commit/44e2fff72ab9386dde52e7ec23060f0c5ef6b41f))
+
 ### [4.0.1](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.0...4.0.1) (2026-06-20)
 
 
