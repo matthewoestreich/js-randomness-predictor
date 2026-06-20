@@ -70,14 +70,14 @@ Browser usage requires additional setup: [browser usage guide](https://github.co
 
 # Predictors
 
-| Runtime             | Auto Generate Sequence | Sequence Length | [Known Issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md) |
-| ------------------- | ---------------------- | :-------------: | :-----------------------------------------------------------------------------------------------------------: |
-| [Node](#node)       | ✅                     |        5        |  [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#node)   |
-| [Bun](#bun)         | ✅ Native Bun only     |        6        |   [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)   |
-| [Deno](#deno)       | ✅ Native Deno only    |        4        |                                                       -                                                       |
-| [Chrome](#chrome)   | ❌                     |        4        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#chrome)  |
-| [Firefox](#firefox) | ❌                     |        4        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#firefox) |
-| [Safari](#safari)   | ❌                     |        6        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)  |
+| Runtime               | Auto Generate Sequence | Sequence Length | [Known Issues](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md) |
+| --------------------- | ---------------------- | :-------------: | :-----------------------------------------------------------------------------------------------------------: |
+| [Node](#node-1)       | ✅                     |        5        |  [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#node)   |
+| [Bun](#bun-1)         | ✅ Native Bun only     |        6        |   [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#bun)   |
+| [Deno](#deno-1)       | ✅ Native Deno only    |        4        |                                                       -                                                       |
+| [Chrome](#chrome-1)   | ❌                     |        4        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#chrome)  |
+| [Firefox](#firefox-1) | ❌                     |        4        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#firefox) |
+| [Safari](#safari-1)   | ❌                     |        6        | [Link](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#safari)  |
 
 ## Node
 
