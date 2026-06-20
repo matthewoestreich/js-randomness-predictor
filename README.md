@@ -1,5 +1,3 @@
-<h2 align="center"><code>js-randomness-predictor</code></h2>
-
 <p align="center">
   <a href="https://www.npmjs.com/package/js-randomness-predictor">
     <img src="https://img.shields.io/npm/v/js-randomness-predictor.svg?logo=npm&color=cb0000" alt="npm version" />
