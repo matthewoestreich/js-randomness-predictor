@@ -6,12 +6,7 @@
 >
 > **PRNGs are deterministic — the same initial seed will _always_ produce the same sequence of outputs.**
 >
-> At a very high level, you can think of the process as:<br>
-> &nbsp;&nbsp;&nbsp;&nbsp;**find the seed**<br>
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-> &nbsp;&nbsp;&nbsp;&nbsp;**feed it into the concrete PRNG algorithm**<br>
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-> &nbsp;&nbsp;&nbsp;&nbsp;**reproduce the sequence of random numbers**
+> At a very high level, you can think of the process as:<br> > &nbsp;&nbsp;&nbsp;&nbsp;**find the seed**<br> > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br> > &nbsp;&nbsp;&nbsp;&nbsp;**feed it into the concrete PRNG algorithm**<br> > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br> > &nbsp;&nbsp;&nbsp;&nbsp;**reproduce the sequence of random numbers**
 
 The exact process depends on the JavaScript engine, runtime, and their implementation details. A Predictor therefore uses one or more **solving strategies**, where each strategy describes how a particular engine and runtime transform the PRNG's internal state into a `Math.random()` value.
 
@@ -35,11 +30,11 @@ Therefore, a Predictor must model the behavior of the specific JavaScript engine
 
 ---
 
-# Meet xorshift128+
+# The PRNG Algorithm
 
-The JavaScript engines currently supported by the Predictors in this repository use **xorshift128+** as their underlying PRNG.
+At the heart of a PRNG is the algorithm used to generate a deterministic sequence of numbers with statistical properties resembling a uniform random distribution.
 
-xorshift128+ is a fast, deterministic pseudorandom number generator designed by Sebastiano Vigna.
+**xorshift128+** is a fast, deterministic pseudorandom number generator designed by Sebastiano Vigna. It is a well-established and widely adopted PRNG, and **is used by _all_ of the JavaScript engines currently supported by this library**.
 
 You can read [Vigna's paper on xorshift+ generators here](https://vigna.di.unimi.it/ftp/papers/xorshiftplus.pdf).
 
