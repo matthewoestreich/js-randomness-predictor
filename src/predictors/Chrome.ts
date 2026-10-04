@@ -42,6 +42,27 @@ const CHROME_STRATEGIES: SolvingStrategy[] = [
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
     advanceConcreteStateBeforeProducingNextRandom: false,
   },
+  // Post May 2026: V8 changed Math.random cache population order.
+  // The PRNG algorithm/output transformation remains the same,
+  // but observed values now correspond to forward state progression.
+  {
+    recoverMantissa: (n: number): bigint => {
+      const mantissa = Math.floor(n * SCALING_FACTOR_53_BIT_INT);
+      return BigInt(mantissa);
+    },
+    toDouble: (concreteState: Pair<bigint>): number => {
+      const random = uint64(concreteState[0] + concreteState[1]);
+      // Calculate next prediction, using first item in concrete state, before modifying concrete state.
+      return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
+    },
+    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+      const sum = symbolicState[0].add(symbolicState[1]);
+      solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
+    },
+    symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+    concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concrete(c),
+    advanceConcreteStateBeforeProducingNextRandom: true,
+  },
 ];
 
 export default class ChromeRandomnessPredictor extends V8Predictor {
