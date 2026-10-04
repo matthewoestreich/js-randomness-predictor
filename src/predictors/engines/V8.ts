@@ -21,10 +21,25 @@ export default class V8Predictor {
     if (this.#concreteState[0] === 0n && this.#concreteState[1] === 0n) {
       await this.#solveWithStrategies();
     }
-    const next = this.#strategy.toDouble(this.#concreteState);
-    // In V8, we advance concrete state AFTER producing next random number.
-    this.#strategy.concreteXorShift(this.#concreteState);
-    return next;
+
+    /* In newer V8 (post May 2026 changes), we advance concrete state BEFORE producing next random number. */
+    if (this.#strategy.advanceConcreteStateBeforeProducingNextRandom === true) {
+      // Advance concrete state.
+      this.#strategy.concreteXorShift(this.#concreteState);
+      // Produce next random number.
+      return this.#strategy.toDouble(this.#concreteState);
+    }
+
+    /* In older V8 (prior to May 2026 changes), we advance concrete state AFTER producing next random number. */
+    if (this.#strategy.advanceConcreteStateBeforeProducingNextRandom === false) {
+      // Produce next random number.
+      const next = this.#strategy.toDouble(this.#concreteState);
+      // Advance concrete state (this is done AFTER producing next random number).
+      this.#strategy.concreteXorShift(this.#concreteState);
+      return next;
+    }
+
+    throw new Error("V8EnginePredictor : strategy is missing concrete state advancement option");
   }
 
   // Solves symbolic state so we can move forward using concrete state, which
@@ -39,10 +54,15 @@ export default class V8Predictor {
       // We do not directly initialize symbolic states inside of our symbolic state Pair because
       // we need references to the original state/BitVecs in order to be able to pull them out of our model.
       const symbolicStatePair: Pair<z3.BitVec> = [symbolicState0, symbolicState1];
-      // V8’s Math.random() returns a number derived from the state *after* advancing the PRNG.
+      const sequence = [...this.sequence];
+
+      // In older V8’s (prior to May 2026 commit) Math.random() returns a number derived from
+      // the state *after* advancing the PRNG.
       // To reconstruct the original hidden state for the solver, we must process the observed
       // sequence in reverse order: last observed number first, first observed number last.
-      const sequence = [...this.sequence].reverse();
+      if (this.#strategy.advanceConcreteStateBeforeProducingNextRandom === false) {
+        sequence.reverse();
+      }
 
       for (const n of sequence) {
         this.#strategy.symbolicXorShift(symbolicStatePair); // Modifies symbolic state
@@ -55,11 +75,22 @@ export default class V8Predictor {
       }
 
       const model = solver.model();
-      this.#concreteState = [
+      const concreteStatePair: Pair<bigint> = [
         // Order matters here!
         (model.get(symbolicState0) as z3.BitVecNum).value(),
         (model.get(symbolicState1) as z3.BitVecNum).value(),
       ];
+
+      if (this.#strategy.advanceConcreteStateBeforeProducingNextRandom === true) {
+        // In newer V8 (post May 2026 changes) we need to advance concrete state to the next unseen number.
+        // Z3 returns state at sequence start, so we have to advance concrete state up to the same point
+        // as our initial sequence length.
+        for (const _ of this.sequence) {
+          this.#strategy.concreteXorShift(concreteStatePair);
+        }
+      }
+
+      this.#concreteState = concreteStatePair;
     } catch (e) {
       return Promise.reject(e);
     }

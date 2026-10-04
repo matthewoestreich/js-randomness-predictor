@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { DenoRandomnessPredictor } from "../../src/predictors";
+import JSRandomnessPredictor from "../../src/index.ts";
 
 const SEQ_ARRAY_FROM_REPL = [0.9774329605199243, 0.8675717483279107, 0.6122234727274231, 0.5218003723841141];
 const EXP_ARRAY_FROM_REPL = [
@@ -7,27 +7,38 @@ const EXP_ARRAY_FROM_REPL = [
   0.03573038091548353, 0.3131705059260478, 0.30127442822811057,
 ];
 
+// These numbers were generated using an older version of Deno
 const SEQ_MATH_RANDOM_REPL = [0.4634195562875715, 0.03533371111620309, 0.35943557492793676, 0.13524597491602786];
 const EXP_MATH_RANDOM_REPL = [
   0.8646077680356445, 0.7286635959760086, 0.8949938429309372, 0.2245826008328513, 0.8383554271394464, 0.10678410004411598, 0.23996888876487066,
   0.3301827249786412, 0.06623917497469078, 0.7289090151502068,
 ];
 
-Main();
-async function Main(): Promise<void> {
-  const SEQ = SEQ_MATH_RANDOM_REPL;
+async function testOldGeneratedNumbers() {
+  const deno = JSRandomnessPredictor.deno(SEQ_MATH_RANDOM_REPL);
   const EXP = EXP_MATH_RANDOM_REPL;
-
-  const deno = new DenoRandomnessPredictor(SEQ);
-  const predictions: number[] = [];
-
+  let predictions: number[] = [];
   for (let i = 0; i < EXP.length; i++) {
     predictions.push(await deno.predictNext());
   }
-
   console.log({
     predictions,
     expected: EXP,
     isAccurate: predictions.every((v, i) => EXP[i] === v),
+  });
+}
+
+Main();
+async function Main(): Promise<void> {
+  const deno = JSRandomnessPredictor.deno();
+  const expected = Array.from({ length: 10 }, Math.random);
+  let predictions: number[] = [];
+  for (let i = 0; i < expected.length; i++) {
+    predictions.push(await deno.predictNext());
+  }
+  console.log({
+    predictions,
+    expected,
+    isAccurate: predictions.every((v, i) => expected[i] === v),
   });
 }

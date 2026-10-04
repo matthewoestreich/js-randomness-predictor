@@ -50,4 +50,5 @@ export type SolvingStrategy = {
   toDouble: ToDoubleFn;
   symbolicXorShift: SymbolicXorShiftFn;
   concreteXorShift: ConcreteXorShiftFn;
+  advanceConcreteStateBeforeProducingNextRandom?: boolean;
 };

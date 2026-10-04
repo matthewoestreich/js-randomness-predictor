@@ -86,6 +86,7 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    advanceConcreteStateBeforeProducingNextRandom: false,
   },
 
   // NodeJS v24 & v25
@@ -103,6 +104,7 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    advanceConcreteStateBeforeProducingNextRandom: false,
   },
 
   // NodeJS v12 - v23
@@ -123,6 +125,7 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    advanceConcreteStateBeforeProducingNextRandom: false,
   },
 
   // NodeJS version <= v11
@@ -150,6 +153,7 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    advanceConcreteStateBeforeProducingNextRandom: false,
   },
 ];
 

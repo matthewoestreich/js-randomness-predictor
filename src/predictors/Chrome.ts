@@ -35,6 +35,7 @@ const CHROME_STRATEGIES: SolvingStrategy[] = [
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    advanceConcreteStateBeforeProducingNextRandom: false,
   },
   // Post Jan 2026 changes
   {
@@ -52,6 +53,7 @@ const CHROME_STRATEGIES: SolvingStrategy[] = [
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    advanceConcreteStateBeforeProducingNextRandom: false,
   },
 ];
 

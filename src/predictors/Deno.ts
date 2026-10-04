@@ -15,8 +15,22 @@ import V8Predictor from "./engines/V8.js";
  *    - See this issue : https://github.com/matthewoestreich/js-randomness-predictor/issues/25
  *    - V8 updated their Math.random implementation in the following commit:
  *        - https://source.chromium.org/chromium/_/chromium/v8/v8/+/0596ead5b04f5988d7742c2a4559637a4f81b849
- *    - AT THE TIME OF WRITING THIS COMMENT, we now first try to old algo - if we get UNSAT, we
- *      try again with the updated algo. If the updated algo produces an error, we return it.
+ *
+ * MAY 2026 UPDATE (Deno v2.9.7ish)
+ *    - Commit: https://source.chromium.org/chromium/_/chromium/v8/v8/+/99f606174481f6e2f4809c4262122a30a25583af
+ *    - V8 changed Math.random cache population order, meaning we do not need to reverse the sequence!
+ *
+      ```
+      // OLD:
+      // Create random numbers.
+      for (int i = 0; i < kCacheSize; i++) { ... }
+
+      // NEW:
+      // Create random numbers.
+      for (int i = kCacheSize - 1; i >= 0; i--) { ... }
+      ```
+ *
+ *    - The PRNG algorithm/output transformation remains the same, but observed values now correspond to forward state progression.
  */
 
 // Map a 53-bit integer into the range [0, 1) as a double.
@@ -38,6 +52,7 @@ const DENO_STRATEGIES: SolvingStrategy[] = [
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    advanceConcreteStateBeforeProducingNextRandom: false,
   },
   // Post Jan 2026 changes
   {
@@ -56,6 +71,28 @@ const DENO_STRATEGIES: SolvingStrategy[] = [
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
     concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concreteBackwards(c),
+    advanceConcreteStateBeforeProducingNextRandom: false,
+  },
+  // Post May 2026: V8 changed Math.random cache population order.
+  // The PRNG algorithm/output transformation remains the same,
+  // but observed values now correspond to forward state progression.
+  {
+    recoverMantissa: (n: number): bigint => {
+      const mantissa = Math.floor(n * SCALING_FACTOR_53_BIT_INT);
+      return BigInt(mantissa);
+    },
+    toDouble: (concreteState: Pair<bigint>): number => {
+      const random = uint64(concreteState[0] + concreteState[1]);
+      // Calculate next prediction, using first item in concrete state, before modifying concrete state.
+      return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
+    },
+    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+      const sum = symbolicState[0].add(symbolicState[1]);
+      solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
+    },
+    symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
+    concreteXorShift: (c: Pair<bigint>): void => XorShift128Plus.concrete(c),
+    advanceConcreteStateBeforeProducingNextRandom: true,
   },
 ];
 
