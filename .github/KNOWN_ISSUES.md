@@ -7,14 +7,14 @@ TLDR; If `number of predictions` + `sequence length` > `64`, we cannot make accu
 **Why does this happen?**
 
 - Node generate 64 "random" numbers at a time, which they cache in a "pool"
-  - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=17-27) that shows how they build the cache
-  - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.h;l=24;drc=75a8035abe03764596f30424030465636e82aa70;bpv=0) showing cache size
+  - [Source code](https://source.chromium.org/chromium/_/chromium/v8/v8/+/85cd208754f5445f4751aa738debbc2931924e13:src/numbers/math-random.cc;l=17-27;drc=c803f15380d8ce9f618aaf3f31a2adb527e9da68;bpv=0;bpt=0) that shows how they build the cache
+  - [Source code](https://source.chromium.org/chromium/_/chromium/v8/v8/+/85cd208754f5445f4751aa738debbc2931924e13:src/numbers/math-random.h;l=24;drc=8cdd7e207759f4530a72094fe6563014c5e8b57d;bpv=0;bpt=0) showing cache size
 - A seed is used to generate these "random" numbers
 - Solving for that seed is what allows us to predict future `Math.random` output
 - When you call `Math.random()` they grab a number from this "pool" and return it to you
-  - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/math.tq;l=515-530) that shows how they pull from cache and return a random number to you, [specifically here](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/math.tq;l=529)
+  - [Source code](https://source.chromium.org/chromium/_/chromium/v8/v8/+/85cd208754f5445f4751aa738debbc2931924e13:src/builtins/math.tq;l=515-530;drc=4db3a45911532e75b00c7adcbfae6d0d2b04210b;bpv=0;bpt=0) that shows how they pull from cache and return a random number to you, [specifically here](https://source.chromium.org/chromium/_/chromium/v8/v8/+/85cd208754f5445f4751aa738debbc2931924e13:src/builtins/math.tq;l=529;drc=4db3a45911532e75b00c7adcbfae6d0d2b04210b;bpv=0;bpt=0)
 - When that "pool" is exhausted, they generate a new "pool", **with a new/different seed**
-  - [Source code](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=35-71) that shows how they refill the cache, [specifically here](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/numbers/math-random.cc;l=61-65)
+  - [Source code](https://source.chromium.org/chromium/_/chromium/v8/v8/+/85cd208754f5445f4751aa738debbc2931924e13:src/numbers/math-random.cc;l=35-71;drc=c803f15380d8ce9f618aaf3f31a2adb527e9da68;bpv=0;bpt=0) that shows how they refill the cache, [specifically here](https://source.chromium.org/chromium/_/chromium/v8/v8/+/85cd208754f5445f4751aa738debbc2931924e13:src/numbers/math-random.cc;l=61-65;drc=c803f15380d8ce9f618aaf3f31a2adb527e9da68;bpv=0;bpt=0)
 - This means we cannot make accurate predictions for the new pool using the old pools seed
 
 **How we handle it**
