@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.3](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.2...4.0.3) (2026-10-04)
+
+
+### Bug Fixes
+
+* **V8:** support new forward Math.random state progression ([256472f](https://github.com/matthewoestreich/js-randomness-predictor/commit/256472fef395c3ce0892e777ee08acb1dc9981a9))
+
+
+### Chores
+
+* **comments:** add/move comments ([a7d461c](https://github.com/matthewoestreich/js-randomness-predictor/commit/a7d461c89faf10e19383589937c1e20d670579c9))
+
 ### [4.0.2](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.1...4.0.2) (2026-06-20)
 
 
