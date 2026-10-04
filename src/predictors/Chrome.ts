@@ -4,19 +4,6 @@ import XorShift128Plus from "../XorShift128Plus.js";
 import uint64 from "../uint64.js";
 import V8Predictor from "./engines/V8.js";
 
-/**
- * ========================================================================================
- * ~ Documenting changes to the Chrome Math.random algorithm ~
- * ========================================================================================
- *
- * JANUARY 2026 UPDATE (comment written on Feb 1, 2026)
- *    - See this issue : https://github.com/matthewoestreich/js-randomness-predictor/issues/25
- *    - V8 updated their Math.random implementation in the following commit:
- *        - https://source.chromium.org/chromium/_/chromium/v8/v8/+/0596ead5b04f5988d7742c2a4559637a4f81b849
- *    - AT THE TIME OF WRITING THIS COMMENT, we now first try to old algo - if we get UNSAT, we
- *      try again with the updated algo. If the updated algo produces an error, we return it.
- */
-
 // Map a 53-bit integer into the range [0, 1) as a double.
 const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
 

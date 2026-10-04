@@ -7,53 +7,6 @@ import V8Predictor from "./engines/V8.js";
 import uint64 from "../uint64.js";
 import { MIN_SEQUENCE_LENGTH } from "../constants.js";
 
-/**
- *
- *  In Node versions <= 11 the ToDouble method was different : https://github.com/nodejs/node/blob/v10.0.0/deps/v8/src/base/utils/random-number-generator.h#L114-L120
- *      ```
- *      static inline double ToDouble(uint64_t state0, uint64_t state1) {
- *         // Exponent for double values for [1.0 .. 2.0)
- *         static const uint64_t kExponentBits = uint64_t{0x3FF0000000000000};
- *         static const uint64_t kMantissaMask = uint64_t{0x000FFFFFFFFFFFFF};
- *         uint64_t random = ((state0 + state1) & kMantissaMask) | kExponentBits;
- *         return bit_cast<double>(random) - 1;
- *      }
- *      ```
- *
- *  In Node v24.x.x (commit was in Feb2025), V8 updated their impl of the `ToDouble` method. The old method was in use since 2022.
- *    This caused breaking changes to this predictor, so we now have to detect node version so we can choose which ToDouble to implement.
- *   - Old Impl: https://github.com/v8/v8/blob/e99218a1cca470ddec1931547b36a256f3450078/src/base/utils/random-number-generator.h#L111
- *      ```
- *      // Static and exposed for external use.
- *      static inline double ToDouble(uint64_t state0) {
- *        // Exponent for double values for [1.0 .. 2.0)
- *        static const uint64_t kExponentBits = uint64_t{0x3FF0000000000000};
- *        uint64_t random = (state0 >> 12) | kExponentBits;
- *        return base::bit_cast<double>(random) - 1;
- *      }
- *      ```
- *
- *   - New Impl: https://github.com/v8/v8/blob/1c3a9c08e932e87b04c7bf9ecc648e1f50d418fd/src/base/utils/random-number-generator.h#L111
- *      ```
- *      // Static and exposed for external use.
- *      static inline double ToDouble(uint64_t state0) {
- *        // Get a random [0,2**53) integer value (up to MAX_SAFE_INTEGER) by dropping
- *        // 11 bits of the state.
- *        double random_0_to_2_53 = static_cast<double>(state0 >> 11);
- *        // Map this to [0,1) by division with 2**53.
- *        constexpr double k2_53{static_cast<uint64_t>(1) << 53};
- *        return random_0_to_2_53 / k2_53;
- *      }
- *      ```
- *
- *  - >= v26.x.x : JANUARY 2026 UPDATE (comment written on Feb 1, 2026)
- *    - See this issue : https://github.com/matthewoestreich/js-randomness-predictor/issues/25
- *    - V8 updated their Math.random implementation in the following commit:
- *        - https://source.chromium.org/chromium/_/chromium/v8/v8/+/0596ead5b04f5988d7742c2a4559637a4f81b849
- *    - AT THE TIME OF WRITING THIS COMMENT, we now first try to old algo - if we get UNSAT, we
- *      try again with the updated algo. If the updated algo produces an error, we return it.
- */
-
 // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
 const MAX_SEQUENCE_LENGTH = 64;
 

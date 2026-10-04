@@ -6,33 +6,6 @@ import ExecutionRuntime from "../ExecutionRuntime.js";
 import uint64 from "../uint64.js";
 import V8Predictor from "./engines/V8.js";
 
-/**
- * ========================================================================================
- * ~ Documenting changes to the Deno Math.random algorithm ~
- * ========================================================================================
- *
- * JANUARY 2026 UPDATE (comment written on Feb 1, 2026)
- *    - See this issue : https://github.com/matthewoestreich/js-randomness-predictor/issues/25
- *    - V8 updated their Math.random implementation in the following commit:
- *        - https://source.chromium.org/chromium/_/chromium/v8/v8/+/0596ead5b04f5988d7742c2a4559637a4f81b849
- *
- * MAY 2026 UPDATE (Deno v2.9.7ish)
- *    - Commit: https://source.chromium.org/chromium/_/chromium/v8/v8/+/99f606174481f6e2f4809c4262122a30a25583af
- *    - V8 changed Math.random cache population order, meaning we do not need to reverse the sequence!
- *
-      ```
-      // OLD:
-      // Create random numbers.
-      for (int i = 0; i < kCacheSize; i++) { ... }
-
-      // NEW:
-      // Create random numbers.
-      for (int i = kCacheSize - 1; i >= 0; i--) { ... }
-      ```
- *
- *    - The PRNG algorithm/output transformation remains the same, but observed values now correspond to forward state progression.
- */
-
 // Map a 53-bit integer into the range [0, 1) as a double.
 const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
 
