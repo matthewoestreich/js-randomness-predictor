@@ -6,7 +6,7 @@
 >
 > **PRNGs are deterministic — the same initial seed will _always_ produce the same sequence of outputs.**
 >
-> At a very high level, you can think of the process as:<br> > &nbsp;&nbsp;&nbsp;&nbsp;**find the seed**<br> > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br> > &nbsp;&nbsp;&nbsp;&nbsp;**feed it into the concrete PRNG algorithm**<br> > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br> > &nbsp;&nbsp;&nbsp;&nbsp;**reproduce the sequence of random numbers**
+> At a very high level, you can think of the process as:<br> &nbsp;&nbsp;&nbsp;&nbsp;**find the seed**<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br> &nbsp;&nbsp;&nbsp;&nbsp;**feed it into the concrete PRNG algorithm**<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br> &nbsp;&nbsp;&nbsp;&nbsp;**reproduce the sequence of random numbers**
 
 The exact process depends on the JavaScript engine, runtime, and their implementation details. A Predictor therefore uses one or more **solving strategies**, where each strategy describes how a particular engine and runtime transform the PRNG's internal state into a `Math.random()` value.
 
