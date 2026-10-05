@@ -85,6 +85,10 @@
     "singleQuote": false,
     "printWidth": 150
   },
+  "allowScripts": {
+    "esbuild@0.25.12": true,
+    "esbuild@0.27.7": true
+  },
   "scripts": {
     "prepublishOnly": "npm run build",
     "postbuild": "node build/postbuild.cjs",
