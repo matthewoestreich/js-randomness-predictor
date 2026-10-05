@@ -11,7 +11,7 @@ import { webkit, Page } from "playwright";
  * that Safari makes.
  */
 
-const SEQUENCE_LENGTH = 4;
+const SEQUENCE_LENGTH = 6;
 const NUMBER_OF_PREDICTIONS = 10;
 
 async function generateRandomNumbersFromPage(page: Page, numRands: number) {
