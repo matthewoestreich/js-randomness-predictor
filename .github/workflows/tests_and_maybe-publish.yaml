@@ -147,7 +147,7 @@ jobs:
         run: deno task test:deno
         env:
           FORCE_COLOR: "1"
-  test-browsers:
+  test-chrome:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -162,11 +162,48 @@ jobs:
         run: npm run build:ci
       - name: Run tests
         shell: bash
-        run: npm run test:chrome && npm run test:firefox && npm run test:safari
+        run: npm run test:chrome
+        env:
+          FORCE_COLOR: "1"
+  test-firefox:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: node
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        shell: bash
+        run: npm run build:ci
+      - name: Run tests
+        shell: bash
+        run: npm run test:firefox
+        env:
+          FORCE_COLOR: "1"
+  test-safari:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: node
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        shell: bash
+        run: npm run build:ci
+      - name: Run tests
+        shell: bash
+        run: npm run test:safari
         env:
           FORCE_COLOR: "1"
   maybe-publish:
-    needs: [test-imports, test-cli, test-legacy-node-versions, test-supported-node-versions, test-bun, test-browsers, test-deno]
+    needs:
+      [test-imports, test-cli, test-legacy-node-versions, test-supported-node-versions, test-bun, test-chrome, test-firefox, test-safari, test-deno]
     if: github.event_name == 'push' && startsWith(github.event.head_commit.message, '[publish] ')
     runs-on: ubuntu-latest
     permissions:
