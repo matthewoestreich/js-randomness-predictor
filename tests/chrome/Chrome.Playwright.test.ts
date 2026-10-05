@@ -26,7 +26,8 @@ import {
  */
 
 // "stable" is the most recent stable version, whatever that may be.
-const CHROME_VERSIONS_OR_TAGS_TO_TEST = ["132", "136", "140", "145", BrowserTag.STABLE];
+// Chrome 135 is the oldest version of Chrome we support.
+const CHROME_VERSIONS_OR_TAGS_TO_TEST = ["135", "136", "140", "145", BrowserTag.STABLE];
 const DOWNLOAD_CACHE_DIR = path.resolve("./.playwright-cache-chrome");
 const PLATFORM = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallback for CI environments
 
@@ -34,21 +35,6 @@ const SEQUENCE_LENGTH = 4;
 const NUMBER_OF_PREDICTIONS = 10;
 
 describe(`Chrome : Playwright`, async () => {
-  after(async () => {
-    try {
-      await fsPromises.access(DOWNLOAD_CACHE_DIR, fsPromises.constants.F_OK);
-    } catch (_) {
-      // Path doesnt exist, just silently return
-      return;
-    }
-
-    try {
-      await fsPromises.rm(DOWNLOAD_CACHE_DIR, { recursive: true, force: true });
-    } catch (error) {
-      console.error("[Cleanup Error] Failed to delete cache folder:", error);
-    }
-  });
-
   for (const versionOrTag of CHROME_VERSIONS_OR_TAGS_TO_TEST) {
     const targetBuildId = await resolveBuildId(Browser.CHROME, PLATFORM, versionOrTag);
 
@@ -87,4 +73,19 @@ describe(`Chrome : Playwright`, async () => {
       }
     });
   }
+
+  after(async () => {
+    try {
+      await fsPromises.access(DOWNLOAD_CACHE_DIR, fsPromises.constants.F_OK);
+    } catch (_) {
+      console.info(`[Cleanup Info] directory '${DOWNLOAD_CACHE_DIR}' does not exist.`);
+      return;
+    }
+
+    try {
+      await fsPromises.rm(DOWNLOAD_CACHE_DIR, { recursive: true, force: true });
+    } catch (error) {
+      console.error("[Cleanup Error] Failed to delete cache folder:", error);
+    }
+  });
 });
