@@ -183,6 +183,7 @@ jobs:
         run: npm run test:firefox
         env:
           FORCE_COLOR: "1"
+  # Cannot testt arbitrary Safari versions, must settle for most recent release
   test-safari:
     runs-on: ubuntu-latest
     steps:
@@ -196,6 +197,8 @@ jobs:
       - name: Build
         shell: bash
         run: npm run build:ci
+      - name: Install Playwright WebKit Dependencies
+        run: npx playwright install webkit --with-deps
       - name: Run tests
         shell: bash
         run: npm run test:safari
