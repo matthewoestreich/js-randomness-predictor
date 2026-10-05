@@ -26,7 +26,7 @@ import {
  */
 
 // "stable" is the most recent stable version, whatever that may be.
-const CHROME_VERSIONS_OR_TAGS_TO_TEST = ["130", "136", "140", "145", BrowserTag.STABLE];
+const CHROME_VERSIONS_OR_TAGS_TO_TEST = ["131", "136", "140", "145", BrowserTag.STABLE];
 const DOWNLOAD_CACHE_DIR = path.resolve("./.playwright-cache-chrome");
 const PLATFORM = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallback for CI environments
 
