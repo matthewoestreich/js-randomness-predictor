@@ -1,7 +1,7 @@
 import JSRandomnessPredictor from "../../dist/esm/index.js";
-import { describe, it, after } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert";
-import { webkit, Page } from "playwright";
+import { webkit, Page, Browser } from "playwright";
 
 /**
  * These tests use playwright to automate js-randomness-predictor usage in a browser (safari in this case).
@@ -21,7 +21,14 @@ async function generateRandomNumbersFromPage(page: Page, numRands: number) {
 }
 
 describe(`Safari : Automated Testing via Playwright`, async () => {
-  const safari = await webkit.launch();
+  let safari: Browser;
+
+  try {
+    safari = await webkit.launch();
+  } catch (err) {
+    console.error("WebKit/Safari install not found!\nPlease run `npx playwright install webkit --with-deps` to install it and try again!");
+    process.exit(1);
+  }
 
   it(`safari ${safari.version()} [newest release] accurately predicts using dynamic generated values`, async () => {
     const context = await safari.newContext();
