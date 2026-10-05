@@ -3,6 +3,11 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import queryDb from "../queryRandomNumbersDatabase";
 
+/**
+ * TODO : if "./Chrome.Playwright.test.ts" exists still, we may be able to remove all of these
+ *         tests and allow dynamic values generated in the chrome runtime via Playwright.
+ */
+
 describe("Chrome", () => {
   const runtime = "chrome";
   it(`should predict accurately using number prior to Jan 2026 update`, async () => {
