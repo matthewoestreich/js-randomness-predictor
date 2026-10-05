@@ -85,10 +85,6 @@
     "singleQuote": false,
     "printWidth": 150
   },
-  "allowScripts": {
-    "esbuild@0.25.12": true,
-    "esbuild@0.27.7": true
-  },
   "scripts": {
     "prepublishOnly": "npm run build",
     "postbuild": "node build/postbuild.cjs",
@@ -152,7 +148,6 @@
   },
   "devDependencies": {
     "@puppeteer/browsers": "3.2.3",
-    "playwright": "1.63.0",
     "@rollup/plugin-commonjs": "28.0.6",
     "@rollup/plugin-node-resolve": "16.0.2",
     "@types/bun": "1.2.22",
@@ -168,6 +163,7 @@
     "husky": "9.1.7",
     "jiti": "2.5.1",
     "lint-staged": "16.4.0",
+    "playwright": "1.63.0",
     "prettier": "3.5.3",
     "rimraf": "6.0.1",
     "rollup": "4.60.1",
@@ -175,7 +171,7 @@
     "standard-version": "9.5.0",
     "tsx": "4.20.5",
     "typescript": "5.9.3",
-    "vite": "7.3.1",
+    "vite": "7.3.6",
     "vite-plugin-static-copy": "3.1.2"
   }
 }

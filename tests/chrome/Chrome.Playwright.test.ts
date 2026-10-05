@@ -4,7 +4,16 @@ import assert from "node:assert";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { chromium, Page } from "playwright";
-import { install, computeExecutablePath, detectBrowserPlatform, resolveBuildId, Browser, BrowserPlatform, BrowserTag } from "@puppeteer/browsers";
+import {
+  install,
+  computeExecutablePath,
+  detectBrowserPlatform,
+  resolveBuildId,
+  Browser,
+  BrowserPlatform,
+  BrowserTag,
+  InstalledBrowser,
+} from "@puppeteer/browsers";
 
 /**
  * These tests use playwright to automate js-randomness-predictor usage in a browser (chrome in this case).
@@ -43,7 +52,7 @@ describe(`Chrome : Playwright`, async () => {
     const targetBuildId = await resolveBuildId(Browser.CHROME, PLATFORM, versionOrTag);
 
     it(`chrome v${targetBuildId} accurately predicts using dynamic generated values`, async () => {
-      const buildInfo = await install({
+      const buildInfo: string | InstalledBrowser = await install({
         browser: Browser.CHROME,
         buildId: targetBuildId,
         cacheDir: DOWNLOAD_CACHE_DIR,
