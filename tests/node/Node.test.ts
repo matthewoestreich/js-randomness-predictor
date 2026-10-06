@@ -20,7 +20,7 @@ if (process.env.RANDOM_NUMBERS_FILE_PATH) {
   /* This "else" block is for when someoone runs tests locally. */
   randomNumbers = {
     version: process.version,
-    sequence: Array.from({ length: 5 }, Math.random),
+    sequence: Array.from({ length: 6 }, Math.random),
     expected: Array.from({ length: 10 }, Math.random),
   };
   console.info(
