@@ -25,20 +25,15 @@ const PLATFORM = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallb
 const SEQUENCE_LENGTH = 4;
 const NUMBER_OF_PREDICTIONS = 10;
 
-async function generateRandomNumbersFromPage(page: Page, numRands: number) {
-  return await page.evaluate((count) => {
-    return Array.from({ length: count }, Math.random);
-  }, numRands);
-}
-
 describe(`Chrome : Automated Testing via Playwright`, async () => {
   for (const versionOrTag of CHROME_VERSIONS_OR_TAGS_TO_TEST) {
     const targetBuildId = await resolveBuildId(BROWSER, PLATFORM, versionOrTag);
 
-    const testTitle =
-      versionOrTag === BrowserTag.STABLE
-        ? `chrome v${targetBuildId} [newest release] accurately predicts using dynamic generated values`
-        : `chrome v${targetBuildId} accurately predicts using dynamic generated values`;
+    let testTitle = "";
+    if (versionOrTag === BrowserTag.STABLE) {
+      testTitle = `[newest release] `;
+    }
+    testTitle += `chrome v${targetBuildId} accurately predicts using dynamic generated values`;
 
     it(testTitle, async () => {
       const buildInfo = await install({
@@ -53,25 +48,22 @@ describe(`Chrome : Automated Testing via Playwright`, async () => {
         cacheDir: DOWNLOAD_CACHE_DIR,
       });
 
-      const browser = await chromium.launch({ executablePath, headless: true });
-      const page = await browser.newPage();
+      const chrome = await chromium.launch({ executablePath, headless: true });
 
       try {
+        const page = await chrome.newPage();
         const sequence = await generateRandomNumbersFromPage(page, SEQUENCE_LENGTH);
         const expected = await generateRandomNumbersFromPage(page, NUMBER_OF_PREDICTIONS);
-
         const predictor = JSRandomnessPredictor.chrome(sequence);
         const predictions = [];
 
         for (let i = 0; i < NUMBER_OF_PREDICTIONS; i++) {
-          const prediction = await predictor.predictNext();
-          predictions.push(prediction);
+          predictions.push(await predictor.predictNext());
         }
 
         assert.deepStrictEqual(predictions, expected);
       } finally {
-        // Clean up the browser instance
-        await browser.close();
+        await chrome.close();
       }
     });
   }
@@ -91,3 +83,9 @@ describe(`Chrome : Automated Testing via Playwright`, async () => {
     }
   });
 });
+
+async function generateRandomNumbersFromPage(page: Page, numRands: number) {
+  return await page.evaluate((count) => {
+    return Array.from({ length: count }, Math.random);
+  }, numRands);
+}

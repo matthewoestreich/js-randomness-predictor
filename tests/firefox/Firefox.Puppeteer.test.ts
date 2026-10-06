@@ -31,20 +31,15 @@ const PLATFORM = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Fallback f
 const SEQUENCE_LENGTH = 4;
 const NUMBER_OF_PREDICTIONS = 10;
 
-async function generateRandomNumbersFromPage(page: Page, numRands: number) {
-  return await page.evaluate((count) => {
-    return Array.from({ length: count }, Math.random);
-  }, numRands);
-}
-
 describe(`Firefox : Automated Testing via Puppeteer`, async () => {
   for (const versionOrTag of FIREFOX_VERSIONS_OR_TAGS_TO_TEST) {
     const targetBuildId = await resolveBuildId(BROWSER, PLATFORM, versionOrTag);
 
-    const testTitle =
-      versionOrTag === BrowserTag.STABLE
-        ? `firefox ${targetBuildId} [newest release] accurately predicts using dynamic generated values`
-        : `firefox ${targetBuildId} accurately predicts using dynamic generated values`;
+    let testTitle = "";
+    if (versionOrTag === BrowserTag.STABLE) {
+      testTitle = "[newest release] ";
+    }
+    testTitle += `firefox ${targetBuildId} accurately predicts using dynamic generated values`;
 
     it(testTitle, async () => {
       const buildInfo = await install({
@@ -59,29 +54,26 @@ describe(`Firefox : Automated Testing via Puppeteer`, async () => {
         cacheDir: DOWNLOAD_CACHE_DIR,
       });
 
-      const browser = await puppeteer.launch({
+      const firefox = await puppeteer.launch({
         browser: BROWSER,
         executablePath,
         headless: true,
       });
 
-      const page = await browser.newPage();
-
       try {
+        const page = await firefox.newPage();
         const sequence = await generateRandomNumbersFromPage(page, SEQUENCE_LENGTH);
         const expected = await generateRandomNumbersFromPage(page, NUMBER_OF_PREDICTIONS);
-
         const predictor = JSRandomnessPredictor.firefox(sequence);
         const predictions = [];
 
         for (let i = 0; i < NUMBER_OF_PREDICTIONS; i++) {
-          const prediction = await predictor.predictNext();
-          predictions.push(prediction);
+          predictions.push(await predictor.predictNext());
         }
 
         assert.deepStrictEqual(predictions, expected);
       } finally {
-        await browser.close();
+        await firefox.close();
       }
     });
   }
@@ -99,3 +91,9 @@ describe(`Firefox : Automated Testing via Puppeteer`, async () => {
     }
   });
 });
+
+async function generateRandomNumbersFromPage(page: Page, numRands: number) {
+  return await page.evaluate((count) => {
+    return Array.from({ length: count }, Math.random);
+  }, numRands);
+}
