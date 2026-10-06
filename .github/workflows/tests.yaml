@@ -245,30 +245,6 @@ jobs:
           FORCE_COLOR: "1"
           VERSION_OR_TAG: ${{ matrix.chrome-version }}
           CACHE_DIRECTORY: ./.browser-cache
-  # test-chrome:
-  #   needs: build-node
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v7
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v7
-  #       with:
-  #         node-version: node
-  #     - name: Download built dist artifact
-  #       uses: actions/download-artifact@v8
-  #       with:
-  #         name: built-dist
-  #         path: dist/
-  #     - name: Restore node_modules cache
-  #       uses: actions/cache/restore@v6
-  #       with:
-  #         path: node_modules
-  #         key: node-modules-${{ hashFiles('package-lock.json') }}
-  #     - name: Run tests
-  #       shell: bash
-  #       run: npm run test:chrome
-  #       env:
-  #         FORCE_COLOR: "1"
 
   test-firefox:
     needs: build-node
@@ -350,4 +326,22 @@ jobs:
         if: ${{ !(contains(needs.test-node.result, 'failure') || contains(needs.test-node.result, 'cancelled')) }}
         run: |
           echo "All Node versions in the matrix verified successfully!"
+          exit 0
+
+  # This acts as the single required gatekeeper status check for repository ruleset
+  test-chrome-success:
+    needs: test-chrome
+    runs-on: ubuntu-latest
+    if: always() # Forces this job to run even if an upstream matrix item crashes
+    steps:
+      - name: Check matrix status results
+        if: ${{ contains(needs.test-chrome.result, 'failure') || contains(needs.test-chrome.result, 'cancelled') }}
+        run: |
+          echo "One or more matrix versions failed to complete successfully."
+          exit 1
+
+      - name: All Matrix Nodes Passed Successfully
+        if: ${{ !(contains(needs.test-chrome.result, 'failure') || contains(needs.test-chrome.result, 'cancelled')) }}
+        run: |
+          echo "All jobs in the matrix completed successfully!"
           exit 0
