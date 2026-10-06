@@ -2,7 +2,9 @@ name: Tests
 
 on:
   schedule:
-    - cron: "0 6 * * *" # Midnight CST
+    # Midnight CST
+    - cron: "0 0 * * *"
+      timezone: "America/Chicago"
 
   workflow_dispatch:
 
