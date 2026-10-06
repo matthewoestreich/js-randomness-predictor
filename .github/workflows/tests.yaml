@@ -194,6 +194,15 @@ jobs:
   test-chrome:
     needs: build-node
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chrome-version:
+          - "135" # The oldest Chrome version we support!
+          - "136"
+          - "140"
+          - "145"
+          - "stable" # Represents the most recent Chrome version.
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node
@@ -210,11 +219,32 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Restore Chrome binary from cache
+        id: chrome-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ./.browser-cache
+          key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
+      - name: Download Chrome binary
+        if: steps.chrome-cache.outputs.cache-hit != 'true'
+        run: npm run browser:install
+        env:
+          BROWSER_TYPE: chrome
+          VERSION_OR_TAG: ${{ matrix.chrome-version }}
+          CACHE_DIRECTORY: ./.browser-cache
+      - name: Save Chrome binary to cache
+        if: steps.chrome-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ./.browser-cache
+          key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
       - name: Run tests
         shell: bash
         run: npm run test:chrome
         env:
           FORCE_COLOR: "1"
+          VERSION_OR_TAG: ${{ matrix.chrome-version }}
+          CACHE_DIRECTORY: ./.browser-cache
 
   test-firefox:
     needs: build-node
@@ -296,4 +326,22 @@ jobs:
         if: ${{ !(contains(needs.test-node.result, 'failure') || contains(needs.test-node.result, 'cancelled')) }}
         run: |
           echo "All Node versions in the matrix verified successfully!"
+          exit 0
+
+  # This acts as the single required gatekeeper status check for repository ruleset
+  test-chrome-success:
+    needs: test-chrome
+    runs-on: ubuntu-latest
+    if: always() # Forces this job to run even if an upstream matrix item crashes
+    steps:
+      - name: Check matrix status results
+        if: ${{ contains(needs.test-chrome.result, 'failure') || contains(needs.test-chrome.result, 'cancelled') }}
+        run: |
+          echo "One or more matrix versions failed to complete successfully."
+          exit 1
+
+      - name: All Matrix Nodes Passed Successfully
+        if: ${{ !(contains(needs.test-chrome.result, 'failure') || contains(needs.test-chrome.result, 'cancelled')) }}
+        run: |
+          echo "All jobs in the matrix completed successfully!"
           exit 0
