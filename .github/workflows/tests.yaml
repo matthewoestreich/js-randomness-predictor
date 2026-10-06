@@ -194,6 +194,15 @@ jobs:
   test-chrome:
     needs: build-node
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chrome-version:
+          - "135" # The oldest Chrome version we support!
+          - "136"
+          - "140"
+          - "145"
+          - "stable"
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node
@@ -210,11 +219,56 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Restore Chrome binary from cache
+        id: chrome-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ./foo
+          key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
+      - name: Download Chrome binary
+        if: steps.chrome-cache.outputs.cache-hit != 'true'
+        run: npm run browser:install
+        env:
+          BROWSER_TYPE: chrome
+          VERSION_OR_TAG: ${{ matrix.chrome-version }}
+          CACHE_DIRECTORY: ./.browser-cache
+      - name: Save Chrome binary to cache
+        if: steps.chrome-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ./.browser-cache
+          key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
       - name: Run tests
         shell: bash
         run: npm run test:chrome
         env:
           FORCE_COLOR: "1"
+          VERSION_OR_TAG: ${{ matrix.chrome-version }}
+          CACHE_DIRECTORY: ./.browser-cache
+  # test-chrome:
+  #   needs: build-node
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v7
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v7
+  #       with:
+  #         node-version: node
+  #     - name: Download built dist artifact
+  #       uses: actions/download-artifact@v8
+  #       with:
+  #         name: built-dist
+  #         path: dist/
+  #     - name: Restore node_modules cache
+  #       uses: actions/cache/restore@v6
+  #       with:
+  #         path: node_modules
+  #         key: node-modules-${{ hashFiles('package-lock.json') }}
+  #     - name: Run tests
+  #       shell: bash
+  #       run: npm run test:chrome
+  #       env:
+  #         FORCE_COLOR: "1"
 
   test-firefox:
     needs: build-node
