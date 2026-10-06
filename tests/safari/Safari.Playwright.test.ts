@@ -14,19 +14,19 @@ import { webkit, Page, Browser } from "playwright";
 const SEQUENCE_LENGTH = 6;
 const NUMBER_OF_PREDICTIONS = 10;
 
-describe(`Safari : Automated Testing via Playwright`, async () => {
-  let safari: Browser;
+let safari: Browser;
 
-  try {
-    safari = await webkit.launch();
-  } catch (err: unknown) {
-    let message = "WebKit/Safari install not found!\nPlease run `npx playwright install webkit --with-deps` to install it and try again!";
-    if (err instanceof Error) {
-      message = `${err.message}\nOr ${message}`;
-    }
-    throw new Error(message);
+try {
+  safari = await webkit.launch();
+} catch (err: unknown) {
+  let message = "WebKit/Safari install not found!\nPlease run `npx playwright install webkit --with-deps` to install it and try again!";
+  if (err instanceof Error) {
+    message = `${err.message}\nOr ${message}`;
   }
+  throw new Error(message);
+}
 
+describe(`Safari : Automated Testing via Playwright`, () => {
   it(`[newest release] safari ${safari.version()} accurately predicts using dynamic generated values`, async () => {
     try {
       const page = await safari.newPage();
