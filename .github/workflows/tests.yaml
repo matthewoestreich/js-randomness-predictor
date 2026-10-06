@@ -1,22 +1,18 @@
 name: Tests
 
 on:
+  workflow_dispatch:
+  workflow_call:
   schedule:
     # Midnight CST
     - cron: "0 0 * * *"
       timezone: "America/Chicago"
-
-  workflow_dispatch:
-
   push:
     branches:
       - main
-
   pull_request:
     branches:
       - main
-
-  workflow_call:
 
 jobs:
   test-bun:
