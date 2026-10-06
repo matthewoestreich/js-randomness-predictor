@@ -62,7 +62,7 @@ jobs:
         run: |
           node -e "
             const fs = require('fs');
-            const sequence = Array.from({ length: 6 }, Math.random);
+            const sequence = Array.from({ length: 5 }, Math.random);
             const expected = Array.from({ length: 10 }, Math.random);
             const rands = { version: process.version, sequence, expected };
             const randsJson = JSON.stringify(rands);
