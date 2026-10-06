@@ -48,6 +48,32 @@ jobs:
         env:
           FORCE_COLOR: "1"
 
+  generate-random-numbers-node:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x, node]
+    steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Generate random numbers
+        run: |
+          node -e "
+            const fs = require('fs');
+            const sequence = Array.from({ length: 5 }, Math.random);
+            const expected = Array.from({ length: 10 }, Math.random);
+            const rands = { version: process.version, sequence, expected };
+            const randsJson = JSON.stringify(rands);
+            fs.writeFileSync('random-numbers.json', randsJson);
+          "
+      - name: Upload generated random numbers
+        uses: actions/upload-artifact@v7
+        with:
+          name: random-numbers-${{ matrix.node-version }}
+          path: random-numbers.json
+
   build-node:
     runs-on: ubuntu-latest
     steps:
@@ -55,24 +81,95 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: node
-      # Look for an existing cache or prepare to save a new one
       - name: Cache node_modules
-        id: cache-dependencies
+        id: cache-node_modules
         uses: actions/cache@v6
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-      # Only install if a cache mismatch occurs
       - name: Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        if: steps.cache-node_modules.outputs.cache-hit != 'true'
         run: npm install --ignore-scripts
-      - name: Build Code assets
+      - name: Build code
         run: npm run build:ci
-      - name: Upload Built Dist
+      - name: Upload built dist artifact
         uses: actions/upload-artifact@v7
         with:
           name: built-dist
           path: dist/
+
+  test-node:
+    needs: [build-node, generate-random-numbers-node]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x, node]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: node
+      - name: Download built dist artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: built-dist
+          path: dist/
+      - name: Download generated random numbers
+        uses: actions/download-artifact@v8
+        with:
+          name: random-numbers-${{ matrix.node-version }}
+          path: random-numbers/
+      #- name: Install Test Harness Dependencies Only
+      #  run: npm install --ignore-scripts && npm i -D esbuild tsx
+      - name: Restore node_modules cache
+        uses: actions/cache/restore@v6
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Run tests
+        run: npm run test:node:ci # tsx --test tests/node/*.test.ts
+        env:
+          FORCE_COLOR: 1
+          RANDOM_NUMBERS_FILE_PATH: ./random-numbers/random-numbers.json
+  #  test-supported-node-versions:
+  #    runs-on: ubuntu-latest
+  #    strategy:
+  #      matrix:
+  #        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x, node] # 'node' means latest stable version
+  #        #node-version: [18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, node] # 'node' means latest stable version
+  #    steps:
+  #      - uses: actions/checkout@v4
+  #      - name: Use Node.js ${{ matrix.node-version }}
+  #        uses: actions/setup-node@v4
+  #        with:
+  #          node-version: ${{ matrix.node-version }}
+  #      - name: Echo Node.js version
+  #        run: echo "Node.js version = $(node -v)"
+  #      - name: Install dependencies
+  #        run: npm install --ignore-scripts && npm i -D esbuild
+  #      - name: Build
+  #        shell: bash
+  #        run: npm run build:ci
+  #      - name: Run tests (>= v20.x)
+  #        if: >
+  #          matrix.node-version == '20.x' ||
+  #          matrix.node-version == '21.x' ||
+  #          matrix.node-version == '22.x' ||
+  #          matrix.node-version == '23.x' ||
+  #          matrix.node-version == '24.x' ||
+  #          matrix.node-version == '25.x' ||
+  #          matrix.node-version == 'node'
+  #        shell: bash
+  #        run: npm run test:node:versions:GE:20
+  #        env:
+  #          FORCE_COLOR: 1
+  #      - name: Run tests (v17.x - v19.x) [node:test doesn't exist in these versions]
+  #        if: ${{ matrix.node-version == '17.x' || matrix.node-version == '18.x' || matrix.node-version == '19.x' }}
+  #        shell: bash
+  #        run: npm run test:node:versions:17:18:19
+  #        env:
+  #          FORCE_COLOR: 1
 
   test-imports:
     needs: build-node
@@ -92,7 +189,7 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Run Import Tests
+      - name: Run tests
         run: npm run test:imports
         env:
           FORCE_COLOR: "1"
@@ -182,30 +279,31 @@ jobs:
   #        env:
   #          FORCE_COLOR: "1"
 
-  test-legacy-node-versions:
-    needs: build-node
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: node
-      - name: Download built dist artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: built-dist
-          path: dist/
-      - name: Restore node_modules cache
-        uses: actions/cache/restore@v6
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Run tests
-        shell: bash
-        run: npm run test:node:versions:LE:16
-        env:
-          FORCE_COLOR: "1"
+  #test-legacy-node-versions:
+  #  needs: build-node
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - uses: actions/checkout@v7
+  #    - name: Setup Node
+  #      uses: actions/setup-node@v7
+  #      with:
+  #        node-version: node
+  #    - name: Download built dist artifact
+  #      uses: actions/download-artifact@v8
+  #      with:
+  #        name: built-dist
+  #        path: dist/
+  #    - name: Restore node_modules cache
+  #      uses: actions/cache/restore@v6
+  #      with:
+  #        path: node_modules
+  #        key: node-modules-${{ hashFiles('package-lock.json') }}
+  #    - name: Run tests
+  #      shell: bash
+  #      run: npm run test:node:versions:LE:16
+  #      env:
+  #        FORCE_COLOR: "1"
+  # ---------------------------------------------------------------------------
   #  test-legacy-node-versions:
   #    runs-on: ubuntu-latest
   #    steps:
@@ -224,45 +322,6 @@ jobs:
   #        run: npm run test:node:versions:LE:16
   #        env:
   #          FORCE_COLOR: "1"
-
-  #  test-supported-node-versions:
-  #    runs-on: ubuntu-latest
-  #    strategy:
-  #      matrix:
-  #        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x, node] # 'node' means latest stable version
-  #        #node-version: [18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, node] # 'node' means latest stable version
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - name: Use Node.js ${{ matrix.node-version }}
-  #        uses: actions/setup-node@v4
-  #        with:
-  #          node-version: ${{ matrix.node-version }}
-  #      - name: Echo Node.js version
-  #        run: echo "Node.js version = $(node -v)"
-  #      - name: Install dependencies
-  #        run: npm install --ignore-scripts && npm i -D esbuild
-  #      - name: Build
-  #        shell: bash
-  #        run: npm run build:ci
-  #      - name: Run tests (>= v20.x)
-  #        if: >
-  #          matrix.node-version == '20.x' ||
-  #          matrix.node-version == '21.x' ||
-  #          matrix.node-version == '22.x' ||
-  #          matrix.node-version == '23.x' ||
-  #          matrix.node-version == '24.x' ||
-  #          matrix.node-version == '25.x' ||
-  #          matrix.node-version == 'node'
-  #        shell: bash
-  #        run: npm run test:node:versions:GE:20
-  #        env:
-  #          FORCE_COLOR: 1
-  #      - name: Run tests (v17.x - v19.x) [node:test doesn't exist in these versions]
-  #        if: ${{ matrix.node-version == '17.x' || matrix.node-version == '18.x' || matrix.node-version == '19.x' }}
-  #        shell: bash
-  #        run: npm run test:node:versions:17:18:19
-  #        env:
-  #          FORCE_COLOR: 1
 
   test-chrome:
     needs: build-node
