@@ -19,6 +19,39 @@ on:
   workflow_call:
 
 jobs:
+  test-bun:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+      - name: Run Bun tests
+        run: bun run test:bun
+
+  test-deno:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: latest
+      - name: Install dependencies
+        run: deno install
+      - name: Build
+        shell: bash
+        run: deno task build
+      - name: Run tests
+        shell: bash
+        run: deno task test:deno
+        env:
+          FORCE_COLOR: "1"
+
   build-node:
     runs-on: ubuntu-latest
     steps:
@@ -234,39 +267,6 @@ jobs:
   #        run: npm run test:node:versions:17:18:19
   #        env:
   #          FORCE_COLOR: 1
-
-  test-bun:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - name: Install dependencies
-        run: bun install
-      - name: Run Bun tests
-        run: bun run test:bun
-
-  test-deno:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: latest
-      - name: Install dependencies
-        run: deno install
-      - name: Build
-        shell: bash
-        run: deno task build
-      - name: Run tests
-        shell: bash
-        run: deno task test:deno
-        env:
-          FORCE_COLOR: "1"
 
   test-chrome:
     needs: build-node
