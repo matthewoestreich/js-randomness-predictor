@@ -132,44 +132,6 @@ jobs:
         env:
           FORCE_COLOR: 1
           RANDOM_NUMBERS_FILE_PATH: ./random-numbers/random-numbers.json
-  #  test-supported-node-versions:
-  #    runs-on: ubuntu-latest
-  #    strategy:
-  #      matrix:
-  #        node-version: [17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x, node] # 'node' means latest stable version
-  #        #node-version: [18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, node] # 'node' means latest stable version
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - name: Use Node.js ${{ matrix.node-version }}
-  #        uses: actions/setup-node@v4
-  #        with:
-  #          node-version: ${{ matrix.node-version }}
-  #      - name: Echo Node.js version
-  #        run: echo "Node.js version = $(node -v)"
-  #      - name: Install dependencies
-  #        run: npm install --ignore-scripts && npm i -D esbuild
-  #      - name: Build
-  #        shell: bash
-  #        run: npm run build:ci
-  #      - name: Run tests (>= v20.x)
-  #        if: >
-  #          matrix.node-version == '20.x' ||
-  #          matrix.node-version == '21.x' ||
-  #          matrix.node-version == '22.x' ||
-  #          matrix.node-version == '23.x' ||
-  #          matrix.node-version == '24.x' ||
-  #          matrix.node-version == '25.x' ||
-  #          matrix.node-version == 'node'
-  #        shell: bash
-  #        run: npm run test:node:versions:GE:20
-  #        env:
-  #          FORCE_COLOR: 1
-  #      - name: Run tests (v17.x - v19.x) [node:test doesn't exist in these versions]
-  #        if: ${{ matrix.node-version == '17.x' || matrix.node-version == '18.x' || matrix.node-version == '19.x' }}
-  #        shell: bash
-  #        run: npm run test:node:versions:17:18:19
-  #        env:
-  #          FORCE_COLOR: 1
 
   test-imports:
     needs: build-node
@@ -193,24 +155,6 @@ jobs:
         run: npm run test:imports
         env:
           FORCE_COLOR: "1"
-  #test-imports:
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v4
-  #    - name: Setup Node
-  #      uses: actions/setup-node@v4
-  #      with:
-  #        node-version: node
-  #    - name: Install dependencies
-  #      run: npm install --ignore-scripts
-  #    - name: Build
-  #      shell: bash
-  #      run: npm run build:ci
-  #    - name: Run tests
-  #      shell: bash
-  #      run: npm run test:imports
-  #      env:
-  #        FORCE_COLOR: "1"
 
   test-cli:
     needs: build-node
@@ -248,80 +192,6 @@ jobs:
         run: npm run test:cli
         env:
           FORCE_COLOR: "1"
-  #  test-cli:
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - name: Setup Node
-  #        uses: actions/setup-node@v4
-  #        with:
-  #          node-version: node
-  #      - name: Install Deno manually
-  #        run: |
-  #          curl -fsSL https://deno.land/x/install/install.sh | sh
-  #          echo "$HOME/.deno/bin" >> $GITHUB_PATH
-  #      - name: Echo Deno version
-  #        run: echo $(deno -v)
-  #      - name: Install Bun manually
-  #        run: |
-  #          curl -fsSL https://bun.sh/install | bash
-  #          echo "$HOME/.bun/bin" >> $GITHUB_PATH
-  #      - name: Echo Bun version
-  #        run: echo $(bun -v)
-  #      - name: Install dependencies
-  #        run: npm install --ignore-scripts
-  #      - name: Build
-  #        shell: bash
-  #        run: npm run build:ci
-  #      - name: Run tests
-  #        shell: bash
-  #        run: npm run test:cli
-  #        env:
-  #          FORCE_COLOR: "1"
-
-  #test-legacy-node-versions:
-  #  needs: build-node
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v7
-  #    - name: Setup Node
-  #      uses: actions/setup-node@v7
-  #      with:
-  #        node-version: node
-  #    - name: Download built dist artifact
-  #      uses: actions/download-artifact@v8
-  #      with:
-  #        name: built-dist
-  #        path: dist/
-  #    - name: Restore node_modules cache
-  #      uses: actions/cache/restore@v6
-  #      with:
-  #        path: node_modules
-  #        key: node-modules-${{ hashFiles('package-lock.json') }}
-  #    - name: Run tests
-  #      shell: bash
-  #      run: npm run test:node:versions:LE:16
-  #      env:
-  #        FORCE_COLOR: "1"
-  # ---------------------------------------------------------------------------
-  #  test-legacy-node-versions:
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - name: Setup Node
-  #        uses: actions/setup-node@v4
-  #        with:
-  #          node-version: node
-  #      - name: Install dependencies
-  #        run: npm install --ignore-scripts
-  #      - name: Build
-  #        shell: bash
-  #        run: npm run build:ci
-  #      - name: Run tests
-  #        shell: bash
-  #        run: npm run test:node:versions:LE:16
-  #        env:
-  #          FORCE_COLOR: "1"
 
   test-chrome:
     needs: build-node
@@ -347,24 +217,6 @@ jobs:
         run: npm run test:chrome
         env:
           FORCE_COLOR: "1"
-  #  test-chrome:
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - name: Setup Node
-  #        uses: actions/setup-node@v4
-  #        with:
-  #          node-version: node
-  #      - name: Install dependencies
-  #        run: npm install --ignore-scripts
-  #      - name: Build
-  #        shell: bash
-  #        run: npm run build:ci
-  #      - name: Run tests
-  #        shell: bash
-  #        run: npm run test:chrome
-  #        env:
-  #          FORCE_COLOR: "1"
 
   test-firefox:
     needs: build-node
@@ -390,24 +242,6 @@ jobs:
         run: npm run test:firefox
         env:
           FORCE_COLOR: "1"
-  #  test-firefox:
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - name: Setup Node
-  #        uses: actions/setup-node@v4
-  #        with:
-  #          node-version: node
-  #      - name: Install dependencies
-  #        run: npm install --ignore-scripts
-  #      - name: Build
-  #        shell: bash
-  #        run: npm run build:ci
-  #      - name: Run tests
-  #        shell: bash
-  #        run: npm run test:firefox
-  #        env:
-  #          FORCE_COLOR: "1"
 
   test-safari:
     needs: build-node
@@ -445,23 +279,3 @@ jobs:
         run: npm run test:safari
         env:
           FORCE_COLOR: "1"
-  # test-safari:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: node
-  #     - name: Install dependencies
-  #       run: npm install --ignore-scripts
-  #     - name: Build
-  #       shell: bash
-  #       run: npm run build:ci
-  #     - name: Install Playwright WebKit Dependencies
-  #       run: npx playwright install webkit --with-deps
-  #     - name: Run tests
-  #       shell: bash
-  #       run: npm run test:safari
-  #       env:
-  #         FORCE_COLOR: "1"
