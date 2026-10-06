@@ -19,7 +19,7 @@ on:
   workflow_call:
 
 jobs:
-  build:
+  build-node:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
           path: dist/
 
   test-imports:
-    needs: build
+    needs: build-node
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -87,7 +87,7 @@ jobs:
   #        FORCE_COLOR: "1"
 
   test-cli:
-    needs: build
+    needs: build-node
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -154,7 +154,7 @@ jobs:
   #          FORCE_COLOR: "1"
 
   test-legacy-node-versions:
-    needs: build
+    needs: build-node
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -269,7 +269,7 @@ jobs:
           FORCE_COLOR: "1"
 
   test-chrome:
-    needs: build
+    needs: build-node
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -312,7 +312,7 @@ jobs:
   #          FORCE_COLOR: "1"
 
   test-firefox:
-    needs: build
+    needs: build-node
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -355,7 +355,7 @@ jobs:
   #          FORCE_COLOR: "1"
 
   test-safari:
-    needs: build
+    needs: build-node
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
