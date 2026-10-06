@@ -14,22 +14,25 @@ import { webkit, Page, Browser } from "playwright";
 const SEQUENCE_LENGTH = 6;
 const NUMBER_OF_PREDICTIONS = 10;
 
-async function generateRandomNumbersFromPage(page: Page, numRands: number) {
-  return await page.evaluate((count) => {
-    return Array.from({ length: count }, Math.random);
-  }, numRands);
-}
+let safari: Browser;
 
-describe(`Safari : Automated Testing via Playwright`, async () => {
-  let safari: Browser;
+try {
+  safari = await webkit.launch();
+} catch (err: unknown) {
+  let message = "WebKit/Safari install not found!\nPlease run `npx playwright install webkit --with-deps` to install it and try again!";
 
-  try {
-    safari = await webkit.launch();
-  } catch (err) {
-    console.error("WebKit/Safari install not found!\nPlease run `npx playwright install webkit --with-deps` to install it and try again!");
-    process.exit(1);
+  if (err instanceof Error) {
+    message = `${err.message}\nOr ${message}`;
   }
 
+  throw new Error(message);
+}
+
+process.once("exit", () => {
+  safari.close();
+});
+
+describe(`Safari : Automated Testing via Playwright`, async () => {
   it(`safari ${safari.version()} [newest release] accurately predicts using dynamic generated values`, async () => {
     const context = await safari.newContext();
     const page = await context.newPage();
@@ -52,3 +55,9 @@ describe(`Safari : Automated Testing via Playwright`, async () => {
     }
   });
 });
+
+async function generateRandomNumbersFromPage(page: Page, numRands: number) {
+  return await page.evaluate((count) => {
+    return Array.from({ length: count }, Math.random);
+  }, numRands);
+}
