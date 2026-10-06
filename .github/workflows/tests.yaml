@@ -244,12 +244,12 @@ jobs:
   test-safari:
     needs: build-node
     runs-on: ubuntu-latest
+    container:
+      # Matches Playwright Linux dependencies,
+      # this means we don't have to manually install WebKit or it's deps!
+      image: ://microsoft.com
     steps:
       - uses: actions/checkout@v7
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: node
       - name: Download built dist artifact
         uses: actions/download-artifact@v8
         with:
@@ -260,15 +260,6 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Cache Playwright WebKit Binary
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - name: (Cache Miss) Install Playwright WebKit
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install webkit
       - name: Run tests
         shell: bash
         run: npm run test:safari
