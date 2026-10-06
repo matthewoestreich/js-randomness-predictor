@@ -128,7 +128,7 @@ jobs:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Run tests
-        run: npm run test:node:ci # tsx --test tests/node/*.test.ts
+        run: npm run test:node
         env:
           FORCE_COLOR: 1
           RANDOM_NUMBERS_FILE_PATH: ./random-numbers/random-numbers.json
