@@ -1,0 +1,40 @@
+test-chrome:
+  needs: build-node
+  runs-on: ubuntu-latest
+  strategy:
+    fail-fast: false
+    matrix:
+      chrome-version:
+        - "135"
+        - "136"
+        - "140"
+        - "145"
+        - "stable"
+  steps:
+    - uses: actions/checkout@v7
+    - name: Setup Node
+      uses: actions/setup-node@v7
+      with:
+        node-version: node
+    - name: Download built dist artifact
+      uses: actions/download-artifact@v8
+      with:
+        name: built-dist
+        path: dist/
+    - name: Restore node_modules cache
+      uses: actions/cache/restore@v6
+      with:
+        path: node_modules
+        key: node-modules-${{ hashFiles('package-lock.json') }}
+    - name: Cache Playwright WebKit Binary
+      id: playwright-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    - name: Run tests
+      shell: bash
+      run: npm run test:chrome
+      env:
+        FORCE_COLOR: "1"
+        CHROME_VERSION: ${{ matrix.chrome-version }}
