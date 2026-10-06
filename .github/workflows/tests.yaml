@@ -62,7 +62,7 @@ jobs:
         run: |
           node -e "
             const fs = require('fs');
-            const sequence = Array.from({ length: 5 }, Math.random);
+            const sequence = Array.from({ length: 6 }, Math.random);
             const expected = Array.from({ length: 10 }, Math.random);
             const rands = { version: process.version, sequence, expected };
             const randsJson = JSON.stringify(rands);
@@ -266,12 +266,9 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - name: (Cache Miss) Install Playwright WebKit AND WebKit System Deps
+      - name: (Cache Miss) Install Playwright WebKit
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install webkit --with-deps
-      - name: (Cache Hit) Install Playwright WebKit System Deps Only
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps webkit
+        run: npx playwright install webkit
       - name: Run tests
         shell: bash
         run: npm run test:safari
