@@ -120,8 +120,6 @@ jobs:
         with:
           name: random-numbers-${{ matrix.node-version }}
           path: random-numbers/
-      #- name: Install Test Harness Dependencies Only
-      #  run: npm install --ignore-scripts && npm i -D esbuild tsx
       - name: Restore node_modules cache
         uses: actions/cache/restore@v6
         with:
@@ -279,3 +277,21 @@ jobs:
         run: npm run test:safari
         env:
           FORCE_COLOR: "1"
+
+  # This acts as the single required gatekeeper status check for repository ruleset
+  test-node-success:
+    needs: test-node
+    runs-on: ubuntu-latest
+    if: always() # Forces this job to run even if an upstream matrix item crashes
+    steps:
+      - name: Check matrix status results
+        if: ${{ contains(needs.test-node.result, 'failure') || contains(needs.test-node.result, 'cancelled') }}
+        run: |
+          echo "One or more matrix versions failed to complete successfully."
+          exit 1
+
+      - name: All Matrix Nodes Passed Successfully
+        if: ${{ !(contains(needs.test-node.result, 'failure') || contains(needs.test-node.result, 'cancelled')) }}
+        run: |
+          echo "All Node versions in the matrix verified successfully!"
+          exit 0
