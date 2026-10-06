@@ -244,10 +244,10 @@ jobs:
   test-safari:
     needs: build-node
     runs-on: ubuntu-latest
+    # Matches Playwright Linux dependencies, this means we don't have to manually install WebKit or it's deps!
     container:
-      # Matches Playwright Linux dependencies,
-      # this means we don't have to manually install WebKit or it's deps!
-      image: ://microsoft.com
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --user 1001 # Ensures correct file permissions on GitHub runners
     steps:
       - uses: actions/checkout@v7
       - name: Download built dist artifact
