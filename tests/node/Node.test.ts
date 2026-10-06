@@ -46,6 +46,7 @@ describe(`Node : ${randomNumbers.version}`, () => {
       // Therefore we need to remove the first N elements from the expected array (where N = numberOfRetries),
       // and push it ontoo the sequence.
       if (numberOfRetries > 0) {
+        console.error(`Retry ${numberOfRetries}`);
         for (let i = 0; i < numberOfRetries; i++) {
           const front = expected.shift();
           if (front) {
