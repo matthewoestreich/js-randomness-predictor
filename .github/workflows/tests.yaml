@@ -202,7 +202,7 @@ jobs:
           - "136"
           - "140"
           - "145"
-          - "stable"
+          - "stable" # Represents the most recent Chrome version.
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node
