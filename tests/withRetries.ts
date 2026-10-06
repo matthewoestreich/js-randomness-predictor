@@ -28,7 +28,7 @@
   });
 ```
  */
-export async function withRetries(fn: () => Promise<void>, retries: number) {
+export async function withRetries(fn: (numberOfTries: number) => Promise<void>, retries: number) {
   let lastError;
 
   for (let i = 0; i <= retries; i++) {
@@ -36,7 +36,7 @@ export async function withRetries(fn: () => Promise<void>, retries: number) {
       if (i > 0) {
         console.log(`RETRY #${i}`);
       }
-      await fn();
+      await fn(i);
       return;
     } catch (err) {
       lastError = err;

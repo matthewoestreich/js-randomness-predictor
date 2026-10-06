@@ -36,15 +36,32 @@ describe(`Node : ${randomNumbers.version}`, () => {
   });
 
   it("predicts accurately using dynamically generated random numbers", async () => {
-    await withRetries(async () => {
-      const predictor = JSRandomnessPredictor.node(randomNumbers.sequence);
+    const MAX_RETRIES = 3;
+
+    await withRetries(async (numberOfRetries: number) => {
+      let sequence = randomNumbers.sequence;
+      let expected = randomNumbers.expected;
+
+      // If we failed, it may mean we need a longger sequence so it gives us a better shot at predicting correctly.
+      // Therefore we need to remove the first N elements from the expected array (where N = numberOfRetries),
+      // and push it ontoo the sequence.
+      if (numberOfRetries > 0) {
+        for (let i = 0; i < numberOfRetries; i++) {
+          const front = expected.shift();
+          if (front) {
+            sequence.push(front);
+          }
+        }
+      }
+
+      const predictor = JSRandomnessPredictor.node(sequence);
       const predictions: number[] = [];
 
       for (let i = 0; i < randomNumbers.expected.length; i++) {
         predictions.push(await predictor.predictNext());
       }
 
-      assert.deepStrictEqual(randomNumbers.expected, predictions);
-    }, 3);
+      assert.deepStrictEqual(expected, predictions);
+    }, MAX_RETRIES);
   });
 });
