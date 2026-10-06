@@ -1,8 +1,6 @@
-```bash
-# Publish new major version and push to main branch
-npm run publish:main:major
-# Publish new minor version and push to main branch
-npm run publish:main:minor
-# Publish new patch version and push to main branch
-npm run publish:main:patch
-```
+We use a manual release workflow.
+
+1. Go to the repo on github.com
+2. Go to the Actions tab
+3. Select the Release workflow
+4. Select Run Workflow
