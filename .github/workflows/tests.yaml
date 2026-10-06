@@ -223,7 +223,7 @@ jobs:
         id: chrome-cache
         uses: actions/cache/restore@v6
         with:
-          path: ./foo
+          path: ./.browser-cache
           key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
       - name: Download Chrome binary
         if: steps.chrome-cache.outputs.cache-hit != 'true'
