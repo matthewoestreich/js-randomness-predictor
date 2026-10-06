@@ -246,7 +246,7 @@ jobs:
     runs-on: ubuntu-latest
     # Matches Playwright Linux dependencies, this means we don't have to manually install WebKit or it's deps!
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      image: mcr.microsoft.com/playwright:latest
       options: --user 1001 # Ensures correct file permissions on GitHub runners
     steps:
       - uses: actions/checkout@v7
