@@ -428,8 +428,18 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Install Playwright WebKit Dependencies
+      - name: Cache Playwright WebKit Binary
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: (Cache Miss) Install Playwright WebKit AND WebKit System Deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install webkit --with-deps
+      - name: (Cache Hit) Install Playwright WebKit System Deps Only
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps webkit
       - name: Run tests
         shell: bash
         run: npm run test:safari
