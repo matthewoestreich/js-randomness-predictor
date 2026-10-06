@@ -1,8 +1,7 @@
 import JSRandomnessPredictor from "../../dist/esm/index.js";
-import { describe, it, after } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert";
 import path from "node:path";
-import fsPromises from "node:fs/promises";
 import puppeteer, { Page } from "puppeteer";
 import { install, computeExecutablePath, detectBrowserPlatform, resolveBuildId, Browser, BrowserPlatform, BrowserTag } from "@puppeteer/browsers";
 
@@ -25,7 +24,7 @@ const BROWSER = Browser.FIREFOX;
 // - `puppeteer/browsers` uses the tags to download from here : https://archive.mozilla.org/pub/firefox/
 //    I am not sure how they form the URLs tho.
 const FIREFOX_VERSIONS_OR_TAGS_TO_TEST = ["stable_130.0", "stable_140.0", "stable_150.0", BrowserTag.STABLE];
-const DOWNLOAD_CACHE_DIR = path.resolve("./.puppeteer-cache-firefox");
+const DOWNLOAD_CACHE_DIR = path.resolve("./.browser-cache/firefox");
 const PLATFORM = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Fallback for CI/CD
 
 const SEQUENCE_LENGTH = 4;
@@ -35,11 +34,10 @@ describe(`Firefox : Automated Testing via Puppeteer`, async () => {
   for (const versionOrTag of FIREFOX_VERSIONS_OR_TAGS_TO_TEST) {
     const targetBuildId = await resolveBuildId(BROWSER, PLATFORM, versionOrTag);
 
-    let testTitle = "";
+    let testTitle = `firefox ${targetBuildId} accurately predicts using dynamic generated values`;
     if (versionOrTag === BrowserTag.STABLE) {
-      testTitle = "[newest release] ";
+      testTitle = `[newest release] ${testTitle}`;
     }
-    testTitle += `firefox ${targetBuildId} accurately predicts using dynamic generated values`;
 
     it(testTitle, async () => {
       const buildInfo = await install({
@@ -77,19 +75,6 @@ describe(`Firefox : Automated Testing via Puppeteer`, async () => {
       }
     });
   }
-
-  after(async () => {
-    try {
-      await fsPromises.access(DOWNLOAD_CACHE_DIR, fsPromises.constants.F_OK);
-    } catch (_) {
-      return;
-    }
-    try {
-      await fsPromises.rm(DOWNLOAD_CACHE_DIR, { recursive: true, force: true });
-    } catch (error) {
-      console.error("[Cleanup Error] Failed to delete cache folder:", error);
-    }
-  });
 });
 
 async function generateRandomNumbersFromPage(page: Page, numRands: number) {

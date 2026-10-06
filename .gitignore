@@ -4,8 +4,7 @@
 deno.lock
 bun.lock
 dist-staging
-.playwright-cache*
-.puppeteer-cache*
+.browser-cache/
 
 # Logs
 logs

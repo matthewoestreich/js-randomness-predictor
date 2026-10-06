@@ -1,8 +1,7 @@
 import JSRandomnessPredictor from "../../dist/esm/index.js";
-import { describe, it, after } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert";
 import path from "node:path";
-import fsPromises from "node:fs/promises";
 import { chromium, Page } from "playwright";
 import { install, computeExecutablePath, detectBrowserPlatform, resolveBuildId, Browser, BrowserPlatform, BrowserTag } from "@puppeteer/browsers";
 
@@ -19,7 +18,7 @@ const BROWSER = Browser.CHROME;
 // "stable" is the most recent stable version, whatever that may be.
 // Chrome 135 is the oldest version of Chrome we support.
 const CHROME_VERSIONS_OR_TAGS_TO_TEST = ["135", "136", "140", "145", BrowserTag.STABLE];
-const DOWNLOAD_CACHE_DIR = path.resolve("./.playwright-cache-chrome");
+const DOWNLOAD_CACHE_DIR = path.resolve("./.browser-cache/chrome");
 const PLATFORM = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallback for CI environments
 
 const SEQUENCE_LENGTH = 4;
@@ -29,11 +28,10 @@ describe(`Chrome : Automated Testing via Playwright`, async () => {
   for (const versionOrTag of CHROME_VERSIONS_OR_TAGS_TO_TEST) {
     const targetBuildId = await resolveBuildId(BROWSER, PLATFORM, versionOrTag);
 
-    let testTitle = "";
+    let testTitle = `chrome v${targetBuildId} accurately predicts using dynamic generated values`;
     if (versionOrTag === BrowserTag.STABLE) {
-      testTitle = `[newest release] `;
+      testTitle = `[newest release] ${testTitle}`;
     }
-    testTitle += `chrome v${targetBuildId} accurately predicts using dynamic generated values`;
 
     it(testTitle, async () => {
       const buildInfo = await install({
@@ -67,21 +65,6 @@ describe(`Chrome : Automated Testing via Playwright`, async () => {
       }
     });
   }
-
-  after(async () => {
-    try {
-      await fsPromises.access(DOWNLOAD_CACHE_DIR, fsPromises.constants.F_OK);
-    } catch (_) {
-      console.info(`[Cleanup Info] directory '${DOWNLOAD_CACHE_DIR}' does not exist.`);
-      return;
-    }
-
-    try {
-      await fsPromises.rm(DOWNLOAD_CACHE_DIR, { recursive: true, force: true });
-    } catch (error) {
-      console.error("[Cleanup Error] Failed to delete cache folder:", error);
-    }
-  });
 });
 
 async function generateRandomNumbersFromPage(page: Page, numRands: number) {
