@@ -18,7 +18,7 @@ jobs:
   # This job only runs if workflow is called via schedule
   show-time:
     runs-on: ubuntu-latest
-    # if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule'
     steps:
       - name: Show Time
         shell: bash
