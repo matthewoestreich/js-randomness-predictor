@@ -33,9 +33,6 @@ export async function withRetries(fn: (numberOfTries: number) => Promise<void>, 
 
   for (let i = 0; i <= retries; i++) {
     try {
-      if (i > 0) {
-        console.log(`RETRY #${i}`);
-      }
       await fn(i);
       return;
     } catch (err) {
