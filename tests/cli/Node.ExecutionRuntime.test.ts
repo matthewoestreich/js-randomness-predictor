@@ -10,8 +10,9 @@ describe("Execution Runtime : Node", () => {
 
   it("[dynamic sequence] should not require a sequence if execution runtime (and version) match '--environment' and '--env-version'", () => {
     const result = callJsRandomnessPredictorCli({ environment });
-    const jsonResult = JSON.parse(result.stdout.toString());
-    assert.ok(jsonResult.isCorrect === true);
+    assertProcessStatus.equal(result, 0);
+    const jsonResult = JSON.parse(result.stdout) as CliResult;
+    assert.strictEqual(jsonResult.isCorrect, true);
   });
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
