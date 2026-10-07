@@ -189,18 +189,40 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: node
-      - name: Install Deno manually
+      - name: Get latest Deno version
+        id: deno-version
+        run: |
+          version=$(curl -fsSL https://dl.deno.land/release-latest.txt)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Cache Deno ${{ steps.deno-version.outputs.version }}
+        id: deno-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.deno/bin
+          key: deno-${{ runner.os }}-${{ runner.arch }}-${{ steps.deno-version.outputs.version }}
+      - name: Install Deno ${{ steps.deno-version.outputs.version }}
+        if: steps.deno-cache.outputs.cache-hit != 'true'
         run: |
           curl -fsSL https://deno.land/x/install/install.sh | sh
-          echo "$HOME/.deno/bin" >> $GITHUB_PATH
-      - name: Echo Deno version
-        run: echo $(deno -v)
-      - name: Install Bun manually
+          echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
+      - name: Get latest Bun version
+        id: bun-version
+        run: |
+          version=$(curl -fsSL https://api.github.com/repos/oven-sh/bun/releases/latest |
+            jq -r '.tag_name' |
+            sed 's/^bun-v//')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Cache Bun ${{ steps.bun-version.outputs.version }}
+        id: bun-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.bun/bin
+          key: bun-${{ runner.os }}-${{ runner.arch }}-${{ steps.bun-version.outputs.version }}
+      - name: Install Bun ${{ steps.bun-version.outputs.version }}
+        if: steps.bun-cache.outputs.cache-hit != 'true'
         run: |
           curl -fsSL https://bun.sh/install | bash
-          echo "$HOME/.bun/bin" >> $GITHUB_PATH
-      - name: Echo Bun version
-        run: echo $(bun -v)
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Download built dist artifact
         uses: actions/download-artifact@v8
         with:
