@@ -204,7 +204,8 @@ jobs:
         if: steps.deno-cache.outputs.cache-hit != 'true'
         run: |
           curl -fsSL https://deno.land/x/install/install.sh | sh
-          echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
+      - name: Add Deno to PATH
+        run: echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
       - name: Get latest Bun version
         id: bun-version
         run: |
@@ -222,7 +223,8 @@ jobs:
         if: steps.bun-cache.outputs.cache-hit != 'true'
         run: |
           curl -fsSL https://bun.sh/install | bash
-          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
+      - name: Add Bun to PATH
+        run: echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Download built dist artifact
         uses: actions/download-artifact@v8
         with:
