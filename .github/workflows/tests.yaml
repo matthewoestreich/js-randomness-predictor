@@ -21,10 +21,11 @@ jobs:
     # if: github.event_name == 'schedule'
     steps:
       - name: Show Time
+        shell: bash
         run: |
-          date '+RUNNER LOCAL: %A, %m-%d-%Y %I:%M:%S %p %Z'
-          date -u '+UTC: %A, %m-%d-%Y %I:%M:%S %p %Z'
-          TZ='America/Chicago' date '+CST: %A, %m-%d-%Y %I:%M:%S %p %Z'
+          printf '%-13s %s\n' 'RUNNER LOCAL:' "$(date '+%A, %m-%d-%Y %I:%M:%S %p %Z')"
+          printf '%-13s %s\n' 'UTC:' "$(date -u '+%A, %m-%d-%Y %I:%M:%S %p %Z')"
+          printf '%-13s %s\n' 'CST:' "$(TZ='America/Chicago' date '+%A, %m-%d-%Y %I:%M:%S %p %Z')"
 
   test-bun:
     runs-on: ubuntu-latest
