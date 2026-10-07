@@ -339,7 +339,7 @@ jobs:
           FORCE_COLOR: "1"
 
   # This acts as the single required gatekeeper status check for repository ruleset
-  test-node-success:
+  check-node-success:
     needs: test-node
     runs-on: ubuntu-latest
     if: always() # Forces this job to run even if an upstream matrix item crashes
@@ -357,7 +357,7 @@ jobs:
           exit 0
 
   # This acts as the single required gatekeeper status check for repository ruleset
-  test-chrome-success:
+  check-chrome-success:
     needs: test-chrome
     runs-on: ubuntu-latest
     if: always() # Forces this job to run even if an upstream matrix item crashes
@@ -375,7 +375,7 @@ jobs:
           exit 0
 
   # This acts as the single required gatekeeper status check for repository ruleset
-  test-firefox-success:
+  check-firefox-success:
     needs: test-firefox
     runs-on: ubuntu-latest
     if: always() # Forces this job to run even if an upstream matrix item crashes
