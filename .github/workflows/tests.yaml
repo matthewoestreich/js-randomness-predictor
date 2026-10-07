@@ -235,7 +235,7 @@ jobs:
           key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Cache Chrome binary
         id: chrome-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ./.browser-cache
           key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
@@ -254,7 +254,6 @@ jobs:
           VERSION_OR_TAG: ${{ matrix.chrome-version }}
           CACHE_DIRECTORY: ./.browser-cache
 
-  # "stable_130.0", "stable_140.0", "stable_150.0", BrowserTag.STABLE
   test-firefox:
     needs: build-node
     runs-on: ubuntu-latest
@@ -284,7 +283,7 @@ jobs:
           key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Cache Firefox binary
         id: firefox-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ./.browser-cache
           key: firefox-${{ runner.os }}-${{ runner.arch }}-${{ matrix.firefox-version }}
