@@ -22,10 +22,9 @@ jobs:
     steps:
       - name: Show Time
         run: |
-          date '+CDT: %A, %m-%d-%Y %I:%M:%S %p'
-          date -u '+UTC: %A, %m-%d-%Y %I:%M:%S %p'
-          date '+TIMEZONE: %Z'
-          TZ='America/Chicago' date '+CST: %A, %m-%d-%Y %I:%M:%S %p'
+          date '+RUNNER LOCAL: %A, %m-%d-%Y %I:%M:%S %p %Z'
+          date -u '+UTC: %A, %m-%d-%Y %I:%M:%S %p %Z'
+          TZ='America/Chicago' date '+CST: %A, %m-%d-%Y %I:%M:%S %p %Z'
 
   test-bun:
     runs-on: ubuntu-latest
