@@ -28,7 +28,7 @@ if (process.env.VERSION_OR_TAG && process.env.CACHE_DIRECTORY) {
    */
   chrome = await chromium.launch({ channel: "chrome", headless: true });
   console.info(
-    `We have detected you are running this test locally. Please note we only test the version of Chrome (${chrome.version()}) you have installed!`,
+    `\n[NOTE] We have detected you are running this test locally.\n[NOTE] We only test the version of Chrome (${chrome.version()}) you have installed!\n`,
   );
 }
 

@@ -1,39 +1,48 @@
 import JSRandomnessPredictor from "../../dist/esm/index.js";
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { firefox as spidermonkey, Page, Browser as PlaywrightBrowser } from "playwright";
-import { computeExecutablePath, detectBrowserPlatform, resolveBuildId, Browser as PuppeteerBrowser, BrowserPlatform } from "@puppeteer/browsers";
+import puppeteer, { Page, Browser as PuppeteerBrowser } from "puppeteer";
+import { computeExecutablePath, detectBrowserPlatform, resolveBuildId, Browser as PuppeteerBrowserKind, BrowserPlatform } from "@puppeteer/browsers";
 
 const SEQUENCE_LENGTH = 4;
 const NUMBER_OF_PREDICTIONS = 10;
 
-let firefox: PlaywrightBrowser;
+let firefox: PuppeteerBrowser;
+let firefoxVersion: string;
 
 if (process.env.VERSION_OR_TAG && process.env.CACHE_DIRECTORY) {
   /*
    * This "if" block is for when this test is ran via CI/CD
    */
-  const browser = PuppeteerBrowser.FIREFOX;
   const platform = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallback for CI environments
-  const buildId = await resolveBuildId(browser, platform, process.env.VERSION_OR_TAG);
+  const buildId = await resolveBuildId(PuppeteerBrowserKind.FIREFOX, platform, process.env.VERSION_OR_TAG);
   const executablePath = computeExecutablePath({
-    browser,
+    browser: PuppeteerBrowserKind.FIREFOX,
     buildId,
     cacheDir: process.env.CACHE_DIRECTORY,
   });
-  firefox = await spidermonkey.launch({ executablePath, headless: true });
+  firefox = await puppeteer.launch({
+    browser: PuppeteerBrowserKind.FIREFOX,
+    executablePath,
+    headless: true,
+  });
+  firefoxVersion = await firefox.version();
 } else {
   /*
    * This "else" block is for when this test is ran locally on a devs machine
    */
-  firefox = await spidermonkey.launch({ headless: true });
+  firefox = await puppeteer.launch({
+    browser: PuppeteerBrowserKind.FIREFOX,
+    headless: true,
+  });
+  firefoxVersion = await firefox.version();
   console.info(
-    `\n[NOTE] We have detected you are running this test locally.\nPlease note we only test the version of Firefox (${firefox.version()}) you have installed!\n`,
+    `\n[NOTE] We have detected you are running this test locally.\n[NOTE] We only test the version of Firefox (${firefoxVersion}) you have installed!\n`,
   );
 }
 
-describe(`Firefox : Automated Testing via Playwright`, async () => {
-  it(`firefox ${firefox.version()} accurately predicts using dynamic generated values`, async () => {
+describe(`Firefox : Automated Testing via Playwright`, () => {
+  it(`firefox ${firefoxVersion} accurately predicts using dynamic generated values`, async () => {
     try {
       const page = await firefox.newPage();
       const sequence = await generateRandomNumbersFromPage(page, SEQUENCE_LENGTH);
