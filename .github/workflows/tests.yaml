@@ -115,6 +115,7 @@ jobs:
     needs: [build-node, generate-random-numbers-node, generate-node-matrix]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         node-version: ${{ fromJSON(needs.generate-node-matrix.outputs.versions) }}
     steps:
