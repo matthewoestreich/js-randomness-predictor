@@ -6,7 +6,7 @@ on:
   schedule:
     # Midnight CST
     - cron: "0 0 * * *"
-      timezone: "America/Chicago"
+      timezone: America/Chicago
   push:
     branches:
       - main
@@ -15,6 +15,15 @@ on:
       - main
 
 jobs:
+  # This job only runs if workflow is called via schedule
+  show-time:
+    #if: github.event_name == 'schedule'
+    run: |
+      date '+CDT: %A, %m-%d-%Y %I:%M:%S %p'
+      date -u '+UTC: %A, %m-%d-%Y %I:%M:%S %p'
+      date '+TIMEZONE: %Z'
+      TZ='America/Chicago' date '+CST: %A, %m-%d-%Y %I:%M:%S %p'
+
   test-bun:
     runs-on: ubuntu-latest
     steps:
@@ -350,7 +359,6 @@ jobs:
         run: |
           echo "One or more matrix versions failed to complete successfully."
           exit 1
-
       - name: All Matrix Nodes Passed Successfully
         if: ${{ !(contains(needs.test-node.result, 'failure') || contains(needs.test-node.result, 'cancelled')) }}
         run: |
@@ -368,7 +376,6 @@ jobs:
         run: |
           echo "One or more matrix versions failed to complete successfully."
           exit 1
-
       - name: All Matrix Nodes Passed Successfully
         if: ${{ !(contains(needs.test-chrome.result, 'failure') || contains(needs.test-chrome.result, 'cancelled')) }}
         run: |
@@ -386,7 +393,6 @@ jobs:
         run: |
           echo "One or more matrix versions failed to complete successfully."
           exit 1
-
       - name: All Matrix Nodes Passed Successfully
         if: ${{ !(contains(needs.test-firefox.result, 'failure') || contains(needs.test-firefox.result, 'cancelled')) }}
         run: |
