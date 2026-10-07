@@ -102,7 +102,7 @@
     "test": "npm run build && npm run test:nobuild",
     "test:nobuild": "node build/runCommands.js ./npm.run.test.json",
     "test:imports": "node --test tests/import/*.test.*",
-    "test:node": "tsx --test tests/node/Node.test.ts",
+    "test:node": "tsx --test tests/node/*.test.ts",
     "test:cli": "tsx --test tests/cli/*.test.ts",
     "test:bun": "bun test tests/bun/*.test.ts",
     "test:deno": "deno test --sloppy-imports --allow-read \"./tests/deno/*.test.ts\"",
