@@ -55,7 +55,8 @@ jobs:
     outputs:
       versions: ${{ steps.matrix.outputs.versions }}
     steps:
-      - id: matrix
+      - name: Create versions variable
+        id: matrix
         run: |
           echo 'versions=["10.x", "11.x", "12.x", "13.x", "14.x", "15.x", "16.x", "17.x", "18.x", "19.x", "20.x","21.x", "22.x", "23.x", "24.x", "25.x", "node"]' >> "$GITHUB_OUTPUT"
 
