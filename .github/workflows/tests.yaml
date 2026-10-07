@@ -233,9 +233,9 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Restore Chrome binary from cache
+      - name: Cache Chrome binary
         id: chrome-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache@v4
         with:
           path: ./.browser-cache
           key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
@@ -246,12 +246,6 @@ jobs:
           BROWSER_TYPE: chrome
           VERSION_OR_TAG: ${{ matrix.chrome-version }}
           CACHE_DIRECTORY: ./.browser-cache
-      - name: Save Chrome binary to cache
-        if: steps.chrome-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
-        with:
-          path: ./.browser-cache
-          key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
       - name: Run tests
         shell: bash
         run: npm run test:chrome
@@ -271,7 +265,7 @@ jobs:
           - "stable_130.0" # The oldest Firefox version we support!
           - "stable_140.0"
           - "stable_150.0"
-          - "stable" # Represents the most recent Chrome version.
+          - "stable" # Represents the most recent Firefox version.
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node
@@ -288,9 +282,9 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Restore Firefox binary from cache
+      - name: Cache Firefox binary
         id: firefox-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache@v4
         with:
           path: ./.browser-cache
           key: firefox-${{ runner.os }}-${{ runner.arch }}-${{ matrix.firefox-version }}
@@ -301,12 +295,6 @@ jobs:
           BROWSER_TYPE: firefox
           VERSION_OR_TAG: ${{ matrix.firefox-version }}
           CACHE_DIRECTORY: ./.browser-cache
-      - name: Save Firefox binary to cache
-        if: steps.firefox-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
-        with:
-          path: ./.browser-cache
-          key: firefox-${{ runner.os }}-${{ runner.arch }}-${{ matrix.firefox-version }}
       - name: Run tests
         shell: bash
         run: npm run test:firefox
