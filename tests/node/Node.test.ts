@@ -38,10 +38,10 @@ describe(`Node : ${randomNumbers.version}`, () => {
   it("predicts accurately using dynamically generated random numbers", async () => {
     const MAX_RETRIES = 3;
 
-    await withRetries(async (numberOfRetries: number) => {
-      let sequence = randomNumbers.sequence;
-      let expected = randomNumbers.expected;
+    let sequence = randomNumbers.sequence;
+    let expected = randomNumbers.expected;
 
+    await withRetries(async (numberOfRetries: number) => {
       // If we failed, it may mean we need a longger sequence so it gives us a better shot at predicting correctly.
       // Therefore we need to remove the first N elements from the expected array (where N = numberOfRetries),
       // and push it ontoo the sequence.
