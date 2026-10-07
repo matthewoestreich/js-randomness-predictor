@@ -246,9 +246,18 @@ jobs:
           VERSION_OR_TAG: ${{ matrix.chrome-version }}
           CACHE_DIRECTORY: ./.browser-cache
 
+  # "stable_130.0", "stable_140.0", "stable_150.0", BrowserTag.STABLE
   test-firefox:
     needs: build-node
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        firefox-version:
+          - "stable_130.0" # The oldest Firefox version we support!
+          - "stable_140.0"
+          - "stable_150.0"
+          - "stable" # Represents the most recent Chrome version.
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node
@@ -265,11 +274,32 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Restore Firefox binary from cache
+        id: firefox-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ./.browser-cache
+          key: firefox-${{ runner.os }}-${{ runner.arch }}-${{ matrix.firefox-version }}
+      - name: Download Firefox binary
+        if: steps.firefox-cache.outputs.cache-hit != 'true'
+        run: npm run browser:install
+        env:
+          BROWSER_TYPE: firefox
+          VERSION_OR_TAG: ${{ matrix.firefox-version }}
+          CACHE_DIRECTORY: ./.browser-cache
+      - name: Save Firefox binary to cache
+        if: steps.firefox-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ./.browser-cache
+          key: firefox-${{ runner.os }}-${{ runner.arch }}-${{ matrix.firefox-version }}
       - name: Run tests
         shell: bash
         run: npm run test:firefox
         env:
           FORCE_COLOR: "1"
+          VERSION_OR_TAG: ${{ matrix.firefox-version }}
+          CACHE_DIRECTORY: ./.browser-cache
 
   test-safari:
     needs: build-node
@@ -296,11 +326,9 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-webkit-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-        # WebKit not cached. Install it as well as system deps
       - name: (Cache Miss) Install Playwright WebKit AND System Deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install webkit --with-deps
-        # WebKit is cached, only install system deps
       - name: (Cache Hit) Install WebKit System Deps Only
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps webkit
@@ -325,7 +353,7 @@ jobs:
       - name: All Matrix Nodes Passed Successfully
         if: ${{ !(contains(needs.test-node.result, 'failure') || contains(needs.test-node.result, 'cancelled')) }}
         run: |
-          echo "All Node versions in the matrix verified successfully!"
+          echo "All jobs in the matrix verified successfully!"
           exit 0
 
   # This acts as the single required gatekeeper status check for repository ruleset
@@ -342,6 +370,24 @@ jobs:
 
       - name: All Matrix Nodes Passed Successfully
         if: ${{ !(contains(needs.test-chrome.result, 'failure') || contains(needs.test-chrome.result, 'cancelled')) }}
+        run: |
+          echo "All jobs in the matrix completed successfully!"
+          exit 0
+
+  # This acts as the single required gatekeeper status check for repository ruleset
+  test-firefox-success:
+    needs: test-firefox
+    runs-on: ubuntu-latest
+    if: always() # Forces this job to run even if an upstream matrix item crashes
+    steps:
+      - name: Check matrix status results
+        if: ${{ contains(needs.test-firefox.result, 'failure') || contains(needs.test-firefox.result, 'cancelled') }}
+        run: |
+          echo "One or more matrix versions failed to complete successfully."
+          exit 1
+
+      - name: All Matrix Nodes Passed Successfully
+        if: ${{ !(contains(needs.test-firefox.result, 'failure') || contains(needs.test-firefox.result, 'cancelled')) }}
         run: |
           echo "All jobs in the matrix completed successfully!"
           exit 0
