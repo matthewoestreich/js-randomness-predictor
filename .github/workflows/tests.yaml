@@ -48,11 +48,23 @@ jobs:
         env:
           FORCE_COLOR: "1"
 
+  # Only need to update node matrix versions here.
+  # Don't have to remember to update multiple jobs,just update this one.
+  generate-node-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.matrix.outputs.versions }}
+    steps:
+      - id: matrix
+        run: |
+          echo 'versions=["10.x", "11.x", "12.x", "13.x", "14.x", "15.x", "16.x", "17.x", "18.x", "19.x", "20.x","21.x", "22.x", "23.x", "24.x", "25.x", "node"]' >> "$GITHUB_OUTPUT"
+
   generate-random-numbers-node:
+    needs: generate-node-matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x, node]
+        node-version: ${{ fromJSON(needs.generate-node-matrix.outputs.versions) }}
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v7
@@ -99,11 +111,11 @@ jobs:
           path: dist/
 
   test-node:
-    needs: [build-node, generate-random-numbers-node]
+    needs: [build-node, generate-random-numbers-node, generate-node-matrix]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x, node]
+        node-version: ${{ fromJSON(needs.generate-node-matrix.outputs.versions) }}
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node
