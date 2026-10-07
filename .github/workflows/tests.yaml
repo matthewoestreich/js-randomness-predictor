@@ -17,12 +17,15 @@ on:
 jobs:
   # This job only runs if workflow is called via schedule
   show-time:
-    #if: github.event_name == 'schedule'
-    run: |
-      date '+CDT: %A, %m-%d-%Y %I:%M:%S %p'
-      date -u '+UTC: %A, %m-%d-%Y %I:%M:%S %p'
-      date '+TIMEZONE: %Z'
-      TZ='America/Chicago' date '+CST: %A, %m-%d-%Y %I:%M:%S %p'
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'schedule'
+    steps:
+      - name: Show Time
+        run: |
+          date '+CDT: %A, %m-%d-%Y %I:%M:%S %p'
+          date -u '+UTC: %A, %m-%d-%Y %I:%M:%S %p'
+          date '+TIMEZONE: %Z'
+          TZ='America/Chicago' date '+CST: %A, %m-%d-%Y %I:%M:%S %p'
 
   test-bun:
     runs-on: ubuntu-latest
