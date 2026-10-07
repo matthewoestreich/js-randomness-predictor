@@ -32,7 +32,7 @@ if (process.env.VERSION_OR_TAG && process.env.CACHE_DIRECTORY) {
   );
 }
 
-describe(`Chrome : Automated Testing via Playwright`, async () => {
+describe(`Chrome : Automated Testing via Playwright`, () => {
   it(`chrome ${chrome.version()} accurately predicts using dynamic generated values`, async () => {
     try {
       const page = await chrome.newPage();
