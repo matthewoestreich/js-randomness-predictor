@@ -13,23 +13,33 @@ if (process.env.VERSION_OR_TAG && process.env.CACHE_DIRECTORY) {
   /*
    * This "if" block is for when this test is ran via CI/CD
    */
-  const browser = PuppeteerBrowser.CHROME;
-  const platform = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallback for CI environments
-  const buildId = await resolveBuildId(browser, platform, process.env.VERSION_OR_TAG);
-  const executablePath = computeExecutablePath({
-    browser,
-    buildId,
-    cacheDir: process.env.CACHE_DIRECTORY,
-  });
-  chrome = await chromium.launch({ executablePath, headless: true });
+  try {
+    const browser = PuppeteerBrowser.CHROME;
+    const platform = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallback for CI environments
+    const buildId = await resolveBuildId(browser, platform, process.env.VERSION_OR_TAG);
+    const executablePath = computeExecutablePath({
+      browser,
+      buildId,
+      cacheDir: process.env.CACHE_DIRECTORY,
+    });
+    chrome = await chromium.launch({ executablePath, headless: true });
+  } catch (err: unknown) {
+    throw new Error(`Something went wrong launching Chrome!\n${(err as Error).message}`);
+  }
 } else {
   /*
    * This "else" block is for when this test is ran locally on a devs machine
    */
-  chrome = await chromium.launch({ channel: "chrome", headless: true });
-  console.info(
-    `\n[NOTE] We have detected you are running this test locally.\n[NOTE] We only test the version of Chrome (${chrome.version()}) you have installed!\n`,
-  );
+  try {
+    chrome = await chromium.launch({ channel: "chrome", headless: true });
+    console.info(
+      `\n[NOTE] We have detected you are running this test locally.\n[NOTE] We only test the version of Chrome (${chrome.version()}) you have installed!\n`,
+    );
+  } catch (err: unknown) {
+    throw new Error(
+      `Either something went wrong launching Chrome or you do not have it installed. Try running \`npx playwright install chrome --with-deps\` to install it.\n${(err as Error).message}`,
+    );
+  }
 }
 
 describe(`Chrome : Automated Testing via Playwright`, () => {

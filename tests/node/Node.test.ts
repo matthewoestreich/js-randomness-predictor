@@ -24,7 +24,7 @@ if (process.env.RANDOM_NUMBERS_FILE_PATH) {
     expected: Array.from({ length: 10 }, Math.random),
   };
   console.info(
-    `\nWe have detected you are running Node tests in a local dev environment. Please note that only the currently installed Node.js version (${randomNumbers.version}) will be tested!\n`,
+    `\n[NOTE] We have detected you are running Node tests in a local dev environment.\n[NOTE] Only the currently installed Node.js version (${randomNumbers.version}) will be tested!\n`,
   );
 }
 

@@ -1,6 +1,8 @@
 import { install, detectBrowserPlatform, resolveBuildId, Browser, BrowserPlatform } from "@puppeteer/browsers";
 
 /**
+ * This script is meant to install puppeteer browsers, mostly for GitHub Actions. You can also run
+ * this script locally, though.
  *
  * Use this script like:
  * `BROWSER_TYPE=chrome VERSION_OR_TAG=stable CACHE_DIRECTORY=./browser-cache npm run browser:install`

@@ -14,31 +14,41 @@ if (process.env.VERSION_OR_TAG && process.env.CACHE_DIRECTORY) {
   /*
    * This "if" block is for when this test is ran via CI/CD
    */
-  const platform = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallback for CI environments
-  const buildId = await resolveBuildId(PuppeteerBrowserKind.FIREFOX, platform, process.env.VERSION_OR_TAG);
-  const executablePath = computeExecutablePath({
-    browser: PuppeteerBrowserKind.FIREFOX,
-    buildId,
-    cacheDir: process.env.CACHE_DIRECTORY,
-  });
-  firefox = await puppeteer.launch({
-    browser: PuppeteerBrowserKind.FIREFOX,
-    executablePath,
-    headless: true,
-  });
-  firefoxVersion = await firefox.version();
+  try {
+    const platform = detectBrowserPlatform() ?? BrowserPlatform.LINUX; // Safe fallback for CI environments
+    const buildId = await resolveBuildId(PuppeteerBrowserKind.FIREFOX, platform, process.env.VERSION_OR_TAG);
+    const executablePath = computeExecutablePath({
+      browser: PuppeteerBrowserKind.FIREFOX,
+      buildId,
+      cacheDir: process.env.CACHE_DIRECTORY,
+    });
+    firefox = await puppeteer.launch({
+      browser: PuppeteerBrowserKind.FIREFOX,
+      executablePath,
+      headless: true,
+    });
+    firefoxVersion = await firefox.version();
+  } catch (err: unknown) {
+    throw new Error(`Something went wrong launching Firefox!\n${(err as Error).message}`);
+  }
 } else {
   /*
    * This "else" block is for when this test is ran locally on a devs machine
    */
-  firefox = await puppeteer.launch({
-    browser: PuppeteerBrowserKind.FIREFOX,
-    headless: true,
-  });
-  firefoxVersion = await firefox.version();
-  console.info(
-    `\n[NOTE] We have detected you are running this test locally.\n[NOTE] We only test the version of Firefox (${firefoxVersion}) you have installed!\n`,
-  );
+  try {
+    firefox = await puppeteer.launch({
+      browser: PuppeteerBrowserKind.FIREFOX,
+      headless: true,
+    });
+    firefoxVersion = await firefox.version();
+    console.info(
+      `\n[NOTE] We have detected you are running this test locally.\n[NOTE] We only test the version of Firefox (${firefoxVersion}) you have installed!\n`,
+    );
+  } catch (err: unknown) {
+    throw new Error(
+      `Either something went wrong launching Firefox or you do not have it installed. Try running \`npx puppeteer browsers install firefox\` to install it.\n${(err as Error).message}`,
+    );
+  }
 }
 
 describe(`Firefox : Automated Testing via Playwright`, () => {
