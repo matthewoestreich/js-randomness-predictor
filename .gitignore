@@ -5,6 +5,7 @@ deno.lock
 bun.lock
 dist-staging
 .browser-cache/
+browser-cache/
 
 # Logs
 logs
