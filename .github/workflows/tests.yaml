@@ -269,14 +269,7 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Cache Chrome binary
-        id: chrome-cache
-        uses: actions/cache@v6
-        with:
-          path: ./.browser-cache
-          key: chrome-${{ runner.os }}-${{ runner.arch }}-${{ matrix.chrome-version }}
       - name: Download Chrome binary
-        if: steps.chrome-cache.outputs.cache-hit != 'true'
         run: npm run browser:install
         env:
           BROWSER_TYPE: chrome
@@ -317,14 +310,7 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Cache Firefox binary
-        id: firefox-cache
-        uses: actions/cache@v6
-        with:
-          path: ./.browser-cache
-          key: firefox-${{ runner.os }}-${{ runner.arch }}-${{ matrix.firefox-version }}
       - name: Download Firefox binary
-        if: steps.firefox-cache.outputs.cache-hit != 'true'
         run: npm run browser:install
         env:
           BROWSER_TYPE: firefox
