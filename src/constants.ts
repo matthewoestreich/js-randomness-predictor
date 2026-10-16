@@ -1,5 +1,9 @@
 import { Runtime, ServerRuntime, BrowserRuntime, Engine } from "./types.js";
 
+export const SCALING_FACTOR_53_BIT_INT = 9007199254740991 + 1; // Doing "+ 1" here because it gets rid of IDE warning.
+export const IEEE754_MANTISSA_BITS_MASK = 0b0000000000001111111111111111111111111111111111111111111111111111n;
+export const IEEE754_EXPONENT_BITS_MASK = 0b0011111111110000000000000000000000000000000000000000000000000000n;
+
 /** The env var KEY (not the value) that determines which runtime the CLI uses. */
 export const EXECUTION_RUNTIME_ENV_VAR_KEY = "JSRP_RUNTIME";
 export const DEFAULT_NUMBER_OF_PREDICTIONS = 10;

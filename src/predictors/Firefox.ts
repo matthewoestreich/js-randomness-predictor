@@ -3,12 +3,7 @@ import { Pair, SolvingStrategy } from "../types.js";
 import XorShift128Plus from "../XorShift128Plus.js";
 import uint64 from "../uint64.js";
 import SpiderMonkeyPredictor from "./engines/SpiderMonkey.js";
-
-// The mantissa bits (53 effective bits = 52 stored + 1 implicit) for doubles as defined in IEEE-754
-const IEEE754_MANTISSA_BITS_MASK = 0x1fffffffffffffn;
-
-// Map a 53-bit integer into the range [0, 1) as a double.
-const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
+import { IEEE754_MANTISSA_BITS_MASK, SCALING_FACTOR_53_BIT_INT } from "../constants.js";
 
 const FIREFOX_STRATEGIES: SolvingStrategy[] = [
   {
