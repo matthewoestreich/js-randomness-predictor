@@ -74,7 +74,26 @@ jobs:
       - name: Create versions variable
         id: matrix
         run: |
-          echo 'versions=["10.x", "11.x", "12.x", "13.x", "14.x", "15.x", "16.x", "17.x", "18.x", "19.x", "20.x","21.x", "22.x", "23.x", "24.x", "25.x", "node"]' >> "$GITHUB_OUTPUT"
+          versions=$(printf '%s\n' \
+            "10.x" \
+            "11.x" \
+            "12.x" \
+            "13.x" \
+            "14.x" \
+            "15.x" \
+            "16.x" \
+            "17.x" \
+            "18.x" \
+            "19.x" \
+            "20.x" \
+            "21.x" \
+            "22.x" \
+            "23.x" \
+            "24.x" \
+            "25.x" \
+            "node" \
+            | jq -R . | jq -s -c .)
+          echo "versions=$versions" >> "$GITHUB_OUTPUT"
 
   generate-random-numbers-node:
     needs: [generate-node-matrix]
