@@ -5,19 +5,10 @@ import XorShift128Plus from "../XorShift128Plus.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import V8Predictor from "./engines/V8.js";
 import uint64 from "../uint64.js";
-import { MIN_SEQUENCE_LENGTH } from "../constants.js";
+import { IEEE754_EXPONENT_BITS_MASK, IEEE754_MANTISSA_52_BITS_MASK, MIN_SEQUENCE_LENGTH, SCALING_FACTOR_53_BIT_INT } from "../constants.js";
 
 // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
 const MAX_SEQUENCE_LENGTH = 64;
-
-// The mantissa bits (lower 52 bits) for doubles as defined in IEEE-754
-const IEEE754_MANTISSA_BITS_MASK = 0x000fffffffffffffn;
-
-// The exponent bits (bits 52–62) for 1.0 as defined in IEEE-754 for double precision
-const IEEE754_EXPONENT_BITS_MASK = 0x3ff0000000000000n;
-
-// Map a 53-bit integer into the range [0, 1) as a double
-const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
 
 // The ordering of these strategies is important! See the comments above each strategy for more info.
 // **BE CAREFUL WHEN MOVING THESE STRATS AROUND, ADDING STRATS, ETC..**
@@ -65,7 +56,7 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
     recoverMantissa: (n: number): bigint => {
       const buffer = Buffer.alloc(8);
       buffer.writeDoubleLE(n + 1, 0);
-      return buffer.readBigUInt64LE(0) & IEEE754_MANTISSA_BITS_MASK;
+      return buffer.readBigUInt64LE(0) & IEEE754_MANTISSA_52_BITS_MASK;
     },
     toDouble: (concreteState: Pair<bigint>): number => {
       const buffer = Buffer.alloc(8);
@@ -91,17 +82,17 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
     recoverMantissa: (n: number): bigint => {
       const buffer = Buffer.alloc(8);
       buffer.writeDoubleLE(n + 1, 0);
-      return buffer.readBigUInt64LE(0) & IEEE754_MANTISSA_BITS_MASK;
+      return buffer.readBigUInt64LE(0) & IEEE754_MANTISSA_52_BITS_MASK;
     },
     toDouble: (concreteState: Pair<bigint>): number => {
       const n = concreteState[0] + concreteState[1];
       const buffer = Buffer.alloc(8);
-      buffer.writeBigUInt64LE((n & IEEE754_MANTISSA_BITS_MASK) | IEEE754_EXPONENT_BITS_MASK, 0);
+      buffer.writeBigUInt64LE((n & IEEE754_MANTISSA_52_BITS_MASK) | IEEE754_EXPONENT_BITS_MASK, 0);
       // Calculate next random number before we modify concrete state.
       return buffer.readDoubleLE(0) - 1;
     },
     constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
-      const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(IEEE754_MANTISSA_BITS_MASK, 64));
+      const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(IEEE754_MANTISSA_52_BITS_MASK, 64));
       solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),

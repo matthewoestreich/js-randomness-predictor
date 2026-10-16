@@ -5,9 +5,7 @@ import XorShift128Plus from "../XorShift128Plus.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import uint64 from "../uint64.js";
 import V8Predictor from "./engines/V8.js";
-
-// Map a 53-bit integer into the range [0, 1) as a double.
-const SCALING_FACTOR_53_BIT_INT = Math.pow(2, 53);
+import { SCALING_FACTOR_53_BIT_INT } from "../constants.js";
 
 const DENO_STRATEGIES: SolvingStrategy[] = [
   // Pre Jan 2026 changes
