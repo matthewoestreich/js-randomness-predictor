@@ -42,7 +42,7 @@ jobs:
         run: |
           npm exec standard-version -- \
             --release-as "${{ inputs.release }}" \
-            --skip.tag \
+            --tag-prefix "" \
             --verbose
 
       - name: Get new version
