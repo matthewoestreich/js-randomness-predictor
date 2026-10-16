@@ -2,6 +2,136 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.5](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.4...4.0.5) (2026-10-16)
+
+
+### Performance Improvements
+
+* **BigInt.asUintN:** move to asUintN vs bitwise ([c91da82](https://github.com/matthewoestreich/js-randomness-predictor/commit/c91da82362074e14570be18341d712f158a2560d))
+
+
+### Documentation
+
+* **code_of_conduct:** create ([071aa51](https://github.com/matthewoestreich/js-randomness-predictor/commit/071aa512cc3b86da7193c6a91d3d0941d07d1b59))
+* **contributing_md:** create ([7add6b8](https://github.com/matthewoestreich/js-randomness-predictor/commit/7add6b850ae9ee4a135834bcf50e3d90d9b3523a))
+* **contributing:** move out of README into CONTRIBUTING ([c647c22](https://github.com/matthewoestreich/js-randomness-predictor/commit/c647c2261e80a13b873cda10e474951f626919f4))
+* **how_does_it_work:** clean it up ([31241b5](https://github.com/matthewoestreich/js-randomness-predictor/commit/31241b5da7530010cdf8e1f1b39198b946f7642b))
+* **how_does_it_work:** clean it up ([cb95d35](https://github.com/matthewoestreich/js-randomness-predictor/commit/cb95d356c1eb0b640903152f5e5d4a566cb20c3d))
+* **how_does_it_work:** clean it up ([a580d47](https://github.com/matthewoestreich/js-randomness-predictor/commit/a580d477edc5908a59efb316c5506096b28c7872))
+* **how_does_it_work:** clean it up ([065e27c](https://github.com/matthewoestreich/js-randomness-predictor/commit/065e27c18854a58fd29016ddb974af16b9300a91))
+* **security:** create ([2b966f2](https://github.com/matthewoestreich/js-randomness-predictor/commit/2b966f24179ffd6f10526313e341ac2fbd7cef2d))
+
+
+### Tests
+
+* **chrome_playwright:** add chrome playwright test ([0edb6ae](https://github.com/matthewoestreich/js-randomness-predictor/commit/0edb6aef4461a2d0bc93620aa1fa1c7e29093caa))
+* **chrome_playwright:** add chrome playwright test ([af8a3e3](https://github.com/matthewoestreich/js-randomness-predictor/commit/af8a3e3364bbf046aba8eb75a2b150f22eae6f19))
+* **chrome_playwright:** add chrome playwright test ([ea22757](https://github.com/matthewoestreich/js-randomness-predictor/commit/ea227572085a0987eaaa6382c633da11bf06c0e9))
+* **chrome_playwright:** add dynamic tests via playwright ([eddac7b](https://github.com/matthewoestreich/js-randomness-predictor/commit/eddac7b9aa78e487df445689ff6dcfbd3d80530e))
+* **chrome_playwright:** found oldest supported Chrome version (135) ([e9d183f](https://github.com/matthewoestreich/js-randomness-predictor/commit/e9d183f8b773b4a5cd7349f7b4151f8f657aa66e))
+* **firefox_puppeteer:** cannot use playwright for firefox ([177ce3d](https://github.com/matthewoestreich/js-randomness-predictor/commit/177ce3d5e924dd361d1a83456613b64c00ab23ae))
+* **node_17:** troubleshoot why test is failing ([66ff6fd](https://github.com/matthewoestreich/js-randomness-predictor/commit/66ff6fdbee2862901ce0b55cc206178eec70743c))
+* **node_17:** troubleshoot why test is failing ([ac5bbb6](https://github.com/matthewoestreich/js-randomness-predictor/commit/ac5bbb6abbfd2af98032b8146bf5985668072d96))
+* **node_17:** troubleshoot why test is failing ([a1fca06](https://github.com/matthewoestreich/js-randomness-predictor/commit/a1fca067cb74d349dc2a570d514f604d474f3cc1))
+* **node_17:** troubleshoot why test is failing ([140d026](https://github.com/matthewoestreich/js-randomness-predictor/commit/140d026056ed5996708c96c93c9f9367a0d882cd))
+* **node_17:** troubleshoot why test is failing ([0931a12](https://github.com/matthewoestreich/js-randomness-predictor/commit/0931a128a7f2b3e0ffd07bedd2d888e434f3dac7))
+* **node_17:** troubleshoot why test is failing ([a289c75](https://github.com/matthewoestreich/js-randomness-predictor/commit/a289c75f717559c7ffe121531403f165f25eced4))
+* **safari:** add install check incase test is run locally ([bca251e](https://github.com/matthewoestreich/js-randomness-predictor/commit/bca251e83cd48d7e244c694bd850275f5d626b18))
+* **safari:** be more explicit with how we exit during error. throw error instead of process.exit ([919b9af](https://github.com/matthewoestreich/js-randomness-predictor/commit/919b9af7135bdea2c12f7463d01c47798f5d2432))
+* **safari:** increase sequence ([7dfcf1c](https://github.com/matthewoestreich/js-randomness-predictor/commit/7dfcf1cd1fd669eb866f3ca64fd8a6eba6cd5fc9))
+
+
+### Chores
+
+* **deps-dev:** bump playwright from 1.63.0 to 1.64.0 ([9537b95](https://github.com/matthewoestreich/js-randomness-predictor/commit/9537b95c80c4510ffdaef2dcbf10654be38197c8))
+* **deps:** bump the github-actions group with 2 updates ([8879d7b](https://github.com/matthewoestreich/js-randomness-predictor/commit/8879d7b061cc9525ec6174d510ce835bfd6dbbca))
+* **deps:** npm audit fix ([4918af2](https://github.com/matthewoestreich/js-randomness-predictor/commit/4918af2fbb12a20a4ae98afade98593fc9a723a5))
+* **deps:** update dev deps ([dd70601](https://github.com/matthewoestreich/js-randomness-predictor/commit/dd70601f387d2efa2e0637dd14d47928befafe75))
+* **deps:** update eslint and eslint related deps ([8f72ff0](https://github.com/matthewoestreich/js-randomness-predictor/commit/8f72ff093584989ee1aae85947bb7416922c83eb))
+* **deps:** upgrade vite-plugin-static-copy ([6224cab](https://github.com/matthewoestreich/js-randomness-predictor/commit/6224cab16af5f47877ead6951a50ef42fdfdb5ad))
+* **gitignore:** add browser-cache/ ([85dd217](https://github.com/matthewoestreich/js-randomness-predictor/commit/85dd217870455246f5c0340e90125a4986e310da))
+* **package.json:** fix node test command ([7b4a89d](https://github.com/matthewoestreich/js-randomness-predictor/commit/7b4a89ddc4ec57e5152e1a779738db76434e0c5e))
+* **package.json:** remove old scripts, update doc ([8f46fe4](https://github.com/matthewoestreich/js-randomness-predictor/commit/8f46fe4568f926b3ed1864a7543421026c6d092a))
+* **tests:** clean up browser tests ([b39aa0d](https://github.com/matthewoestreich/js-randomness-predictor/commit/b39aa0d62304edaa3dc5dc1b1328a7cc25cd1b49))
+
+
+### Refactors
+
+* **predictors:** use 52 and 53 bit masks for appropriate predictors ([b7a7738](https://github.com/matthewoestreich/js-randomness-predictor/commit/b7a7738038ee9f7fded1c9b3cd390cb8b5235212))
+* **predictors:** use 52 and 53 bit masks for appropriate predictors ([25fb95f](https://github.com/matthewoestreich/js-randomness-predictor/commit/25fb95f8eff972267fed40db33aba4e674c5fc64))
+* **predictors:** use constants for masks, etc ([215b6ee](https://github.com/matthewoestreich/js-randomness-predictor/commit/215b6eeb2c4f5c3699dc94a4c37417a7c8937d83))
+* **variables:** rename variables ([4355a60](https://github.com/matthewoestreich/js-randomness-predictor/commit/4355a609e0af6b581711ac3180000fdbb7a38919))
+
+
+### Styles
+
+* change print width ([0834b1c](https://github.com/matthewoestreich/js-randomness-predictor/commit/0834b1cd7a6b85a5367ee3e48ba2780bb044e7a0))
+* change print width ([dcc3206](https://github.com/matthewoestreich/js-randomness-predictor/commit/dcc32062ac00e22bff25f71d74d1da3eb2921ec3))
+
+
+### CI
+
+* **(tests:** handle exceptions and remove od node test ([fcddb77](https://github.com/matthewoestreich/js-randomness-predictor/commit/fcddb772ea63994f2f4a510c89ca74ac7d02793a))
+* **(tests:** remove comment, set actions/cache to v6 ([0852c46](https://github.com/matthewoestreich/js-randomness-predictor/commit/0852c46fef452e8d31475b20da6162a9de3c04f3))
+* **(tests:** remove fail fast for node matrix ([1458c74](https://github.com/matthewoestreich/js-randomness-predictor/commit/1458c74d6a035e948730a1219f4f3067a3375854))
+* **(tests:** remove unnecessary async ([5565b24](https://github.com/matthewoestreich/js-randomness-predictor/commit/5565b24a47f8492d8b5cb7257d35433bf3b63eb6))
+* **(tests:** simplify caching in workflow ([b1c173a](https://github.com/matthewoestreich/js-randomness-predictor/commit/b1c173a25c05cc8a69bd95125fb07d0d8b808e44))
+* **(tests:** update retry fn ([2ddda7b](https://github.com/matthewoestreich/js-randomness-predictor/commit/2ddda7b56fa505f5b9297249773553b32b8f8c5d))
+* **chrome:** add comment ([4d8ceda](https://github.com/matthewoestreich/js-randomness-predictor/commit/4d8ceda05c860e21d5e0e28a7d83bb45ae306e67))
+* **chrome:** create gatekeeping job for chrome matrix ([2fa3c31](https://github.com/matthewoestreich/js-randomness-predictor/commit/2fa3c31ef00d327355611f08f8451b514cf16d98))
+* **chrome:** create matrix ([130e256](https://github.com/matthewoestreich/js-randomness-predictor/commit/130e256206dc552b83a4d3dd9c1b8e3c50c37e10))
+* **chrome:** fix cache path ([32dc182](https://github.com/matthewoestreich/js-randomness-predictor/commit/32dc182a6ba9a27b073f001d9d9915320ab3d7c6))
+* **concurrency:** only allow one job to run at a time ([e19c148](https://github.com/matthewoestreich/js-randomness-predictor/commit/e19c14878df11e7289c8f10ed1f1ce9203440034))
+* **dependabot:** add dependabot for GH Actions and Playwright ([22a84d0](https://github.com/matthewoestreich/js-randomness-predictor/commit/22a84d099028691d4b5ed6c2c3b4efa0b2075d54))
+* **firefox:** create firefox matrix ([d96e1e6](https://github.com/matthewoestreich/js-randomness-predictor/commit/d96e1e6d0c2f076746d6ada095b413410623082d))
+* **firefox:** fix firefox test ([e53917e](https://github.com/matthewoestreich/js-randomness-predictor/commit/e53917eba2cecc28781fede8f548c6854b4da8d3))
+* **firefox:** rename test to check for matrix success jobs ([b8bbacb](https://github.com/matthewoestreich/js-randomness-predictor/commit/b8bbacb6950dd1f52334df5bf8efc3194925a337))
+* **publish:** add publish workflow ([dd2cc36](https://github.com/matthewoestreich/js-randomness-predictor/commit/dd2cc360fb26134bf29156dbfc7a0628e7c27169))
+* **safari:** use playwright to automate most recent version testing ([9b3f216](https://github.com/matthewoestreich/js-randomness-predictor/commit/9b3f2162447ca5f94f80099f8d21d499d397869d))
+* **tests:** add bun/deno to path ([2d4e126](https://github.com/matthewoestreich/js-randomness-predictor/commit/2d4e12621542aed0a390aa3135e44ec4e678c14f))
+* **tests:** add gatekeeping job for ruleset ([83bd253](https://github.com/matthewoestreich/js-randomness-predictor/commit/83bd253913ac3c0b532e320ad74d860a1198ea21))
+* **tests:** add matrix job so we dont have to remember to update matrix values in more than one place ([3fd77bc](https://github.com/matthewoestreich/js-randomness-predictor/commit/3fd77bc568ae5c92a18e8443848c7258cdbf64b2))
+* **tests:** add matrix job so we dont have to remember to update matrix values in more than one place ([f1be5a5](https://github.com/matthewoestreich/js-randomness-predictor/commit/f1be5a570cfcc523d4bf1287c31f3a6604e2d129))
+* **tests:** add matrix job so we dont have to remember to update matrix values in more than one place ([ea45924](https://github.com/matthewoestreich/js-randomness-predictor/commit/ea4592494290258102d51fa4a9a3f39713e7ee0d))
+* **tests:** add node rand gen, add node test matrix, add node ci test file ([75771ac](https://github.com/matthewoestreich/js-randomness-predictor/commit/75771ac5b1c4dc2dbdcc2d79b04e333748de2174))
+* **tests:** cache playwright webkit binary ([6a6f2b8](https://github.com/matthewoestreich/js-randomness-predictor/commit/6a6f2b8e366a1fa26653b8fd85da4b6aac48b41e))
+* **tests:** clean up node tests and npm scripts ([7252834](https://github.com/matthewoestreich/js-randomness-predictor/commit/7252834ee5d143979ff9f10e6056ba23697023e6))
+* **tests:** clean up tests, dont cache browsers anymore besides safari ([9aa0fc2](https://github.com/matthewoestreich/js-randomness-predictor/commit/9aa0fc23889eb88843ed35c50f10f8360023e889))
+* **tests:** fix cron schedule ([7cefcd7](https://github.com/matthewoestreich/js-randomness-predictor/commit/7cefcd7b91b72f3fe697d7dccadfffeee835cb1f))
+* **tests:** fix retry logic ([b0315df](https://github.com/matthewoestreich/js-randomness-predictor/commit/b0315dfd3dda3295151dfea4e8de7a5d1a773dda))
+* **tests:** forgot to add all versions to rand num gen job ([b65f1cf](https://github.com/matthewoestreich/js-randomness-predictor/commit/b65f1cfd6e60290cdf2dbd5a4d712ec2ecc86276))
+* **tests:** improve retry logic ([6fec749](https://github.com/matthewoestreich/js-randomness-predictor/commit/6fec749439241e8439366ae0daedbb595dc456c9))
+* **tests:** improve retry logic ([6bf0a26](https://github.com/matthewoestreich/js-randomness-predictor/commit/6bf0a26a7aaa1b63ac8e5476e82caa24be547402))
+* **tests:** move launch to top level ([afc6ddb](https://github.com/matthewoestreich/js-randomness-predictor/commit/afc6ddbd21d432253653552284e194bcd6a7625b))
+* **tests:** refine caching strategy for chrome and firefox ([a5f3303](https://github.com/matthewoestreich/js-randomness-predictor/commit/a5f330309aa7098c8951cb5b337b43e501ff8eb3))
+* **tests:** remove old tests ([1e7a9aa](https://github.com/matthewoestreich/js-randomness-predictor/commit/1e7a9aaa53159cfc1b8d6f3f4d15255d5845c620))
+* **tests:** rename job ([32b6270](https://github.com/matthewoestreich/js-randomness-predictor/commit/32b6270a1d6d821907853baa06409d8de6b4bc29))
+* **tests:** restructure job order ([c350fcd](https://github.com/matthewoestreich/js-randomness-predictor/commit/c350fcda8777cd4419efea386bfa839ce47ae4c8))
+* **tests:** restructure job order ([b0687c2](https://github.com/matthewoestreich/js-randomness-predictor/commit/b0687c2f98f07610648c15684c3a4d99f1e78954))
+* **tests:** run safari test in container ([a075b03](https://github.com/matthewoestreich/js-randomness-predictor/commit/a075b035763f0e14c5dd5239fcb70947b9d4c8ea))
+* **tests:** run safari test in container ([ae32a8c](https://github.com/matthewoestreich/js-randomness-predictor/commit/ae32a8c9c17256eb88c40d3e96e5a23054c1a2fa))
+* **tests:** run safari test in container ([351860e](https://github.com/matthewoestreich/js-randomness-predictor/commit/351860e83f6d5bc5f546aac9d08c55dec0c5750d))
+* **tests:** start optimizing workflow logic ([d8ad545](https://github.com/matthewoestreich/js-randomness-predictor/commit/d8ad545defe5ed7e8cdd8eacb977c653d3f315fa))
+* **tests:** testing firefox ([eed0b36](https://github.com/matthewoestreich/js-randomness-predictor/commit/eed0b362cf477e2a2520b307104a51d17c9230bd))
+* **tests:** testing firefox ([72e4f65](https://github.com/matthewoestreich/js-randomness-predictor/commit/72e4f65928ccd851c69025b43702dcff9c1bae1b))
+* **tests:** testing safari ([5c40c68](https://github.com/matthewoestreich/js-randomness-predictor/commit/5c40c682eb1efcfef6cbb43e92cd1fa5926dd55d))
+* **tests:** testing safari ([6f365df](https://github.com/matthewoestreich/js-randomness-predictor/commit/6f365dfc393e72b781bfabe620331c8f7b55d73e))
+* **tests:** testing safari ([9dfa4e7](https://github.com/matthewoestreich/js-randomness-predictor/commit/9dfa4e7707a64eebb7b93099b9ebe8eda796294b))
+* **tests:** testing safari ([2284aea](https://github.com/matthewoestreich/js-randomness-predictor/commit/2284aeae383dd07e14d95823d2ced09f3196486c))
+* **tests:** troubleshoot ([40b4c7e](https://github.com/matthewoestreich/js-randomness-predictor/commit/40b4c7e4e100b6ea9d084289fdb09a8030f796c3))
+* **tests:** troubleshoot cli ([6520684](https://github.com/matthewoestreich/js-randomness-predictor/commit/6520684f5f6a58e2ea23cbe23913a67e2c80b4c7))
+* **tests:** troubleshoot cli ([c4593fa](https://github.com/matthewoestreich/js-randomness-predictor/commit/c4593faf627a93393f95022bb2fe67675dbecd7f))
+* **tests:** troubleshoot schedule ([ee7e02b](https://github.com/matthewoestreich/js-randomness-predictor/commit/ee7e02b63b69a93e93de707fbfa39269208634b8))
+* **tests:** troubleshoot schedule ([f55c545](https://github.com/matthewoestreich/js-randomness-predictor/commit/f55c545da0d036ebc79e422fd6440028dd51acdd))
+* **tests:** troubleshoot schedule ([4065c3f](https://github.com/matthewoestreich/js-randomness-predictor/commit/4065c3fd34061cecb690204d7286487baeb2790f))
+* **tests:** troubleshoot schedule ([06ce4dc](https://github.com/matthewoestreich/js-randomness-predictor/commit/06ce4dc554adf0220f4e850fe9da19ff43abebe8))
+* **tests:** troubleshoot schedule ([cf769f9](https://github.com/matthewoestreich/js-randomness-predictor/commit/cf769f9ef777c7594758e31f0b9dd8783f3af609))
+* **tests:** troubleshoot schedule ([42f40dd](https://github.com/matthewoestreich/js-randomness-predictor/commit/42f40ddec32491cbc809b81bed5eb7406bf99f62))
+* **tests:** upgrade actions versions ([c29358f](https://github.com/matthewoestreich/js-randomness-predictor/commit/c29358f14557b0eae86bcd2be41309785d6ceef1))
+* **workflow:** instead of testing all browsers in a single job, create a job per browser ([2985c54](https://github.com/matthewoestreich/js-randomness-predictor/commit/2985c54ff4cadfd31b65e7172e49ac882e7bc605))
+* **workflows:** rename old workflow file to txt. keeping it for now to use as a reference ([1509b6b](https://github.com/matthewoestreich/js-randomness-predictor/commit/1509b6b04cd4039c0f7d57b976023a816c98c504))
+* **workflows:** separate tests and release workflows, clean up release workflow ([10630a3](https://github.com/matthewoestreich/js-randomness-predictor/commit/10630a3880339fd29bb7da358137396f0202fae7))
+
 ### [4.0.4](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.3...4.0.4) (2026-10-04)
 
 
