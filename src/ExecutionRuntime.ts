@@ -7,10 +7,12 @@ export default class ExecutionRuntime {
   private constructor() {}
 
   static isDeno(): boolean {
-    // @ts-ignore
     return (
+      // @ts-ignore
       typeof globalThis.Deno !== "undefined" &&
+      // @ts-ignore
       typeof Deno.version !== "undefined" &&
+      // @ts-ignore
       typeof Deno.version.deno === "string"
     );
   }
