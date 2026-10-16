@@ -15,7 +15,12 @@ const CHROME_STRATEGIES: SolvingStrategy[] = [
     toDouble: (concreteState: Pair<bigint>): number => {
       return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
@@ -32,7 +37,12 @@ const CHROME_STRATEGIES: SolvingStrategy[] = [
       const random = uint64(concreteState[0] + concreteState[1]);
       return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       const sum = symbolicState[0].add(symbolicState[1]);
       solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
@@ -53,7 +63,12 @@ const CHROME_STRATEGIES: SolvingStrategy[] = [
       // Calculate next prediction, using first item in concrete state, before modifying concrete state.
       return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       const sum = symbolicState[0].add(symbolicState[1]);
       solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },

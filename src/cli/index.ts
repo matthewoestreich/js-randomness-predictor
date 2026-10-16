@@ -127,7 +127,8 @@ function makeCommand(): CommandModule<{}, CliArgs> {
         })
         .option("export", {
           alias: "x",
-          describe: "File path to export results. Must be to a .json file. Path relative to current working directory!",
+          describe:
+            "File path to export results. Must be to a .json file. Path relative to current working directory!",
           type: "string",
         })
         .option("force", {
@@ -252,7 +253,9 @@ function computePredictionCount(argv: CliArgs, result: CliResult): number {
 
   // Check if sequence.length by itself is >= 64. If so, that's an error bc we have no room for predictions.
   if (result.sequence.length >= V8_MAX_PREDICTIONS) {
-    throw new Error(`Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${result.sequence.length}'`);
+    throw new Error(
+      `Sequence too large! Sequence length must be less than '${V8_MAX_PREDICTIONS}', got '${result.sequence.length}'`,
+    );
   }
 
   // We are within bounds.
@@ -294,7 +297,11 @@ function populateActualResults(argv: CliArgs, result: CliResult, numPredictions:
 /**
  * Make predictions and add them to result
  */
-async function makePredictions(predictor: Predictor, result: CliResult, numPredictions: number): Promise<void> {
+async function makePredictions(
+  predictor: Predictor,
+  result: CliResult,
+  numPredictions: number,
+): Promise<void> {
   for (let i = 0; i < numPredictions; i++) {
     result.predictions.push(await predictor.predictNext());
   }
@@ -329,7 +336,9 @@ function exportResult(argv: CliArgs, result: CliResult): void {
   }
 
   if (fileExists && !argv.force) {
-    result._warnings?.push(`Export path already exists and '--force' was not used! Use '--force' to overwrite existing files.`);
+    result._warnings?.push(
+      `Export path already exists and '--force' was not used! Use '--force' to overwrite existing files.`,
+    );
     return;
   }
 
@@ -349,7 +358,12 @@ function exportResult(argv: CliArgs, result: CliResult): void {
 
 function writeResultsToFile(path: string, result: CliResult): void {
   try {
-    const json: CliResult = { sequence: result.sequence, predictions: result.predictions, actual: result.actual, runtime: result.runtime };
+    const json: CliResult = {
+      sequence: result.sequence,
+      predictions: result.predictions,
+      actual: result.actual,
+      runtime: result.runtime,
+    };
     if (result.isCorrect !== undefined) {
       json.isCorrect = result.isCorrect;
     }

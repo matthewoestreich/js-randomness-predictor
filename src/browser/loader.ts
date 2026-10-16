@@ -26,7 +26,10 @@ export default async function loader(): Promise<void> {
   try {
     const [jsResponse, wasmResponse] = await Promise.all([fetch(Z3_BUILT_JS), fetch(Z3_BUILT_WASM)]);
     if (!jsResponse.ok || !wasmResponse.ok) {
-      console.error("js-randomness-predictor Failed to fetch z3 files", { jsResponse: jsResponse.ok, wasmResponse: wasmResponse.ok });
+      console.error("js-randomness-predictor Failed to fetch z3 files", {
+        jsResponse: jsResponse.ok,
+        wasmResponse: wasmResponse.ok,
+      });
     }
 
     const jsText = await jsResponse.text();

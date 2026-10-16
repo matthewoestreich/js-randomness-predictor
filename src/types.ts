@@ -31,7 +31,12 @@ export type Pair<T> = [T, T];
 export type SymbolicXorShiftFn = (symbolicState: Pair<BitVec>) => void;
 export type ConcreteXorShiftFn = (concreteState: Pair<bigint>) => void;
 export type RecoverMantissaFn = (n: number) => bigint;
-export type ConstrainMantissaFn = (mantissa: bigint, symbolicState: Pair<BitVec>, solver: Solver, context: Context) => void;
+export type ConstrainMantissaFn = (
+  mantissa: bigint,
+  symbolicState: Pair<BitVec>,
+  solver: Solver,
+  context: Context,
+) => void;
 export type ToDoubleFn = (concreteState: Pair<bigint>) => number;
 
 export type CliResult = {

@@ -12,10 +12,14 @@ describe("Execution Runtime : Deno", () => {
   const environment: Runtime = "deno";
   const differentEnvironment: Runtime = "bun";
 
-  it("[dynamic sequence] should not require a sequence if execution runtime matches '--environment'", { skip: false }, async () => {
-    const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
-    assertProcessStatus.equal(result, 0); // Not expecting error code
-  });
+  it(
+    "[dynamic sequence] should not require a sequence if execution runtime matches '--environment'",
+    { skip: false },
+    async () => {
+      const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime, isDryRun: true });
+      assertProcessStatus.equal(result, 0); // Not expecting error code
+    },
+  );
 
   it("should truncate number of predictions when (sequence.length + numPredictions) > 64", () => {
     const seqLength = 4;
@@ -23,14 +27,20 @@ describe("Execution Runtime : Deno", () => {
     const expectedNumPreds = 64 - seqLength;
     const seq = Array.from({ length: seqLength }, Math.random);
     const expected = Array.from({ length: expectedNumPreds }, Math.random);
-    const result = callJsRandomnessPredictorCli({ environment, sequence: seq, predictions: numPreds }, { executionRuntime });
+    const result = callJsRandomnessPredictorCli(
+      { environment, sequence: seq, predictions: numPreds },
+      { executionRuntime },
+    );
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.equal(jsonResult.predictions.length, expectedNumPreds);
     assert.deepStrictEqual(jsonResult.predictions, expected);
   });
 
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${process.env[EXECUTION_RUNTIME_ENV_VAR_KEY]})`, async () => {
-    const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
+    const result = callJsRandomnessPredictorCli(
+      { environment: differentEnvironment },
+      { executionRuntime, isDryRun: true },
+    );
     assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
   });
 
@@ -62,7 +72,10 @@ describe("Execution Runtime : Deno", () => {
     // https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
     it("should trigger pool exhaustion", () => {
       const seq = Array.from({ length: 64 }, Math.random);
-      const result = callJsRandomnessPredictorCli({ environment, sequence: seq }, { executionRuntime, isDryRun: true });
+      const result = callJsRandomnessPredictorCli(
+        { environment, sequence: seq },
+        { executionRuntime, isDryRun: true },
+      );
       // This only throws bc the sequence eats up the pool, therefore we have no room for predictions
       // so we can't even truncate predictions to fit bounds.
       assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
@@ -79,7 +92,11 @@ describe("Execution Runtime : Deno", () => {
         { isDryRun: true, executionRuntime },
       );
       const json = JSON.parse(result.stdout);
-      assert.equal(json._warnings?.length, 0, `\n\nGOT WARNINGS:\n${json._warnings?.reduce((a: string, s: string) => (a += s + ", "), "")}\n`);
+      assert.equal(
+        json._warnings?.length,
+        0,
+        `\n\nGOT WARNINGS:\n${json._warnings?.reduce((a: string, s: string) => (a += s + ", "), "")}\n`,
+      );
     });
   });
 });

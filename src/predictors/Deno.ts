@@ -18,7 +18,12 @@ const DENO_STRATEGIES: SolvingStrategy[] = [
       // Calculate next prediction, using first item in concrete state, before modifying concrete state.
       return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
@@ -36,7 +41,12 @@ const DENO_STRATEGIES: SolvingStrategy[] = [
       // Calculate next prediction, using first item in concrete state, before modifying concrete state.
       return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       const sum = symbolicState[0].add(symbolicState[1]);
       solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
@@ -57,7 +67,12 @@ const DENO_STRATEGIES: SolvingStrategy[] = [
       // Calculate next prediction, using first item in concrete state, before modifying concrete state.
       return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       const sum = symbolicState[0].add(symbolicState[1]);
       solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
@@ -71,7 +86,9 @@ export default class DenoRandomnessPredictor extends V8Predictor {
   constructor(sequence?: number[]) {
     if (!sequence) {
       if (!ExecutionRuntime.isDeno()) {
-        throw new UnexpectedRuntimeError("Expected Deno runtime! Unable to auto-generate sequence, please provide one.");
+        throw new UnexpectedRuntimeError(
+          "Expected Deno runtime! Unable to auto-generate sequence, please provide one.",
+        );
       }
       sequence = Array.from({ length: 4 }, Math.random);
     }

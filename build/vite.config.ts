@@ -50,7 +50,9 @@ function createBuildOptions(target: BuildTarget): BuildEnvironmentOptions {
         },
       };
     default:
-      throw new Error(`[vite] Unknown build target in 'process.env.BUILD_TARGET'. Expected one of '${BUILD_TARGETS.join(", ")}' got '${target}'`);
+      throw new Error(
+        `[vite] Unknown build target in 'process.env.BUILD_TARGET'. Expected one of '${BUILD_TARGETS.join(", ")}' got '${target}'`,
+      );
   }
 }
 

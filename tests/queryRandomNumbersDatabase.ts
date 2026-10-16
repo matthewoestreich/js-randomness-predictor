@@ -25,10 +25,14 @@ function tagsAreEqual(a: Tags, b: Tags): boolean {
 export default function queryRandomNumbersDatabase(query: DatabaseQuery): SequenceAndExpected {
   // Filter database by runtime and optional version
   const candidates = randomNumbersDatabase.filter(
-    (entry) => entry.runtime === query.runtime && (query.runtimeVersion === undefined || entry.runtimeVersion === query.runtimeVersion),
+    (entry) =>
+      entry.runtime === query.runtime &&
+      (query.runtimeVersion === undefined || entry.runtimeVersion === query.runtimeVersion),
   );
 
-  const matches = candidates.flatMap((c) => c.randomNumbers).filter((rn) => tagsAreEqual(rn.tags, query.tags));
+  const matches = candidates
+    .flatMap((c) => c.randomNumbers)
+    .filter((rn) => tagsAreEqual(rn.tags, query.tags));
 
   if (matches.length === 1) {
     return matches[0];

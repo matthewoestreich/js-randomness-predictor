@@ -28,7 +28,10 @@ describe("Execution Runtime : Node", () => {
   });
 
   it(`results show execution runtime type is node`, async () => {
-    const result = callJsRandomnessPredictorCli({ environment }, { executionRuntime: "node", isDryRun: true });
+    const result = callJsRandomnessPredictorCli(
+      { environment },
+      { executionRuntime: "node", isDryRun: true },
+    );
     const jsonResult = JSON.parse(result.stdout.toString()) as CliResult;
     const expectedRuntime: Runtime = "node";
     assert.equal(jsonResult.runtime, expectedRuntime);
@@ -50,9 +53,16 @@ describe("Execution Runtime : Node", () => {
     // but specifying an environment that does NOT have this limitation (bun), we do not trigger the limit.
     it("should NOT trigger pool exhaustion", async () => {
       const { sequence, expected } = queryDb({ runtime: "bun", tags: { sequence64: true } });
-      const result = callJsRandomnessPredictorCli({ environment: "bun", sequence, predictions: expected.length }, { isDryRun: true });
+      const result = callJsRandomnessPredictorCli(
+        { environment: "bun", sequence, predictions: expected.length },
+        { isDryRun: true },
+      );
       const json = JSON.parse(result.stdout);
-      assert.equal(json._warnings?.length, 0, `\n\nGOT WARNINGS:\n${json._warnings?.reduce((a: string, s: string) => (a += s + ", "), "")}\n`);
+      assert.equal(
+        json._warnings?.length,
+        0,
+        `\n\nGOT WARNINGS:\n${json._warnings?.reduce((a: string, s: string) => (a += s + ", "), "")}\n`,
+      );
     });
   });
 });

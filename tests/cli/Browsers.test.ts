@@ -30,7 +30,10 @@ describe("Browsers", () => {
     });
 
     it(`should predict accurately using numbers after Jan 2026 update`, async () => {
-      const { sequence, expected } = queryDb({ runtime: environment, tags: { afterJanuary2026Update: true } });
+      const { sequence, expected } = queryDb({
+        runtime: environment,
+        tags: { afterJanuary2026Update: true },
+      });
       const result = callJsRandomnessPredictorCli({ environment, sequence, predictions: expected.length });
       const jsonResult = JSON.parse(result.stdout.toString());
       assert.deepStrictEqual(jsonResult.predictions, expected);

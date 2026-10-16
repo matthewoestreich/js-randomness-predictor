@@ -24,7 +24,12 @@ const STRATEGY_BASE = {
     const n = uint64(concreteState[0] + concreteState[1]);
     return Number(n & MANTISSA_53_BITS_MASK) / SCALING_FACTOR_53_BIT_INT;
   },
-  constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+  constrainMantissa: (
+    mantissa: bigint,
+    symbolicState: Pair<z3.BitVec>,
+    solver: z3.Solver,
+    context: z3.Context,
+  ): void => {
     const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(MANTISSA_53_BITS_MASK, 64));
     solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
   },
@@ -48,11 +53,15 @@ const BUN_STRATEGIES: SolvingStrategy[] = [
 export default class BunRandomnessPredictor extends JavaScriptCorePredictor {
   constructor(sequence?: number[]) {
     if (sequence && sequence.length < MIN_SEQUENCE_LEN) {
-      throw new InsufficientSequenceLengthError(`sequence length must be >= ${MIN_SEQUENCE_LEN} : got ${sequence.length}`);
+      throw new InsufficientSequenceLengthError(
+        `sequence length must be >= ${MIN_SEQUENCE_LEN} : got ${sequence.length}`,
+      );
     }
     if (!sequence) {
       if (!ExecutionRuntime.isBun()) {
-        throw new UnexpectedRuntimeError("Expected Bun runtime! Unable to auto-generate sequence, please provide one.");
+        throw new UnexpectedRuntimeError(
+          "Expected Bun runtime! Unable to auto-generate sequence, please provide one.",
+        );
       }
       sequence = callMathRandom(MIN_SEQUENCE_LEN);
     }

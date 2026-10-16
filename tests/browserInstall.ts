@@ -1,4 +1,10 @@
-import { install, detectBrowserPlatform, resolveBuildId, Browser, BrowserPlatform } from "@puppeteer/browsers";
+import {
+  install,
+  detectBrowserPlatform,
+  resolveBuildId,
+  Browser,
+  BrowserPlatform,
+} from "@puppeteer/browsers";
 
 /**
  * This script is meant to install puppeteer browsers, mostly for GitHub Actions. You can also run
@@ -20,7 +26,9 @@ if (!process.env.BROWSER_TYPE || !process.env.VERSION_OR_TAG || !process.env.CAC
 const ALLOWED_BROWSER_TYPES = ["chrome", "firefox"];
 
 if (!ALLOWED_BROWSER_TYPES.includes(process.env.BROWSER_TYPE)) {
-  throw new Error(`Invalid process.env.BROWSER_TYPE! Must be one of ${JSON.stringify(ALLOWED_BROWSER_TYPES)}`);
+  throw new Error(
+    `Invalid process.env.BROWSER_TYPE! Must be one of ${JSON.stringify(ALLOWED_BROWSER_TYPES)}`,
+  );
 }
 
 try {

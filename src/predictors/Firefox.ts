@@ -14,7 +14,12 @@ const FIREFOX_STRATEGIES: SolvingStrategy[] = [
       const n = uint64(concreteState[0] + concreteState[1]);
       return Number(n & MANTISSA_53_BITS_MASK) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       const sum = symbolicState[0].add(symbolicState[1]).and(context!.BitVec.val(MANTISSA_53_BITS_MASK, 64));
       solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
     },

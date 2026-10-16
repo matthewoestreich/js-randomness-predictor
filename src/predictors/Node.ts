@@ -5,7 +5,12 @@ import XorShift128Plus from "../XorShift128Plus.js";
 import ExecutionRuntime from "../ExecutionRuntime.js";
 import V8Predictor from "./engines/V8.js";
 import uint64 from "../uint64.js";
-import { EXPONENT_BITS_MASK, MANTISSA_52_BITS_MASK, MIN_SEQUENCE_LENGTH, SCALING_FACTOR_53_BIT_INT } from "../constants.js";
+import {
+  EXPONENT_BITS_MASK,
+  MANTISSA_52_BITS_MASK,
+  MIN_SEQUENCE_LENGTH,
+  SCALING_FACTOR_53_BIT_INT,
+} from "../constants.js";
 
 // See here for why MAX_SEQUENCE_LENGTH is needed: https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/KNOWN_ISSUES.md#random-number-pool-exhaustion
 const MAX_SEQUENCE_LENGTH = 64;
@@ -24,7 +29,12 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
       const random = uint64(concreteState[0] + concreteState[1]);
       return Number(random >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       const sum = symbolicState[0].add(symbolicState[1]);
       solver.add(sum.lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
@@ -43,7 +53,12 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
       // Calculate next random number before we modify concrete state.
       return Number(concreteState[0] >> 11n) / SCALING_FACTOR_53_BIT_INT;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       solver.add(symbolicState[0].lshr(11).eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
@@ -64,7 +79,12 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
       // Calculate next random number before we modify concrete state.
       return buffer.readDoubleLE(0) - 1;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       solver.add(symbolicState[0].lshr(12).eq(context.BitVec.val(mantissa, 64)));
     },
     symbolicXorShift: (s: Pair<z3.BitVec>): void => XorShift128Plus.symbolic(s),
@@ -91,7 +111,12 @@ const NODE_STRATEGIES: SolvingStrategy[] = [
       // Calculate next random number before we modify concrete state.
       return buffer.readDoubleLE(0) - 1;
     },
-    constrainMantissa: (mantissa: bigint, symbolicState: Pair<z3.BitVec>, solver: z3.Solver, context: z3.Context): void => {
+    constrainMantissa: (
+      mantissa: bigint,
+      symbolicState: Pair<z3.BitVec>,
+      solver: z3.Solver,
+      context: z3.Context,
+    ): void => {
       const sum = symbolicState[0].add(symbolicState[1]).and(context.BitVec.val(MANTISSA_52_BITS_MASK, 64));
       solver.add(sum.eq(context.BitVec.val(mantissa, 64)));
     },
@@ -105,16 +130,22 @@ export default class NodeRandomnessPredictor extends V8Predictor {
   constructor(sequence?: number[]) {
     if (sequence) {
       if (sequence.length >= MAX_SEQUENCE_LENGTH) {
-        throw new Error(`sequence.length must be less than '${MAX_SEQUENCE_LENGTH}', got '${sequence.length}'`);
+        throw new Error(
+          `sequence.length must be less than '${MAX_SEQUENCE_LENGTH}', got '${sequence.length}'`,
+        );
       }
       if (sequence.length < MIN_SEQUENCE_LENGTH.node) {
-        throw new Error(`sequence.length must be at least '${MIN_SEQUENCE_LENGTH.node}', got '${sequence.length}'`);
+        throw new Error(
+          `sequence.length must be at least '${MIN_SEQUENCE_LENGTH.node}', got '${sequence.length}'`,
+        );
       }
     }
 
     if (!sequence) {
       if (!ExecutionRuntime.isNode()) {
-        throw new UnexpectedRuntimeError("Expected NodeJS runtime! Unable to auto-generate sequence, please provide one.");
+        throw new UnexpectedRuntimeError(
+          "Expected NodeJS runtime! Unable to auto-generate sequence, please provide one.",
+        );
       }
       sequence = Array.from({ length: MIN_SEQUENCE_LENGTH.node }, Math.random);
     }

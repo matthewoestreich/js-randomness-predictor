@@ -10,7 +10,10 @@ const JSRP_CLI_PATH = nodepath.resolve(import.meta.dirname, "../../dist/cli/inde
  * @param {PredictorArgs} args
  * @param {CliEnvironmentArgs} extendedOptions : misc environmental options unrelated to CLI args. Not to be confused with env vars.
  */
-export default function callJsRandomnessPredictorCli(args: CliArgs, extendedOptions?: CliEnvironmentArgs): SpawnSyncReturns<string> {
+export default function callJsRandomnessPredictorCli(
+  args: CliArgs,
+  extendedOptions?: CliEnvironmentArgs,
+): SpawnSyncReturns<string> {
   if (!extendedOptions?.jsRandomnessPredictorCliPath) {
     (extendedOptions ||= {}).jsRandomnessPredictorCliPath = JSRP_CLI_PATH;
   }

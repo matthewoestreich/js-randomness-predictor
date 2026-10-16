@@ -8,12 +8,20 @@ export default class ExecutionRuntime {
 
   static isDeno(): boolean {
     // @ts-ignore
-    return typeof globalThis.Deno !== "undefined" && typeof Deno.version !== "undefined" && typeof Deno.version.deno === "string";
+    return (
+      typeof globalThis.Deno !== "undefined" &&
+      typeof Deno.version !== "undefined" &&
+      typeof Deno.version.deno === "string"
+    );
   }
 
   static isBun(): boolean {
     // @ts-ignore
-    return typeof globalThis.Bun !== "undefined" && typeof Bun.version !== "undefined" && typeof process.versions.bun === "string";
+    return (
+      typeof globalThis.Bun !== "undefined" &&
+      typeof Bun.version !== "undefined" &&
+      typeof process.versions.bun === "string"
+    );
   }
 
   static isNode(): boolean {

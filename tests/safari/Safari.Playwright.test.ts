@@ -19,7 +19,8 @@ let safari: Browser;
 try {
   safari = await webkit.launch();
 } catch (err: unknown) {
-  let message = "WebKit/Safari install not found!\nPlease run `npx playwright install webkit --with-deps` to install it and try again!";
+  let message =
+    "WebKit/Safari install not found!\nPlease run `npx playwright install webkit --with-deps` to install it and try again!";
   if (err instanceof Error) {
     message = `${err.message}\nOr ${message}`;
   }

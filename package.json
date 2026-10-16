@@ -83,7 +83,7 @@
   "prettier": {
     "semi": true,
     "singleQuote": false,
-    "printWidth": 150
+    "printWidth": 110
   },
   "scripts": {
     "prepublishOnly": "npm run build",

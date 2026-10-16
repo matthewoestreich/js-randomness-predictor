@@ -15,7 +15,9 @@ export async function init(): Promise<Z3Api> {
   }
 
   if (!window.initZ3 || !window.Module) {
-    throw new Error("Z3 not initialized properly! window.initZ3 and window.Module should be set via IIFE in entry!");
+    throw new Error(
+      "Z3 not initialized properly! window.initZ3 and window.Module should be set via IIFE in entry!",
+    );
   }
 
   const initZ3 = window.initZ3;

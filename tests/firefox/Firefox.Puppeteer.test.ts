@@ -2,7 +2,13 @@ import JSRandomnessPredictor from "../../dist/esm/index.js";
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import puppeteer, { Page, Browser as PuppeteerBrowser } from "puppeteer";
-import { computeExecutablePath, detectBrowserPlatform, resolveBuildId, Browser as PuppeteerBrowserKind, BrowserPlatform } from "@puppeteer/browsers";
+import {
+  computeExecutablePath,
+  detectBrowserPlatform,
+  resolveBuildId,
+  Browser as PuppeteerBrowserKind,
+  BrowserPlatform,
+} from "@puppeteer/browsers";
 
 /**
  * If you want to use parameters for this script you'll need to set specific env vars.

@@ -67,17 +67,25 @@ function parseArgIntoJson() {
   }
   const relativePath = argv[0];
   if (!relativePath.endsWith(".json")) {
-    throw new Error(`Expected json file path! ${red(`Got ${relativePath}\n Usage:\n${program} /some/json/file.json\n`)}`);
+    throw new Error(
+      `Expected json file path! ${red(`Got ${relativePath}\n Usage:\n${program} /some/json/file.json\n`)}`,
+    );
   }
   const absolutePath = nodepath.resolve(import.meta.dirname, relativePath);
   if (!nodefs.existsSync(absolutePath)) {
-    throw new Error(`JSON file does not exist at path! ${red(`Got ${absolutePath}\n Usage:\n${program} /some/json/file.json\n`)}`);
+    throw new Error(
+      `JSON file does not exist at path! ${red(`Got ${absolutePath}\n Usage:\n${program} /some/json/file.json\n`)}`,
+    );
   }
   return JSON.parse(nodefs.readFileSync(absolutePath, "utf-8"));
 }
 
 function logSuccess() {
-  console.log(`\n\n${blue(hashtags(75))}` + green("\n\tSuccess! All commands ran without error!\n") + `${blue(hashtags(75))}\n\n`);
+  console.log(
+    `\n\n${blue(hashtags(75))}` +
+      green("\n\tSuccess! All commands ran without error!\n") +
+      `${blue(hashtags(75))}\n\n`,
+  );
 }
 
 function hashtags(n = 10) {

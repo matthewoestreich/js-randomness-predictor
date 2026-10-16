@@ -11,7 +11,11 @@ describe("Engine : V8", () => {
     assert.equal(sequence_size + expected_size, V8_MAX_PREDICTIONS);
     const sequence = Array.from({ length: sequence_size }, Math.random);
     const expected = Array.from({ length: expected_size }, Math.random);
-    const result = callJsRandomnessPredictorCli({ environment: "node", sequence, predictions: expected.length });
+    const result = callJsRandomnessPredictorCli({
+      environment: "node",
+      sequence,
+      predictions: expected.length,
+    });
     const jsonResult = JSON.parse(result.stdout.toString());
     assert.equal(jsonResult.predictions.length + jsonResult.sequence.length, V8_MAX_PREDICTIONS);
     assert.deepStrictEqual(jsonResult.predictions, expected);

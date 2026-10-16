@@ -18,7 +18,10 @@ describe("Execution Runtime : Bun", () => {
   });
 
   it(`should require a sequence if '--environemnt' value ('${differentEnvironment}') differs from '${EXECUTION_RUNTIME_ENV_VAR_KEY}' value (${executionRuntime})`, () => {
-    const result = callJsRandomnessPredictorCli({ environment: differentEnvironment }, { executionRuntime, isDryRun: true });
+    const result = callJsRandomnessPredictorCli(
+      { environment: differentEnvironment },
+      { executionRuntime, isDryRun: true },
+    );
     assertProcessStatus.notEqual(result, 0); // Any non-zero status signals an error (we are expecting an error)
   });
 

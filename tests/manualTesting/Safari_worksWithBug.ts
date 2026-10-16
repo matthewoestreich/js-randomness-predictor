@@ -119,7 +119,12 @@ export default class SafariRandomnessPredictor_worksWithBug {
    * Given solved initial state, advance it through the observed sequence length
    * and return an array of the next `count` predicted doubles (matching your C++ get()).
    */
-  static predictFromSolvedState(initialLow: bigint, initialHigh: bigint, observedLen: number, predictCount = 10): number[] {
+  static predictFromSolvedState(
+    initialLow: bigint,
+    initialHigh: bigint,
+    observedLen: number,
+    predictCount = 10,
+  ): number[] {
     let low = initialLow;
     let high = initialHigh;
 
