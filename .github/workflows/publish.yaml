@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release: ${{ steps.check.outputs.release }}
+      version: ${{ steps.check.outputs.version }}
 
     steps:
       - name: Checkout repository
@@ -29,9 +30,11 @@ jobs:
           if [[ "$PREVIOUS_VERSION" != "$CURRENT_VERSION" ]]; then
             echo "Release detected: $PREVIOUS_VERSION -> $CURRENT_VERSION"
             echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
           else
             echo "No version change detected."
             echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "version=" >> "$GITHUB_OUTPUT"
           fi
 
   publish:
@@ -40,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       id-token: write
 
     steps:
@@ -59,3 +62,13 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --access public
+
+      - name: Create and push Git tag
+        env:
+          VERSION: ${{ needs.check-release.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin "$VERSION"
