@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.5...4.1.0) (2026-11-01)
+
+
+### Features
+
+* **node:** add solving strat for nodejs 27 ([baf80a6](https://github.com/matthewoestreich/js-randomness-predictor/commit/baf80a663d8628e66fa1430d95d9df6086370018))
+
+
+### CI
+
+* **formatting:** put each version on own line ([94de78b](https://github.com/matthewoestreich/js-randomness-predictor/commit/94de78b9e24803c8fa495a527d5a601ab7b2ae21))
+* **release:** fine tune release workflow ([514ed1f](https://github.com/matthewoestreich/js-randomness-predictor/commit/514ed1f32188bf4d62d6f2937748dedaaf2b2e60))
+* **tags:** fix tag ([a0b6039](https://github.com/matthewoestreich/js-randomness-predictor/commit/a0b6039f328072611a311e1a27d905294d507eef))
+
+
+### Styles
+
+* comments ([1fc1929](https://github.com/matthewoestreich/js-randomness-predictor/commit/1fc1929fb2c7d114c8af9c93fc146a51c13e22ae))
+
+
+### Chores
+
+* **deps-dev:** bump playwright from 1.64.0 to 1.64.1 ([6e5c0c0](https://github.com/matthewoestreich/js-randomness-predictor/commit/6e5c0c0af73c94019584b6f9f1ee82e4d2473790))
+
 ### [4.0.5](https://github.com/matthewoestreich/js-randomness-predictor/compare/4.0.4...4.0.5) (2026-10-16)
 
 
