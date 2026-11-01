@@ -45,7 +45,7 @@ import { UnsatError } from "../../errors.js";
  *    - V8 updated their Math.random implementation in the following commit:
  *        - https://source.chromium.org/chromium/_/chromium/v8/v8/+/0596ead5b04f5988d7742c2a4559637a4f81b849
  *
- * MAY 2026 UPDATE (Deno v2.9.7ish)
+ * MAY 2026 UPDATE (Deno v2.9.7ish, Node v27ish)
  *    - Commit: https://source.chromium.org/chromium/_/chromium/v8/v8/+/99f606174481f6e2f4809c4262122a30a25583af
  *    - V8 changed Math.random cache population order, meaning we do not need to reverse the sequence!
  *    ```
