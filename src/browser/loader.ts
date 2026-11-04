@@ -22,11 +22,13 @@
 let initialization: Promise<void> | undefined;
 
 export default async function loader(): Promise<void> {
-  try {
-    initialization = initializeLoader();
-  } catch (e: unknown) {
-    initialization = undefined;
-    throw e;
+  if (!initialization) {
+    try {
+      initialization = initializeLoader();
+    } catch (e: unknown) {
+      initialization = undefined;
+      throw e;
+    }
   }
 
   return initialization;
