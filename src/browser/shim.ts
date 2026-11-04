@@ -1,13 +1,15 @@
+/**
+ * TLDR; for browser builds, this file is the entry point when importing js-randomness-predictor!
+ *
+ * For our browser builds we need to override the default Z3 API.  Vite uses a "resolve.alias"
+ * rule to replace the default import to this file.
+ *
+ * Our "loader" step, which at the time of writing this comment is located at src/browser/loader.ts,
+ * is what sets up the global "window" variables that are used in this function.
+ */
+
 import { Z3Api } from "../types.js";
 
-/**
- * For our browser builds we need to override the default Z3 API.
- * Vite uses a "resolve.alias" rule to replace the default import
- * to this.
- *
- * Our "js-randomness-predictor-loader" is what sets up the global "window"
- * variables that are used in this function.
- */
 let CACHED_Z3API: Z3Api | undefined = undefined;
 export async function init(): Promise<Z3Api> {
   if (CACHED_Z3API) {

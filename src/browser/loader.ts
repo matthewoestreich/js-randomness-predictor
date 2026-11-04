@@ -1,24 +1,26 @@
-//
-// TLDR; This loader is what allows us to use Z3 via a CDN.
-//
-// It sets up `window.initZ3` and `window.Module` variables so that we can tap into them while initializing our predictors.
-// So now anyone that uses js-randomness-predictor via <script> tag doesn't have to worry about loading Z3 on their own
-// servers.
-//
-// Normally, you have to host the z3-built.js and z3-built.wasm files on the same domain as your website due to:
-// 1) how z3 looks for the built files (which is not easy to change, hence why we are using a cusotm fork of z3)..
-// 2) web/service workers not being able to load the "main" script (z3-built.js) cross-origin
-//
-// The cross-origin error was something like :
-//    "Failed to construct 'Worker': Script at '<cdn_url>/z3-built.js' cannot be accessed from origin 'http://localhost:5555'"
-// From there, the issue was getting our predictors (which are tailored to using Node) to recognize the same z3 "Module". Which
-// is what the shim solves.
-//
-// That is what this loader solves. It fetches the z3-built.js file and loads it as a <script> on "this" page via a blob url.
-// So now the worker script is also at "locahost:5555" (or whatever page "this" is)..
-//
-// There are still a ton ov caveats with Z3, though...
-//
+/**
+ * TLDR; This loader is what allows us to use Z3 via a CDN.
+ *
+ * It sets up `window.initZ3` and `window.Module` variables so that we can tap into them while initializing our predictors.
+ * So now anyone that uses js-randomness-predictor via a <script> tag doesn't have to worry about loading Z3 on their own
+ * servers.
+ *
+ * Normally, you have to host the z3-built.js and z3-built.wasm files on the same domain as your website due to:
+ * 1) How Z3 looks for the built files (which is not easy to change, hence why we are using a custom fork of Z3).
+ * 2) Web/service workers not being able to load the "main" script (z3-built.js) cross-origin.
+ *
+ * The cross-origin error was something like:
+ * "Failed to construct 'Worker': Script at '<cdn_url>/z3-built.js' cannot be accessed from origin 'http://localhost:5555'"
+ *
+ * From there, the issue was getting our predictors (which are tailored to using Node) to recognize the same Z3 "Module".
+ * Which is what the shim solves.
+ *
+ * That is what this loader solves. It fetches the z3-built.js file and loads it as a <script> on "this" page via a blob URL.
+ * So now the worker script is also at "localhost:5555" (or whatever page "this" is).
+ *
+ * There are still a ton of caveats with Z3, though...
+ */
+
 let initialization: Promise<void> | undefined;
 
 export default async function loader(): Promise<void> {
