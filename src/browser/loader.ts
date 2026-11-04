@@ -19,17 +19,31 @@
 //
 // There are still a ton ov caveats with Z3, though...
 //
+let initialization: Promise<void> | undefined;
+
 export default async function loader(): Promise<void> {
+  try {
+    initialization = initializeLoader();
+  } catch (e: unknown) {
+    initialization = undefined;
+    throw e;
+  }
+
+  return initialization;
+}
+
+async function initializeLoader(): Promise<void> {
   const Z3_BUILT_JS = "https://z3-tawny.vercel.app/z3-built.js";
   const Z3_BUILT_WASM = "https://z3-tawny.vercel.app/z3-built.wasm";
 
   try {
     const [jsResponse, wasmResponse] = await Promise.all([fetch(Z3_BUILT_JS), fetch(Z3_BUILT_WASM)]);
-    if (!jsResponse.ok || !wasmResponse.ok) {
-      console.error("js-randomness-predictor Failed to fetch z3 files", {
-        jsResponse: jsResponse.ok,
-        wasmResponse: wasmResponse.ok,
-      });
+
+    if (!jsResponse.ok) {
+      throw new Error(`Failed to fetch Z3 JavaScript: HTTP ${jsResponse.status}`);
+    }
+    if (!wasmResponse.ok) {
+      throw new Error(`Failed to fetch Z3 WASM: HTTP ${wasmResponse.status}`);
     }
 
     const jsText = await jsResponse.text();
@@ -46,6 +60,9 @@ export default async function loader(): Promise<void> {
       onRuntimeInitialized: () => {
         console.log("js-randomness-predictor initialized.");
       },
+      onAbort: (reason: unknown) => {
+        throw new Error(`js-randomness-predictor aborted initialization! ${String(reason)}`);
+      },
       wasmBinaryFile: Z3_BUILT_WASM,
       mainScriptUrlOrBlob,
     };
@@ -61,7 +78,7 @@ export default async function loader(): Promise<void> {
     (function initialize() {
       try {
         // @ts-ignore
-        // initZ3 comes from 'z3-built.js', which is the name emscripten gives to it's glue code.
+        // `initZ3` comes from 'z3-built.js' (lives in the `z3-solver-jsrp` package/dependency), which is the name emscripten gives to it's glue code.
         if (typeof initZ3 === "undefined") {
           setTimeout(() => initialize(), 300);
         } else {
@@ -73,10 +90,14 @@ export default async function loader(): Promise<void> {
           }
         }
       } catch (e) {
-        console.error("js-randomness-predictor something went wrong during initialize()", e);
+        throw new Error("js-randomness-predictor something went wrong during initialize()", {
+          cause: e,
+        });
       }
     })();
   } catch (error) {
-    console.error("js-randomness-predictor an error occurred during loading:", error);
+    throw new Error("js-randomness-predictor an error occurred during loading:", {
+      cause: error,
+    });
   }
 }

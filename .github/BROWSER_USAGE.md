@@ -8,8 +8,6 @@ You need to configure specific response headers for any route/page that uses `js
 
 Our core dependency, Z3, is written in C++ and uses PThreads (multithreaded), which is ultimately compiled to WebAssembly (aka WASM). You need COOP (Cross-Origin Opener Policy) and COEP (Cross-Origin Embedder Policy) headers when using WebAssembly modules that rely on `SharedArrayBuffer` — or, more generally, when your WASM code depends on shared memory, threading, or features that use Atomics (such as PThreads).
 
----
-
 # Demos
 
 [We have plenty of examples here](https://github.com/matthewoestreich/js-randomness-predictor-demos/tree/main), which show you how to use `js-randomness-predictor` in the browser.
@@ -24,6 +22,8 @@ If you are using a framework this applies to you (eg. React, Vue, Svelte). You'l
 import JSRandomnessPredictor from "js-randomness-predictor/browser";
 ```
 
+**Prior to using a predictor, you need to call `await JSRandomnessPredictor.ready()` to ensure the initial setup was successful.**
+
 # CDN : using via &lt;script&gt; tag
 
 You can use `jsDelivr` (or any CDN that automatically serves files from GitHub)
@@ -33,6 +33,8 @@ For example, `jsDelivr` : `"https://cdn.jsdelivr.net/npm/js-randomness-predictor
 ```html
 <script src="https://cdn.jsdelivr.net/npm/js-randomness-predictor@latest/dist/umd/js-randomness-predictor.min.js"></script>
 ```
+
+**Prior to using a predictor, you need to call `await JSRandomnessPredictor.ready()` to ensure the initial setup was successful.**
 
 ---
 
@@ -64,3 +66,41 @@ Cross-Origin-Embedder-Policy: "require-corp"
 The specific type of service worker you need is called a **COOP/COEP service worker**. The role a **COOP/COEP service worker** is to add the `Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers on the "fly".
 
 [You can find the same service worker that we use for our GitHub pages demo(s) here, if you'd like to use it.](https://github.com/matthewoestreich/js-randomness-predictor/blob/main/.github/coi.serviceworker.js)
+
+# Internal Technical Info
+
+## Lifecycle
+
+```text
+ready() [browser/index.ts]
+  |
+  v
+loader() [browser/loader.ts]
+  |
+  +-- Fetch z3-built.js
+  +-- Fetch z3-built.wasm
+  +-- Configure Module
+  +-- Load script
+  +-- Expose initZ3
+  |
+  v
+Z3 environment ready
+  |
+  v
+Predictor initialization
+  |
+  v
+shim.init() [browser/shim.ts]
+  |
+  +-- Call initZ3(Module)
+  +-- Initialize WASM runtime
+  +-- Create Z3 API
+  |
+  v
+Ready to predict
+```
+
+- `ready()` and `loader()` prepare the Z3 environment by loading the required scripts and exposing the necessary globals.
+- `shim.init()` (exposed internally to each predictor engine as `z3.init()`) initializes the WASM runtime and creates the Z3 API. This is the actual Z3 initialization entry point for browser builds.
+
+---

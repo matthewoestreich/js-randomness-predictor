@@ -11,8 +11,8 @@ import {
 
 import type { BrowserRuntime, Predictor } from "../types.js";
 
-// Invoke immediately upon page load.
-loader();
+// IMPORTANT!! Must be called prior to using a predictor!
+const ready = () => loader();
 
 export type { BrowserRuntime, Predictor };
 
@@ -24,6 +24,7 @@ const bun = (sequence?: number[]): BunRandomnessPredictor => new BunRandomnessPr
 const deno = (sequence?: number[]): DenoRandomnessPredictor => new DenoRandomnessPredictor(sequence);
 
 export {
+  ready,
   FirefoxRandomnessPredictor,
   ChromeRandomnessPredictor,
   NodeRandomnessPredictor,
