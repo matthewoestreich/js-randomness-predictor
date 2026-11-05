@@ -1,7 +1,3 @@
-import * as z3 from "z3-solver-jsrp";
-import { SolvingStrategy, Pair } from "../../types.js";
-import { UnsatError } from "../../errors.js";
-
 /**
  *  BEFORE FEBRUARY 2025
  *    - In Node versions <= 11 the ToDouble method was different : https://github.com/nodejs/node/blob/v10.0.0/deps/v8/src/base/utils/random-number-generator.h#L114-L120
@@ -59,6 +55,10 @@ import { UnsatError } from "../../errors.js";
  *    ```
  *    - The PRNG algorithm/output transformation remains the same, but observed values now correspond to forward state progression.
  */
+
+import * as z3 from "z3-solver-jsrp";
+import { SolvingStrategy, Pair } from "../../types.js";
+import { UnsatError } from "../../errors.js";
 
 export default class V8Predictor {
   public sequence: number[];
