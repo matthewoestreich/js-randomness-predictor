@@ -91,6 +91,7 @@ jobs:
             "23.x" \
             "24.x" \
             "25.x" \
+            "26.x" \
             "node" \
             | jq -R . | jq -s -c .)
           echo "versions=$versions" >> "$GITHUB_OUTPUT"
